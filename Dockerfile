@@ -9,7 +9,7 @@ WORKDIR /code
 
 COPY --chown=node:node package.json yarn.lock ./
 
-RUN npm i -g @nestjs/cli
+RUN yarn global add @nestjs/cli
 RUN yarn install --frozen-lockfile
 
 COPY --chown=node:node . ./
