@@ -2,6 +2,7 @@ import {Module} from '@nestjs/common'
 import {ObjectionModule} from '@willsoto/nestjs-objection'
 import {AppController} from './app.controller'
 import {AppService} from './app.service'
+import {TasksModule} from './tasks/tasks.module'
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import {AppService} from './app.service'
           tableName: 'migrations'
         }
       }
-    })
+    }),
+    TasksModule
   ],
   controllers: [AppController],
   providers: [AppService]
