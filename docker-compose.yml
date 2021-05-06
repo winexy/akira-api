@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13-alpine
+    environment: 
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: project-akira
+    ports:
+      - 5432:5432
+  akira-api:
+    build: .
+    volumes: 
+      - .:/code
+    environment: 
+      PORT: 3000
+      PG_HOST: db
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_DB: project-akira
+    ports: 
+      - 3000:3000
+    depends_on: 
+      - db
+    links: 
+      - db
