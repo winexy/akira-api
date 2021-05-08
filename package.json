@@ -26,6 +26,7 @@
     "@nestjs/core": "^7.5.1",
     "@nestjs/platform-express": "^7.5.1",
     "@willsoto/nestjs-objection": "^5.0.0",
+    "firebase-admin": "^9.7.0",
     "knex": "^0.21.2",
     "objection": "^2.2.15",
     "pg": "^8.6.0",
