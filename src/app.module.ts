@@ -1,4 +1,5 @@
 import {Module} from '@nestjs/common'
+import {ConfigModule} from '@nestjs/config'
 import {ObjectionModule} from '@willsoto/nestjs-objection'
 import {AppController} from './app.controller'
 import {AppService} from './app.service'
@@ -6,6 +7,7 @@ import {TasksModule} from './tasks/tasks.module'
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     ObjectionModule.register({
       config: {
         client: 'pg',
