@@ -13,6 +13,8 @@ async function bootstrap() {
     credential: firebase.credential.cert(serviceAccount as ServiceAccount)
   })
 
+  app.enableCors()
+
   await app.listen(port)
 }
 
