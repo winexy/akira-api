@@ -31,7 +31,13 @@ export class TasksController {
   }
 
   @Get(':id')
-  findOne(@User() user: UserRecord, @Param('id') id: string) {
-    return this.taskService.findOne(id, user.uid)
+  async findOne(@User() user: UserRecord, @Param('id') id: string) {
+    const task = await this.taskService.findOne(id, user.uid)
+
+    if (task.isLeft()) {
+      throw task.value
+    }
+
+    return task.value
   }
 }

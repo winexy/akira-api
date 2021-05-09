@@ -1,6 +1,8 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {TaskModel, TaskT} from './task.model'
 import {CreateTaskDto} from './create-task.dto'
+import {Either, left, right} from '@sweet-monads/either'
+import {DBError} from 'db-errors'
 
 @Injectable()
 export class TasksRepo {
@@ -20,9 +22,22 @@ export class TasksRepo {
     })
   }
 
-  findOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
-    return this.taskModel.query().findOne('id', taskId).where({
-      author_uid: uid
-    })
+  async findOne(
+    taskId: TaskT['id'],
+    uid: UserRecord['uid']
+  ): Promise<Either<DBError, TaskT>> {
+    try {
+      const task = await this.taskModel
+        .query()
+        .findOne('id', taskId)
+        .where({
+          author_uid: uid
+        })
+        .throwIfNotFound()
+
+      return right(task)
+    } catch (error) {
+      return left(error)
+    }
   }
 }
