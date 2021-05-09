@@ -10,7 +10,9 @@ export class TasksRepo {
 
   create(taskDto: CreateTaskDto) {
     return this.taskModel.transaction(trx => {
-      return this.taskModel.query(trx).insert(taskDto)
+      return this.taskModel.query(trx).insert(taskDto).returning('*')
+    })
+  }
     })
   }
 }
