@@ -3,8 +3,6 @@ import {DBError} from 'db-errors'
 import {Response} from 'express'
 import {NotFoundError} from 'objection'
 
-type DBException = DBError | NotFoundError
-
 @Catch(DBError, NotFoundError)
 export class DbExceptionFilter implements ExceptionFilter {
   constructor(private readonly configService: AppConfigService) {}
