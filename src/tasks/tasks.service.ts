@@ -9,4 +9,8 @@ export class TasksService {
   create(taskDto: CreateTaskDto) {
     return this.tasksRepo.create(taskDto)
   }
+
+  findAllByUID(uid: UserRecord['uid']) {
+    return this.tasksRepo.findAllByUID(uid)
+  }
 }

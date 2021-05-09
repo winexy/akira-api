@@ -13,6 +13,10 @@ export class TasksRepo {
       return this.taskModel.query(trx).insert(taskDto).returning('*')
     })
   }
+
+  findAllByUID(uid: UserRecord['uid']) {
+    return this.taskModel.query().where({
+      author_uid: uid
     })
   }
 }
