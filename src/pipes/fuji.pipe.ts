@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, PipeTransform} from '@nestjs/common'
+import {HttpException, Injectable, PipeTransform} from '@nestjs/common'
 import {Fuji, runWith} from '@winexy/fuji'
 
 @Injectable()
@@ -9,7 +9,13 @@ export class FujiPipe<T> implements PipeTransform {
     const errors = runWith(this.schema, value)
 
     if (errors.length > 0) {
-      throw new BadRequestException('Validation Failed')
+      throw new HttpException(
+        {
+          type: 'validation-error',
+          errors
+        },
+        400
+      )
     }
     return value
   }
