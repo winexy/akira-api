@@ -8,6 +8,7 @@ module.exports = {
   },
   migrations: {
     table: 'migrations',
-    directory: './src/migrations'
+    directory: './src/migrations',
+    extension: 'ts'
   }
 }
