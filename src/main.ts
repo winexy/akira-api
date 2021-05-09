@@ -3,6 +3,7 @@ import {NestFactory} from '@nestjs/core'
 import firebase, {ServiceAccount} from 'firebase-admin'
 import {AppModule} from './app.module'
 import * as serviceAccount from '../firebase-service-account.json'
+import {DbExceptionFilter} from './filters/db-exception.filter'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -14,6 +15,7 @@ async function bootstrap() {
   })
 
   app.enableCors()
+  app.useGlobalFilters(new DbExceptionFilter(config))
 
   await app.listen(port)
 }
