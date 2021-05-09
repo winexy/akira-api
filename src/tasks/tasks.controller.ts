@@ -1,4 +1,12 @@
-import {Body, Controller, Get, HttpCode, Post, UseGuards} from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  UseGuards
+} from '@nestjs/common'
 import {TasksService} from './tasks.service'
 import {AuthGuard} from '../auth.guard'
 import {CreateTaskDto} from './create-task.dto'
@@ -20,5 +28,10 @@ export class TasksController {
   @Get()
   findAll(@User() user: UserRecord) {
     return this.taskService.findAllByUID(user.uid)
+  }
+
+  @Get(':id')
+  findOne(@User() user: UserRecord, @Param('id') id: string) {
+    return this.taskService.findOne(id, user.uid)
   }
 }

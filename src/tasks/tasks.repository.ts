@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TaskModel} from './task.model'
+import {TaskModel, TaskT} from './task.model'
 import {CreateTaskDto} from './create-task.dto'
 
 @Injectable()
@@ -16,6 +16,12 @@ export class TasksRepo {
 
   findAllByUID(uid: UserRecord['uid']) {
     return this.taskModel.query().where({
+      author_uid: uid
+    })
+  }
+
+  findOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
+    return this.taskModel.query().findOne('id', taskId).where({
       author_uid: uid
     })
   }

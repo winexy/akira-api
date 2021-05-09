@@ -1,6 +1,6 @@
 import {Model} from 'objection'
 
-type TaskT = {
+export type TaskT = {
   id: string
   author_uid: string
   title: string
