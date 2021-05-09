@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Post,
   UseGuards
 } from '@nestjs/common'
@@ -13,6 +14,7 @@ import {CreateTaskDto} from './create-task.dto'
 import {FujiPipe} from '../pipes/fuji.pipe'
 import {createTaskDtoSchema} from './schemas'
 import {User} from 'src/decorators/user.decorator'
+import {TaskT} from './task.model'
 
 @Controller('tasks')
 @UseGuards(AuthGuard)
@@ -31,8 +33,22 @@ export class TasksController {
   }
 
   @Get(':id')
-  async findOne(@User() user: UserRecord, @Param('id') id: string) {
+  async findOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
     const task = await this.taskService.findOne(id, user.uid)
+
+    if (task.isLeft()) {
+      throw task.value
+    }
+
+    return task.value
+  }
+
+  @Patch(':id/complete/toggle')
+  async toggleCompleted(
+    @User() user: UserRecord,
+    @Param('id') taskId: TaskT['id']
+  ) {
+    const task = await this.taskService.toggleCompleted(taskId, user.uid)
 
     if (task.isLeft()) {
       throw task.value

@@ -1,6 +1,4 @@
 import {Injectable} from '@nestjs/common'
-import {Either} from '@sweet-monads/either'
-import {DBError} from 'db-errors'
 import {TasksRepo} from './tasks.repository'
 import {CreateTaskDto} from './create-task.dto'
 import {TaskT} from './task.model'
@@ -17,10 +15,17 @@ export class TasksService {
     return this.tasksRepo.findAllByUID(uid)
   }
 
-  findOne(
-    taskId: TaskT['id'],
-    uid: UserRecord['uid']
-  ): Promise<Either<DBError, TaskT>> {
+  findOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
     return this.tasksRepo.findOne(taskId, uid)
+  }
+
+  async toggleCompleted(taskId: TaskT['id'], uid: UserRecord['uid']) {
+    const result = await this.findOne(taskId, uid)
+
+    return result.asyncChain(task =>
+      this.tasksRepo.update(taskId, uid, {
+        is_completed: !task.is_completed
+      })
+    )
   }
 }
