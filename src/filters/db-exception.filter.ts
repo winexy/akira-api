@@ -1,5 +1,6 @@
 import {ArgumentsHost, Catch, ExceptionFilter} from '@nestjs/common'
 import {DBError} from 'db-errors'
+import {Response} from 'express'
 import {NotFoundError} from 'objection'
 
 type DBException = DBError | NotFoundError
@@ -10,7 +11,7 @@ export class DbExceptionFilter implements ExceptionFilter {
 
   catch(exception: DBException, host: ArgumentsHost) {
     const ctx = host.switchToHttp()
-    const response = ctx.getResponse()
+    const response: Response = ctx.getResponse()
     const status = this.matchStatus(exception)
     const payload = this.getPayload(exception)
 
