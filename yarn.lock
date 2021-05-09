@@ -1349,6 +1349,11 @@
   resolved "https://registry.yarnpkg.com/@willsoto/nestjs-objection/-/nestjs-objection-5.0.0.tgz#5f37c7a5e846acf7e210869c78d392de16d71bc2"
   integrity sha512-zXQhrePk6etkAaq6am9tHAGKRtEdSYVlwfFYvtgjEXUddkAKogM0S8epR+1nyG0kjUGo1tMak9AfIBqozdeVGQ==
 
+"@winexy/fuji@^0.1.0-beta.7":
+  version "0.1.0-beta.7"
+  resolved "https://registry.yarnpkg.com/@winexy/fuji/-/fuji-0.1.0-beta.7.tgz#48bdbfac888519c17f4f58b0a7ea027dda590c77"
+  integrity sha512-S22RI5ZQ3ZJ/9kqxX/FJdD9BXrGdwItgsyGTPMGPGf5X+I1hQXwNygXiug63E2o9Va4r+Ol7T6AFoEvA83ev8Q==
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"
