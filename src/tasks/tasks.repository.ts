@@ -48,7 +48,7 @@ export class TasksRepo {
     try {
       const task = await this.taskModel
         .query()
-        .where({author_id: uid})
+        .where({author_uid: uid})
         .patchAndFetchById(id, patch)
         .throwIfNotFound()
 
