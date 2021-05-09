@@ -6,7 +6,7 @@ import * as serviceAccount from '../firebase-service-account.json'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
-  const config = app.get<ConfigService>(ConfigService)
+  const config = app.get<AppConfigService>(ConfigService)
   const port = config.get('PORT', 3000)
 
   firebase.initializeApp({
