@@ -1,12 +1,13 @@
 import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common'
 import firebase from 'firebase-admin'
-import {get, isString} from 'lodash'
+import {isString} from 'lodash'
+import {Request} from 'express'
 import {Maybe, just, none} from '@sweet-monads/maybe'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest()
+    const request: Request = context.switchToHttp().getRequest()
     const token = this.extractToken(request)
 
     if (token.isNone()) {
@@ -22,8 +23,8 @@ export class AuthGuard implements CanActivate {
     return true
   }
 
-  extractToken(request: unknown): Maybe<string> {
-    const header = get(request, 'headers.authorization')
+  extractToken(request: Request): Maybe<string> {
+    const header = request.header('authorization')
     const prefix = 'Bearer '
 
     if (isString(header) && header.startsWith(prefix)) {
