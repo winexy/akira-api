@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string('author_uid').notNullable()
     t.boolean('is_completed').notNullable().defaultTo(false)
     t.boolean('is_important').notNullable().defaultTo(false)
-    t.timestamps(true)
+    t.timestamps(true, true)
   })
 }
 
