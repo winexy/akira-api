@@ -2,6 +2,7 @@ import {ConfigService} from '@nestjs/config'
 
 declare global {
   export type AppConfig = {
+    NODE_ENV: 'development' | 'production'
     PORT: string
     POSTGRES_HOST: string
     POSTGRES_PASSWORD: string

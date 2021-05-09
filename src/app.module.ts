@@ -4,10 +4,13 @@ import {ObjectionModule} from '@willsoto/nestjs-objection'
 import {AppController} from './app.controller'
 import {AppService} from './app.service'
 import {TasksModule} from './tasks/tasks.module'
+import {validateEnv} from './env.validation'
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      validate: validateEnv
+    }),
     ObjectionModule.register({
       config: {
         client: 'pg',
