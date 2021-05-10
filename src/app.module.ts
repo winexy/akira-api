@@ -3,7 +3,7 @@ import {ConfigModule} from '@nestjs/config'
 import {ObjectionModule} from '@willsoto/nestjs-objection'
 import {AppController} from './app.controller'
 import {AppService} from './app.service'
-import {TasksModule} from './tasks/tasks.module'
+import {TasksModule} from './modules/tasks/tasks.module'
 import {validateEnv} from './env.validation'
 
 @Module({
