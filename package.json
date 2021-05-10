@@ -22,7 +22,10 @@
     "migrate:up": "knex migrate:up",
     "migrate:down": "knex migrate:down",
     "migrate:latest": "knex migrate:latest",
-    "migrate:rollback": "knex migrate:rollback"
+    "migrate:rollback": "knex migrate:rollback",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down",
+    "docker:sh": "docker-compose exec akira-api sh"
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
