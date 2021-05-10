@@ -2,6 +2,7 @@ import {Inject, Injectable} from '@nestjs/common'
 import {TaskModel, TaskT} from './task.model'
 import {CreateTaskDto} from './create-task.dto'
 import {left, right} from '@sweet-monads/either'
+import {DBError} from 'db-errors'
 
 @Injectable()
 export class TasksRepo {
@@ -53,6 +54,25 @@ export class TasksRepo {
         .throwIfNotFound()
 
       return right(task)
+    } catch (error) {
+      return left(error)
+    }
+  }
+
+  async deleteOne(
+    taskId: TaskT['id'],
+    uid: UserRecord['uid']
+  ): EitherP<DBException, boolean> {
+    try {
+      const count = await this.taskModel
+        .query()
+        .deleteById(taskId)
+        .where({
+          author_uid: uid
+        })
+        .throwIfNotFound()
+
+      return right(count !== 0)
     } catch (error) {
       return left(error)
     }

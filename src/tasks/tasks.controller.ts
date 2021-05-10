@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -55,5 +57,20 @@ export class TasksController {
     }
 
     return task.value
+  }
+
+  @Delete(':id')
+  async deleteOne(@User() user: UserRecord, @Param('id') taskId: TaskT['id']) {
+    const result = await this.taskService.deleteOne(taskId, user.uid)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    if (!result.value) {
+      throw new InternalServerErrorException('failed to delete task')
+    }
+
+    return result.value
   }
 }

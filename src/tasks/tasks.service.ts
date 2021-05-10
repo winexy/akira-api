@@ -28,4 +28,8 @@ export class TasksService {
       })
     )
   }
+
+  deleteOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
+    return this.tasksRepo.deleteOne(taskId, uid)
+  }
 }
