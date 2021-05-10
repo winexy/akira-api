@@ -29,6 +29,16 @@ export class TasksService {
     )
   }
 
+  async toggleImportant(taskId: TaskT['id'], uid: UserRecord['uid']) {
+    const result = await this.findOne(taskId, uid)
+
+    return result.asyncChain(task =>
+      this.tasksRepo.update(taskId, uid, {
+        is_important: !task.is_important
+      })
+    )
+  }
+
   deleteOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
     return this.tasksRepo.deleteOne(taskId, uid)
   }

@@ -59,6 +59,20 @@ export class TasksController {
     return task.value
   }
 
+  @Patch(':id/important/toggle')
+  async toggleImportant(
+    @User() user: UserRecord,
+    @Param('id') taskId: TaskT['id']
+  ) {
+    const task = await this.taskService.toggleImportant(taskId, user.uid)
+
+    if (task.isLeft()) {
+      throw task.value
+    }
+
+    return task.value
+  }
+
   @Delete(':id')
   async deleteOne(@User() user: UserRecord, @Param('id') taskId: TaskT['id']) {
     const result = await this.taskService.deleteOne(taskId, user.uid)
