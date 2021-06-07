@@ -42,4 +42,9 @@ export class TasksService {
   deleteOne(taskId: TaskIdT, uid: UID) {
     return this.tasksRepo.deleteOne(taskId, uid)
   }
+
+  async ensureAuthority(taskId: TaskIdT, uid: UID): EitherP<DBException, true> {
+    const res = await this.findOne(taskId, uid)
+    return res.map(() => true)
+  }
 }

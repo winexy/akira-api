@@ -1,5 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
+import {TaskIdT} from '../tasks/task.model'
 import {ChecklistModel} from './checklist.model'
 import {CreateTodoDto} from './create-todo.dto'
 
@@ -21,6 +22,21 @@ export class ChecklistRepo {
         .returning('*')
 
       return right(todo)
+    } catch (error) {
+      return left(error)
+    }
+  }
+
+  async findAllByTaskId(taskId: TaskIdT) {
+    try {
+      const result = await this.checklistModel
+        .query()
+        .where({
+          task_id: taskId
+        })
+        .limit(100)
+
+      return right(result)
     } catch (error) {
       return left(error)
     }
