@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+  db:
+    image: postgres:13-alpine
+    env_file:
+      - .env.postgres
+    ports:
+      - 5432:5432
+  akira-api:
+    build: ./Dockerfile.dev
+    volumes: 
+      - .:/code
+    env_file: 
+       - .env
+       - .env.postgres
+    environment: 
+      NODE_ENV: development
+    depends_on: 
+      - db
+    links: 
+      - db
+    ports:
+      - 8000:8000

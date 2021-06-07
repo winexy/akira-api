@@ -7,13 +7,21 @@ services:
     ports:
       - 5432:5432
   akira-api:
-    build: .
+    image: seitmagambet/akira-api
     volumes: 
       - .:/code
     env_file: 
        - .env
        - .env.postgres
+    environment: 
+      NODE_ENV: production
     depends_on: 
       - db
     links: 
       - db
+    ports:
+      - 8000:8000
+  watchtower:
+    image: containrrr/watchtower 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

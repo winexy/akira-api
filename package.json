@@ -23,7 +23,8 @@
     "migrate:down": "knex migrate:down",
     "migrate:latest": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
-    "docker:up": "docker-compose up",
+    "docker:up": "docker-compose -f docker-compose.dev.yml up",
+    "docker:up:prod": "docker-compose -f docker-compose.prod.yml up",
     "docker:down": "docker-compose down",
     "docker:sh": "docker-compose exec akira-api sh"
   },

@@ -1,0 +1,19 @@
+FROM node:12-alpine
+
+RUN mkdir /code
+RUN chown node /code
+
+USER node
+
+WORKDIR /code
+
+COPY --chown=node:node package.json yarn.lock ./
+
+RUN yarn global add @nestjs/cli
+RUN yarn install --frozen-lockfile
+
+COPY --chown=node:node . ./
+
+EXPOSE 8000
+
+CMD ["yarn", "start:dev"]
