@@ -18,6 +18,8 @@ async function bootstrap() {
   app.useGlobalFilters(new DbExceptionFilter(config))
 
   await app.listen(port)
+
+  global.console.log(`💫 Application Started on port ${port}`)
 }
 
 bootstrap()
