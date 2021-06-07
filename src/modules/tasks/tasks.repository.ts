@@ -2,7 +2,6 @@ import {Inject, Injectable} from '@nestjs/common'
 import {TaskModel, TaskT} from './task.model'
 import {CreateTaskDto} from './create-task.dto'
 import {left, right} from '@sweet-monads/either'
-import {DBError} from 'db-errors'
 
 @Injectable()
 export class TasksRepo {

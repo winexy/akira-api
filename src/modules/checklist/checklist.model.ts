@@ -3,7 +3,7 @@ import {Model} from 'objection'
 export type ChecklistT = {
   id: number
   title: string
-  task_id: number
+  task_id: string
   is_completed: boolean
 }
 
@@ -12,6 +12,6 @@ export class ChecklistModel extends Model implements ChecklistT {
 
   id: number
   title: string
-  task_id: number
+  task_id: string
   is_completed: boolean
 }

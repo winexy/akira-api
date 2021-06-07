@@ -17,6 +17,7 @@ export class FujiPipe<T> implements PipeTransform {
         400
       )
     }
+
     return value
   }
 }

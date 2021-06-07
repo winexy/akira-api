@@ -10,6 +10,7 @@ export type TaskT = {
   updated_at: string
 }
 
+export type TaskIdT = TaskT['id']
 export class TaskModel extends Model implements TaskT {
   id: string
   author_uid: string
