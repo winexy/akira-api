@@ -8,6 +8,7 @@ import {TasksService} from './tasks.service'
 @Module({
   imports: [ObjectionModule.forFeature([TaskModel])],
   providers: [TasksRepo, TasksService],
-  controllers: [TasksController]
+  controllers: [TasksController],
+  exports: [TasksService]
 })
 export class TasksModule {}
