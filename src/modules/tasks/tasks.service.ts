@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common'
 import {TasksRepo} from './tasks.repository'
 import {CreateTaskDto} from './create-task.dto'
-import {TaskT} from './task.model'
+import {TaskIdT} from './task.model'
 
 @Injectable()
 export class TasksService {
@@ -11,15 +11,15 @@ export class TasksService {
     return this.tasksRepo.create(taskDto)
   }
 
-  findAllByUID(uid: UserRecord['uid']) {
+  findAllByUID(uid: UID) {
     return this.tasksRepo.findAllByUID(uid)
   }
 
-  findOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
+  findOne(taskId: TaskIdT, uid: UID) {
     return this.tasksRepo.findOne(taskId, uid)
   }
 
-  async toggleCompleted(taskId: TaskT['id'], uid: UserRecord['uid']) {
+  async toggleCompleted(taskId: TaskIdT, uid: UID) {
     const result = await this.findOne(taskId, uid)
 
     return result.asyncChain(task =>
@@ -29,7 +29,7 @@ export class TasksService {
     )
   }
 
-  async toggleImportant(taskId: TaskT['id'], uid: UserRecord['uid']) {
+  async toggleImportant(taskId: TaskIdT, uid: UID) {
     const result = await this.findOne(taskId, uid)
 
     return result.asyncChain(task =>
@@ -39,7 +39,7 @@ export class TasksService {
     )
   }
 
-  deleteOne(taskId: TaskT['id'], uid: UserRecord['uid']) {
+  deleteOne(taskId: TaskIdT, uid: UID) {
     return this.tasksRepo.deleteOne(taskId, uid)
   }
 }
