@@ -1,5 +1,5 @@
 import {ArgumentsHost, Catch, ExceptionFilter, HttpStatus} from '@nestjs/common'
-import {DBError} from 'db-errors'
+import {DataError, DBError} from 'db-errors'
 import {Response} from 'express'
 import {NotFoundError} from 'objection'
 
@@ -17,11 +17,14 @@ export class DbExceptionFilter implements ExceptionFilter {
   }
 
   matchStatus(exception: DBException) {
-    if (exception instanceof NotFoundError) {
-      return HttpStatus.BAD_REQUEST
+    switch (true) {
+      case exception instanceof NotFoundError:
+        return HttpStatus.NOT_FOUND
+      case exception instanceof DataError:
+        return HttpStatus.BAD_REQUEST
+      default:
+        return HttpStatus.INTERNAL_SERVER_ERROR
     }
-
-    return HttpStatus.INTERNAL_SERVER_ERROR
   }
 
   getPayload(exception: DBException) {
