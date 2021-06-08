@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
 import {TaskIdT} from '../tasks/task.model'
-import {ChecklistModel} from './checklist.model'
+import {ChecklistModel, TodoIdT} from './checklist.model'
 import {CreateTodoDto} from './create-todo.dto'
 
 @Injectable()
@@ -22,6 +22,20 @@ export class ChecklistRepo {
         .returning('*')
 
       return right(todo)
+    } catch (error) {
+      return left(error)
+    }
+  }
+
+  async removeTodo(taskId: TaskIdT, todoId: TodoIdT) {
+    try {
+      const result = await this.checklistModel
+        .query()
+        .deleteById(todoId)
+        .where({task_id: taskId})
+        .throwIfNotFound()
+
+      return right(result)
     } catch (error) {
       return left(error)
     }

@@ -3,6 +3,7 @@ import {TaskIdT} from '../tasks/task.model'
 import {ChecklistRepo} from './checklist.repository'
 import {CreateTodoDto} from './create-todo.dto'
 import {TasksService} from '../tasks/tasks.service'
+import {TodoIdT} from './checklist.model'
 
 @Injectable()
 export class ChecklistService {
@@ -13,6 +14,14 @@ export class ChecklistService {
 
   addTodo(dto: CreateTodoDto) {
     return this.checklistRepo.addTodo(dto)
+  }
+
+  async removeTodo(uid: UID, taskId: TaskIdT, todoId: TodoIdT) {
+    const isAuthor = await this.tasksService.ensureAuthority(taskId, uid)
+
+    return isAuthor.asyncChain(() => {
+      return this.checklistRepo.removeTodo(taskId, todoId)
+    })
   }
 
   async findAllByTaskId(user: UserRecord, taskId: TaskIdT) {

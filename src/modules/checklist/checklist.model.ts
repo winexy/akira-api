@@ -1,13 +1,15 @@
 import {Model} from 'objection'
 
-export type ChecklistT = {
+export type TodoT = {
   id: number
   title: string
   task_id: string
   is_completed: boolean
 }
 
-export class ChecklistModel extends Model implements ChecklistT {
+export type TodoIdT = TodoT['id']
+
+export class ChecklistModel extends Model implements TodoT {
   static tableName = 'checklist'
 
   id: number
