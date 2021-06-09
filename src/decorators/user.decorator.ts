@@ -1,11 +1,11 @@
 import {createParamDecorator, ExecutionContext} from '@nestjs/common'
-import {get} from 'lodash'
+import {get, PropertyPath} from 'lodash'
 
 export const User = createParamDecorator(
-  (data: string, ctx: ExecutionContext) => {
+  (path: PropertyPath, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest()
     const user = request.user
 
-    return data ? get(user, data) : user
+    return path ? get(user, path) : user
   }
 )
