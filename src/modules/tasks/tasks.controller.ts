@@ -16,7 +16,7 @@ import {CreateTaskDto} from './create-task.dto'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {createTaskDtoSchema} from './schemas'
 import {User} from 'src/decorators/user.decorator'
-import {TaskT} from './task.model'
+import {TaskPatchT, TaskT, TaskIdT, taskPatchSchema} from './task.model'
 
 @Controller('tasks')
 @UseGuards(AuthGuard)
@@ -43,6 +43,21 @@ export class TasksController {
     }
 
     return task.value
+  }
+
+  @Patch(':id')
+  async patchTask(
+    @User('uid') uid: UID,
+    @Param('id') id: TaskIdT,
+    @Body(FujiPipe.with(taskPatchSchema)) patch: TaskPatchT
+  ) {
+    const result = await this.taskService.patchTask(uid, id, patch)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
   }
 
   @Patch(':id/complete/toggle')

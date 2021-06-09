@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common'
 import {TasksRepo} from './tasks.repository'
 import {CreateTaskDto} from './create-task.dto'
-import {TaskIdT} from './task.model'
+import {TaskIdT, TaskPatchT, TaskT} from './task.model'
 
 @Injectable()
 export class TasksService {
@@ -46,5 +46,13 @@ export class TasksService {
   async ensureAuthority(taskId: TaskIdT, uid: UID): EitherP<DBException, true> {
     const res = await this.findOne(taskId, uid)
     return res.map(() => true)
+  }
+
+  patchTask(
+    uid: UID,
+    taskId: TaskIdT,
+    patch: TaskPatchT
+  ): EitherP<DBException, TaskT> {
+    return this.tasksRepo.update(taskId, uid, patch)
   }
 }
