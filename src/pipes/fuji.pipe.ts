@@ -5,6 +5,10 @@ import {Fuji, runWith} from '@winexy/fuji'
 export class FujiPipe<T> implements PipeTransform {
   constructor(private readonly schema: Fuji<T>) {}
 
+  static with<T>(schema: Fuji<T>) {
+    return new FujiPipe(schema)
+  }
+
   transform(value: any) {
     const errors = runWith(this.schema, value)
 
