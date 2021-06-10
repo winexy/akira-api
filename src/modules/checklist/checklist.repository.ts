@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
 import {TaskIdT} from '../tasks/task.model'
-import {ChecklistModel, TodoIdT} from './checklist.model'
+import {ChecklistModel, TodoIdT, TodoPatchT, TodoT} from './checklist.model'
 import {CreateTodoDto} from './create-todo.dto'
 
 @Injectable()
@@ -41,7 +41,7 @@ export class ChecklistRepo {
     }
   }
 
-  async findAllByTaskId(taskId: TaskIdT) {
+  async findAllByTaskId(taskId: TaskIdT): EitherP<DBException, TodoT[]> {
     try {
       const result = await this.checklistModel
         .query()
@@ -49,6 +49,22 @@ export class ChecklistRepo {
           task_id: taskId
         })
         .limit(100)
+
+      return right(result)
+    } catch (error) {
+      return left(error)
+    }
+  }
+
+  async patchTodo(
+    todoId: TodoIdT,
+    patch: TodoPatchT
+  ): EitherP<DBException, TodoT> {
+    try {
+      const result = await this.checklistModel
+        .query()
+        .patchAndFetchById(todoId, patch)
+        .throwIfNotFound()
 
       return right(result)
     } catch (error) {

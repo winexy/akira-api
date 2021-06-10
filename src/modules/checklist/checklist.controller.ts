@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards
 } from '@nestjs/common'
@@ -14,7 +15,7 @@ import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
 import {TaskIdT} from '../tasks/task.model'
 import {AuthGuard} from '../../auth.guard'
-import {TodoIdT} from './checklist.model'
+import {TodoIdT, todoPatchSchema, TodoPatchT} from './checklist.model'
 
 @UseGuards(AuthGuard)
 @Controller('checklist')
@@ -56,6 +57,27 @@ export class ChecklistController {
       user.uid,
       taskId,
       todoId
+    )
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
+  }
+
+  @Patch(':taskId/:todoId')
+  async patchTodo(
+    @User('uid') uid: UID,
+    @Param('taskId') taskId: TaskIdT,
+    @Param('todoId', ParseIntPipe) todoId: TodoIdT,
+    @Body(FujiPipe.with(todoPatchSchema)) patch: TodoPatchT
+  ) {
+    const result = await this.checklistService.patchTodo(
+      uid,
+      taskId,
+      todoId,
+      patch
     )
 
     if (result.isLeft()) {
