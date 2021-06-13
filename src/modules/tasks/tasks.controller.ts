@@ -25,7 +25,10 @@ export class TasksController {
 
   @Post()
   @HttpCode(201)
-  create(@Body(new FujiPipe(createTaskDtoSchema)) taskDto: CreateTaskDto) {
+  create(
+    @Body(FujiPipe.of(createTaskDtoSchema))
+    taskDto: CreateTaskDto
+  ) {
     return this.taskService.create(taskDto)
   }
 
@@ -49,7 +52,7 @@ export class TasksController {
   async patchTask(
     @User('uid') uid: UID,
     @Param('id') id: TaskIdT,
-    @Body(FujiPipe.with(taskPatchSchema)) patch: TaskPatchT
+    @Body(FujiPipe.of(taskPatchSchema)) patch: TaskPatchT
   ) {
     const result = await this.taskService.patchTask(uid, id, patch)
 

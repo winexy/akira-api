@@ -23,7 +23,7 @@ export class ChecklistController {
   constructor(private readonly checklistService: ChecklistService) {}
 
   @Post()
-  async addTodo(@Body(new FujiPipe(createTodoDtoSchema)) body: CreateTodoDto) {
+  async addTodo(@Body(FujiPipe.of(createTodoDtoSchema)) body: CreateTodoDto) {
     const result = await this.checklistService.addTodo(body)
 
     if (result.isLeft()) {
@@ -71,7 +71,7 @@ export class ChecklistController {
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskIdT,
     @Param('todoId', ParseIntPipe) todoId: TodoIdT,
-    @Body(FujiPipe.with(todoPatchSchema)) patch: TodoPatchT
+    @Body(FujiPipe.of(todoPatchSchema)) patch: TodoPatchT
   ) {
     const result = await this.checklistService.patchTodo(
       uid,
