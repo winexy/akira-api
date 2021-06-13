@@ -1,4 +1,4 @@
-import {fuji, shape, string} from '@winexy/fuji'
+import {bool, fuji, shape, string} from '@winexy/fuji'
 import {Model} from 'objection'
 
 export type TaskT = {
@@ -31,10 +31,9 @@ export class TaskModel extends Model implements TaskT {
 
 export const taskPatchSchema = fuji(
   shape({
-    // TODO update FUJI
-    // title: fuji(string('titlte should be type of string')),
-    description: fuji(string('description should be type of string'))
-    // is_completed: fuji(bool('is_completed should be type of boolean')),
-    // is_important: fuji(bool('is_important should be type of boolean'))
+    title: fuji(string()),
+    description: fuji(string()),
+    is_completed: fuji(bool()),
+    is_important: fuji(bool())
   })
 )

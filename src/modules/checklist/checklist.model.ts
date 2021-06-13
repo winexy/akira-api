@@ -23,7 +23,7 @@ export class ChecklistModel extends Model implements TodoT {
 
 export const todoPatchSchema = fuji(
   shape({
-    // title: fuji(string('title should be type of string')),
-    is_completed: fuji(bool('is_completed should be type of bool'))
+    title: fuji(string()),
+    is_completed: fuji(bool())
   })
 )
