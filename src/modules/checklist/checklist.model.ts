@@ -1,4 +1,4 @@
-import {bool, fuji, shape, string} from '@winexy/fuji'
+import {bool, f, Infer, string} from '@winexy/fuji'
 import {Model} from 'objection'
 
 export type TodoT = {
@@ -9,9 +9,6 @@ export type TodoT = {
 }
 
 export type TodoIdT = TodoT['id']
-
-type NonPatchableProps = 'id' | 'task_id'
-export type TodoPatchT = Partial<Omit<TodoT, NonPatchableProps>>
 export class ChecklistModel extends Model implements TodoT {
   static tableName = 'checklist'
 
@@ -21,9 +18,9 @@ export class ChecklistModel extends Model implements TodoT {
   is_completed: boolean
 }
 
-export const todoPatchSchema = fuji(
-  shape({
-    title: fuji(string()),
-    is_completed: fuji(bool())
-  })
-)
+export const todoPatchSchema = f.shape({
+  title: f(string()),
+  is_completed: f(bool())
+})
+
+export type TodoPatchT = Infer<typeof todoPatchSchema>

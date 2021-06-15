@@ -1,14 +1,10 @@
-import {fuji, shape, required, string} from '@winexy/fuji'
-import {TaskIdT} from '../tasks/task.model'
+import {f, Infer, required, shape, string} from '@winexy/fuji'
 
-export type CreateTodoDto = {
-  taskId: TaskIdT
-  title: string
-}
-
-export const createTodoDtoSchema = fuji(
+export const createTodoDtoSchema = f(
   shape({
-    taskId: fuji(required(), string()),
-    title: fuji(required(), string())
+    taskId: f(string(), required()),
+    title: f(string(), required())
   })
 )
+
+export type CreateTodoDto = Infer<typeof createTodoDtoSchema>

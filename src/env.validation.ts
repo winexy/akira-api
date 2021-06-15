@@ -1,23 +1,38 @@
-import {fuji, oneOf, required, runWith, shape} from '@winexy/fuji'
+import {f, map as fmap, Infer, oneOf, required, run, string} from '@winexy/fuji'
+import {OneOfType} from '@winexy/fuji/dist/rules/one-of'
+import {RequiredType} from '@winexy/fuji/dist/rules/required'
+import {map} from 'lodash'
 
-const envTypes = ['development', 'production']
+const envTypes = ['development', 'production'] as const
 
-const schema = fuji(
-  shape({
-    NODE_ENV: fuji(required(), oneOf(envTypes)),
-    PORT: fuji(required()),
-    POSTGRES_HOST: fuji(required()),
-    POSTGRES_PASSWORD: fuji(required()),
-    POSTGRES_USER: fuji(required()),
-    POSTGRES_DB: fuji(required())
-  })
-)
+type EnvTypes = Mutable<typeof envTypes>[number]
+
+const schema = f.shape({
+  NODE_ENV: f<RequiredType | OneOfType, EnvTypes>(
+    required(),
+    oneOf(envTypes as Mutable<typeof envTypes>)
+  ),
+  PORT: f(
+    string(),
+    required(),
+    fmap(s => parseInt(s))
+  ),
+  POSTGRES_HOST: f(string(), required()),
+  POSTGRES_PASSWORD: f(string(), required()),
+  POSTGRES_USER: f(string(), required()),
+  POSTGRES_DB: f(string(), required())
+})
+
+export type AppConfig = Infer<typeof schema>
 
 export function validateEnv(config: Record<string, string>) {
-  const errors = runWith(schema, config)
+  const result = run(schema, config, {
+    valueName: 'env schema',
+    allowUnknown: true
+  })
 
-  if (errors.length > 0) {
-    throw new Error(errors.map(error => error.message).join('\n'))
+  if (result.invalid) {
+    throw new Error(map(result.errors, 'message').join('\n'))
   }
 
   return config

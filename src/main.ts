@@ -4,11 +4,12 @@ import firebase, {ServiceAccount} from 'firebase-admin'
 import {AppModule} from './app.module'
 import * as serviceAccount from '../firebase-service-account.json'
 import {DbExceptionFilter} from './filters/db-exception.filter'
+import {AppConfig} from './env.validation'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const config = app.get<AppConfigService>(ConfigService)
-  const port = config.get('PORT', 3000)
+  const port = config.get<AppConfig['PORT']>('PORT', 3000)
 
   firebase.initializeApp({
     credential: firebase.credential.cert(serviceAccount as ServiceAccount)

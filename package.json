@@ -36,7 +36,7 @@
     "@sweet-monads/either": "^2.3.0",
     "@sweet-monads/maybe": "^2.3.0",
     "@willsoto/nestjs-objection": "^5.0.0",
-    "@winexy/fuji": "0.1.0-beta.9",
+    "@winexy/fuji": "0.1.0-beta.16",
     "db-errors": "^0.2.3",
     "firebase-admin": "^9.7.0",
     "knex": "^0.21.2",
@@ -68,7 +68,7 @@
     "ts-loader": "^8.0.8",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.0.5"
+    "typescript": "^4.3.2"
   },
   "jest": {
     "moduleFileExtensions": [

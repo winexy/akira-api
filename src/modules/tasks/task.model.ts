@@ -1,4 +1,4 @@
-import {bool, fuji, shape, string} from '@winexy/fuji'
+import {bool, f, Infer, string} from '@winexy/fuji'
 import {Model} from 'objection'
 
 export type TaskT = {
@@ -11,9 +11,6 @@ export type TaskT = {
   created_at: string
   updated_at: string
 }
-
-type NonPatchableProps = 'id' | 'author_uid' | 'created_at' | 'updated_at'
-export type TaskPatchT = Partial<Omit<TaskT, NonPatchableProps>>
 
 export type TaskIdT = TaskT['id']
 export class TaskModel extends Model implements TaskT {
@@ -29,11 +26,11 @@ export class TaskModel extends Model implements TaskT {
   static tableName = 'tasks'
 }
 
-export const taskPatchSchema = fuji(
-  shape({
-    title: fuji(string()),
-    description: fuji(string()),
-    is_completed: fuji(bool()),
-    is_important: fuji(bool())
-  })
-)
+export const taskPatchSchema = f.shape({
+  title: f(string()),
+  description: f(string()),
+  is_completed: f(bool()),
+  is_important: f(bool())
+})
+
+export type TaskPatchT = Infer<typeof taskPatchSchema>

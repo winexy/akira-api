@@ -1,14 +1,6 @@
 import {ConfigService} from '@nestjs/config'
+import {AppConfig} from 'src/env.validation'
 
 declare global {
-  export type AppConfig = {
-    NODE_ENV: 'development' | 'production'
-    PORT: string
-    POSTGRES_HOST: string
-    POSTGRES_PASSWORD: string
-    POSTGRES_USER: string
-    POSTGRES_DB: string
-  }
-
   export type AppConfigService = ConfigService<AppConfig>
 }

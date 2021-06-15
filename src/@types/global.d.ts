@@ -5,4 +5,8 @@ import {NotFoundError} from 'objection'
 declare global {
   type EitherP<L, R> = Promise<Either<L, R>>
   type DBException = DBError | NotFoundError
+
+  type Mutable<T> = {
+    -readonly [P in keyof T]: T[P]
+  }
 }

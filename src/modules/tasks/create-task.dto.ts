@@ -1,12 +1,8 @@
-import {fuji, required, shape, string} from '@winexy/fuji'
-export interface CreateTaskDto {
-  title: string
-  author_uid: string
-}
+import {f, Infer, required, string} from '@winexy/fuji'
 
-export const createTaskDtoSchema = fuji(
-  shape({
-    title: fuji(string(), required()),
-    author_uid: fuji(string(), required())
-  })
-)
+export const createTaskDtoSchema = f.shape({
+  title: f(string(), required()),
+  author_uid: f(string(), required())
+})
+
+export type CreateTaskDto = Infer<typeof createTaskDtoSchema>

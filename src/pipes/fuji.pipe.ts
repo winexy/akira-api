@@ -1,25 +1,28 @@
 import {HttpException, Injectable, PipeTransform} from '@nestjs/common'
-import {Fuji, FujiConfig, runWith} from '@winexy/fuji'
+import {Fuji, FujiConfig, RuleType, run} from '@winexy/fuji'
 
 @Injectable()
-export class FujiPipe<T> implements PipeTransform {
+export class FujiPipe<Types extends RuleType, T> implements PipeTransform {
   constructor(
-    private readonly schema: Fuji<T>,
+    private readonly schema: Fuji<Types, T>,
     private readonly config?: Partial<FujiConfig>
   ) {}
 
-  static of<T>(schema: Fuji<T>, config?: Partial<FujiConfig>) {
+  static of<Types extends RuleType, T>(
+    schema: Fuji<Types, T>,
+    config?: Partial<FujiConfig>
+  ) {
     return new FujiPipe(schema, config)
   }
 
   transform(value: any) {
-    const errors = runWith(this.schema, value, this.config)
+    const result = run(this.schema, value, this.config)
 
-    if (errors.length > 0) {
+    if (result.invalid) {
       throw new HttpException(
         {
           type: 'validation-error',
-          errors
+          errors: result.errors
         },
         400
       )
