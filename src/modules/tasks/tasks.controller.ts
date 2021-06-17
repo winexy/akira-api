@@ -37,6 +37,11 @@ export class TasksController {
     return this.taskService.findAllByUID(user.uid)
   }
 
+  @Get('today')
+  findTodayTasks(@User('uid') uid: UID) {
+    return this.taskService.findTodayTasksByUID(uid)
+  }
+
   @Get(':id')
   async findOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
     const task = await this.taskService.findOne(id, user.uid)

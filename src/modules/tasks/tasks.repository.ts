@@ -15,10 +15,20 @@ export class TasksRepo {
     })
   }
 
-  findAllByUID(uid: UserRecord['uid']) {
+  findAllByUID(uid: UID) {
     return this.taskModel.query().where({
       author_uid: uid
     })
+  }
+
+  findTodayTasksByUID(uid: UID) {
+    return this.taskModel
+      .query()
+      .where({author_uid: uid})
+      .whereBetween('created_at', [
+        this.taskModel.raw('CURRENT_DATE - 1'),
+        this.taskModel.raw('CURRENT_DATE + 1')
+      ])
   }
 
   async findOne(
