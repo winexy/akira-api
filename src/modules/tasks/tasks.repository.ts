@@ -1,6 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TaskModel, TaskT} from './task.model'
-import {CreateTaskDto} from './create-task.dto'
+import {TaskModel, TaskT, CreateTaskDto} from './task.model'
 import {left, right} from '@sweet-monads/either'
 
 @Injectable()

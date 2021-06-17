@@ -12,11 +12,16 @@ import {
 } from '@nestjs/common'
 import {TasksService} from './tasks.service'
 import {AuthGuard} from '../../auth.guard'
-import {CreateTaskDto} from './create-task.dto'
 import {FujiPipe} from '../../pipes/fuji.pipe'
-import {createTaskDtoSchema} from './schemas'
 import {User} from 'src/decorators/user.decorator'
-import {TaskPatchT, TaskT, TaskIdT, taskPatchSchema} from './task.model'
+import {
+  TaskPatchT,
+  TaskT,
+  TaskIdT,
+  taskPatchSchema,
+  CreateTaskDto,
+  createTaskDtoSchema
+} from './task.model'
 
 @Controller('tasks')
 @UseGuards(AuthGuard)

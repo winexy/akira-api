@@ -1,4 +1,12 @@
-import {bool, f, Infer, string} from '@winexy/fuji'
+import {
+  bool,
+  f,
+  Infer,
+  maxLength,
+  required,
+  string,
+  excludeRules
+} from '@winexy/fuji'
 import {Model} from 'objection'
 
 export type TaskT = {
@@ -26,8 +34,17 @@ export class TaskModel extends Model implements TaskT {
   static tableName = 'tasks'
 }
 
+const titleSchema = f(string(), required(), maxLength(255))
+
+export const createTaskDtoSchema = f.shape({
+  title: titleSchema,
+  author_uid: f(string(), required())
+})
+
+export type CreateTaskDto = Infer<typeof createTaskDtoSchema>
+
 export const taskPatchSchema = f.shape({
-  title: f(string()),
+  title: excludeRules(titleSchema, ['required']),
   description: f(string()),
   is_completed: f(bool()),
   is_important: f(bool())

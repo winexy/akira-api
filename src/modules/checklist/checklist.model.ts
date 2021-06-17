@@ -1,4 +1,12 @@
-import {bool, f, Infer, string} from '@winexy/fuji'
+import {
+  bool,
+  excludeRules,
+  f,
+  Infer,
+  maxLength,
+  required,
+  string
+} from '@winexy/fuji'
 import {Model} from 'objection'
 
 export type TodoT = {
@@ -18,8 +26,17 @@ export class ChecklistModel extends Model implements TodoT {
   is_completed: boolean
 }
 
+const titleSchema = f(string(), maxLength(255), required())
+
+export const createTodoDtoSchema = f.shape({
+  taskId: f(string(), required()),
+  title: titleSchema
+})
+
+export type CreateTodoDto = Infer<typeof createTodoDtoSchema>
+
 export const todoPatchSchema = f.shape({
-  title: f(string()),
+  title: excludeRules(titleSchema, ['required']),
   is_completed: f(bool())
 })
 

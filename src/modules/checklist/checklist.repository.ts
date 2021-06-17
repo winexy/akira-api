@@ -1,8 +1,13 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
 import {TaskIdT} from '../tasks/task.model'
-import {ChecklistModel, TodoIdT, TodoPatchT, TodoT} from './checklist.model'
-import {CreateTodoDto} from './create-todo.dto'
+import {
+  ChecklistModel,
+  CreateTodoDto,
+  TodoIdT,
+  TodoPatchT,
+  TodoT
+} from './checklist.model'
 
 @Injectable()
 export class ChecklistRepo {

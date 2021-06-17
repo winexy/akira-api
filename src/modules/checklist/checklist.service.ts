@@ -1,9 +1,8 @@
 import {Injectable} from '@nestjs/common'
 import {TaskIdT} from '../tasks/task.model'
 import {ChecklistRepo} from './checklist.repository'
-import {CreateTodoDto} from './create-todo.dto'
 import {TasksService} from '../tasks/tasks.service'
-import {TodoIdT, TodoPatchT} from './checklist.model'
+import {CreateTodoDto, TodoIdT, TodoPatchT} from './checklist.model'
 
 @Injectable()
 export class ChecklistService {

@@ -10,12 +10,17 @@ import {
   UseGuards
 } from '@nestjs/common'
 import {ChecklistService} from './checklist.service'
-import {CreateTodoDto, createTodoDtoSchema} from './create-todo.dto'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
 import {TaskIdT} from '../tasks/task.model'
 import {AuthGuard} from '../../auth.guard'
-import {TodoIdT, todoPatchSchema, TodoPatchT} from './checklist.model'
+import {
+  CreateTodoDto,
+  createTodoDtoSchema,
+  TodoIdT,
+  todoPatchSchema,
+  TodoPatchT
+} from './checklist.model'
 
 @UseGuards(AuthGuard)
 @Controller('checklist')
