@@ -1,6 +1,12 @@
 import {Injectable} from '@nestjs/common'
 import {TasksRepo} from './tasks.repository'
-import {TaskIdT, TaskPatchT, TaskT, CreateTaskDto} from './task.model'
+import {
+  TaskIdT,
+  TaskPatchT,
+  TaskT,
+  CreateTaskDto,
+  TasksQueryFiltersT
+} from './task.model'
 
 @Injectable()
 export class TasksService {
@@ -10,8 +16,8 @@ export class TasksService {
     return this.tasksRepo.create(taskDto)
   }
 
-  findAllByUID(uid: UID) {
-    return this.tasksRepo.findAllByUID(uid)
+  findAllByUID(uid: UID, query: TasksQueryFiltersT) {
+    return this.tasksRepo.findAllByUID(uid, query)
   }
 
   findTodayTasksByUID(uid: UID) {

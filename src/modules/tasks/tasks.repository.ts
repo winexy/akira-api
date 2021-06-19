@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TaskModel, TaskT, CreateTaskDto} from './task.model'
+import {TaskModel, TaskT, CreateTaskDto, TasksQueryFiltersT} from './task.model'
 import {left, right} from '@sweet-monads/either'
 
 @Injectable()
@@ -14,9 +14,10 @@ export class TasksRepo {
     })
   }
 
-  findAllByUID(uid: UID) {
+  findAllByUID(uid: UID, query: TasksQueryFiltersT) {
     return this.taskModel.query().where({
-      author_uid: uid
+      author_uid: uid,
+      ...query
     })
   }
 

@@ -8,12 +8,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards
 } from '@nestjs/common'
 import {TasksService} from './tasks.service'
 import {AuthGuard} from '../../auth.guard'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
+import {TasksQueryFiltersT, tasksQueryFiltersSchema} from './task.model'
 import {
   TaskPatchT,
   TaskT,
@@ -38,8 +40,11 @@ export class TasksController {
   }
 
   @Get()
-  findAll(@User() user: UserRecord) {
-    return this.taskService.findAllByUID(user.uid)
+  findAll(
+    @User() user: UserRecord,
+    @Query(FujiPipe.of(tasksQueryFiltersSchema)) query: TasksQueryFiltersT
+  ) {
+    return this.taskService.findAllByUID(user.uid, query)
   }
 
   @Get('today')
