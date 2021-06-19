@@ -28,6 +28,6 @@ export class FujiPipe<Types extends RuleType, T> implements PipeTransform {
       )
     }
 
-    return value
+    return result.value
   }
 }
