@@ -59,11 +59,12 @@ const toBoolOrUndef = fmap((x: string) => {
   return isUndefined(x) ? undefined : x === '1'
 })
 
-const isNumericBool = oneOf(['1', '0'])
+const numericBoolSchema = f(string(), oneOf(['1', '0']), toBoolOrUndef)
 
 export const tasksQueryFiltersSchema = f.shape({
-  is_completed: f(string(), isNumericBool, toBoolOrUndef),
-  is_important: f(string(), isNumericBool, toBoolOrUndef)
+  is_completed: numericBoolSchema,
+  is_important: numericBoolSchema,
+  is_today: numericBoolSchema
 })
 
 export type TasksQueryFiltersT = Infer<typeof tasksQueryFiltersSchema>

@@ -14,11 +14,20 @@ export class TasksRepo {
     })
   }
 
-  findAllByUID(uid: UID, query: TasksQueryFiltersT) {
-    return this.taskModel.query().where({
+  findAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
+    const query = this.taskModel.query().where({
       author_uid: uid,
-      ...query
+      ...params
     })
+
+    if (is_today) {
+      query.andWhereBetween('created_at', [
+        this.taskModel.raw('CURRENT_DATE'),
+        this.taskModel.raw('CURRENT_DATE + 1')
+      ])
+    }
+
+    return query
   }
 
   findTodayTasksByUID(uid: UID) {
