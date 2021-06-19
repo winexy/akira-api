@@ -1,4 +1,4 @@
-import {f, map as fmap, Infer, oneOf, required, run, string} from '@winexy/fuji'
+import {f, fmap, Infer, oneOf, required, run, string} from '@winexy/fuji'
 import {OneOfType} from '@winexy/fuji/dist/rules/one-of'
 import {RequiredType} from '@winexy/fuji/dist/rules/required'
 import {map} from 'lodash'
