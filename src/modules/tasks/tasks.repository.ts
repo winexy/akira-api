@@ -25,7 +25,7 @@ export class TasksRepo {
       .query()
       .where({author_uid: uid})
       .whereBetween('created_at', [
-        this.taskModel.raw('CURRENT_DATE - 1'),
+        this.taskModel.raw('CURRENT_DATE'),
         this.taskModel.raw('CURRENT_DATE + 1')
       ])
   }
