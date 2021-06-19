@@ -1,12 +1,15 @@
 import {
   bool,
   f,
+  fmap,
   Infer,
   maxLength,
   required,
   string,
-  excludeRules
+  excludeRules,
+  oneOf
 } from '@winexy/fuji'
+import {isUndefined} from 'lodash'
 import {Model} from 'objection'
 
 export type TaskT = {
@@ -51,3 +54,16 @@ export const taskPatchSchema = f.shape({
 })
 
 export type TaskPatchT = Infer<typeof taskPatchSchema>
+
+const toBoolOrUndef = fmap((x: string) => {
+  return isUndefined(x) ? undefined : x === '1'
+})
+
+const isNumericBool = oneOf(['1', '0'])
+
+export const tasksQueryFiltersSchema = f.shape({
+  is_completed: f(string(), isNumericBool, toBoolOrUndef),
+  is_important: f(string(), isNumericBool, toBoolOrUndef)
+})
+
+export type TasksQueryFiltersT = Infer<typeof tasksQueryFiltersSchema>
