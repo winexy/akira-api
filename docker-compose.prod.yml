@@ -8,8 +8,6 @@ services:
       - 5432:5432
   akira-api:
     image: seitmagambet/akira-api
-    volumes: 
-      - .:/code
     env_file: 
        - .env
        - .env.postgres
