@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TaskListModel} from './task-list.model'
+import {CreateTaskListDto, TaskListModel} from './task-list.model'
 
 @Injectable()
 export class TaskListRepo {
@@ -7,4 +7,11 @@ export class TaskListRepo {
     @Inject(TaskListModel)
     private readonly taskListModel: typeof TaskListModel
   ) {}
+
+  createTaskList(uid: UID, dto: CreateTaskListDto) {
+    return this.taskListModel.query().insert({
+      ...dto,
+      author_uid: uid
+    })
+  }
 }
