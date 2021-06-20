@@ -21,7 +21,3 @@ services:
       - db
     ports:
       - 8000:8000
-  watchtower:
-    image: containrrr/watchtower 
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
