@@ -1349,10 +1349,10 @@
   resolved "https://registry.yarnpkg.com/@willsoto/nestjs-objection/-/nestjs-objection-5.0.0.tgz#5f37c7a5e846acf7e210869c78d392de16d71bc2"
   integrity sha512-zXQhrePk6etkAaq6am9tHAGKRtEdSYVlwfFYvtgjEXUddkAKogM0S8epR+1nyG0kjUGo1tMak9AfIBqozdeVGQ==
 
-"@winexy/fuji@^0.1.0-beta.7":
-  version "0.1.0-beta.7"
-  resolved "https://registry.yarnpkg.com/@winexy/fuji/-/fuji-0.1.0-beta.7.tgz#48bdbfac888519c17f4f58b0a7ea027dda590c77"
-  integrity sha512-S22RI5ZQ3ZJ/9kqxX/FJdD9BXrGdwItgsyGTPMGPGf5X+I1hQXwNygXiug63E2o9Va4r+Ol7T6AFoEvA83ev8Q==
+"@winexy/fuji@0.1.0-beta.20":
+  version "0.1.0-beta.20"
+  resolved "https://registry.yarnpkg.com/@winexy/fuji/-/fuji-0.1.0-beta.20.tgz#181469fac88d7d6abc7b7e594a68e970d2ea4b8d"
+  integrity sha512-FVWuWNNUTDz61Y3ydjOMMkYOZyxF2zCAPm/ldDaG+U622PO5EcBmOQd8ddSPSBbldil6xLgrCdphWbfqB3541A==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
@@ -6743,10 +6743,10 @@ typescript@4.2.3:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.3.tgz#39062d8019912d43726298f09493d598048c1ce3"
   integrity sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==
 
-typescript@^4.0.5:
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
-  integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
+typescript@^4.3.2:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.4.tgz#3f85b986945bcf31071decdd96cf8bfa65f9dcbc"
+  integrity sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==
 
 unc-path-regex@^0.1.2:
   version "0.1.2"
