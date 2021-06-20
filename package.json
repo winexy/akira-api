@@ -26,7 +26,8 @@
     "docker:up": "docker-compose -f docker-compose.dev.yml up",
     "docker:up:prod": "docker-compose -f docker-compose.prod.yml up",
     "docker:down": "docker-compose down",
-    "docker:sh": "docker-compose -f docker-compose.dev.yml exec akira-api sh"
+    "docker:sh": "docker-compose -f docker-compose.dev.yml exec akira-api sh",
+    "docker-compose:prod": "docker-compose -f docker-compose.prod.yml"
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
