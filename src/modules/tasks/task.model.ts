@@ -21,6 +21,7 @@ export type TaskT = {
   is_important: boolean
   created_at: string
   updated_at: string
+  list_id: number | null
 }
 
 export type TaskIdT = TaskT['id']
@@ -33,6 +34,7 @@ export class TaskModel extends Model implements TaskT {
   is_important: boolean
   created_at: string
   updated_at: string
+  list_id: number | null
 
   static tableName = 'tasks'
 }
