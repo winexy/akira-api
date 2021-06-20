@@ -50,7 +50,10 @@ export type CreateTaskDto = Infer<typeof createTaskDtoSchema>
 
 export const taskPatchSchema = f.shape({
   title: excludeRules(titleSchema, ['required']),
-  description: f(string()),
+  description: f(
+    string(),
+    fmap(s => s?.trim())
+  ),
   is_completed: f(bool()),
   is_important: f(bool())
 })
