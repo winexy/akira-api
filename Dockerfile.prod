@@ -14,8 +14,6 @@ RUN yarn install --frozen-lockfile
 
 COPY --chown=node:node . ./
 
-RUN ls -la
-
 RUN yarn build
 
 EXPOSE 3000

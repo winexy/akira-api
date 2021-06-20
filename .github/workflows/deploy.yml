@@ -15,8 +15,6 @@ jobs:
           cat <<EOF > firebase-service-account.json
           ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           EOF
-      - run: ls -la
-      - run: cat firebase-service-account.json
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
