@@ -5,10 +5,11 @@ import {TaskModel} from './task.model'
 import {TasksRepo} from './tasks.repository'
 import {TasksService} from './tasks.service'
 import {TasksTagsModel} from './task-tags.model'
+import {TasksTagsRepo} from './task-tags.repository'
 
 @Module({
   imports: [ObjectionModule.forFeature([TaskModel, TasksTagsModel])],
-  providers: [TasksRepo, TasksService],
+  providers: [TasksRepo, TasksService, TasksTagsRepo],
   controllers: [TasksController],
   exports: [TasksService]
 })

@@ -4,7 +4,7 @@ import {Tag} from '../tags/tag.model'
 import {TaskT} from './task.model'
 
 @Injectable()
-export class TasksTagsRepository {
+export class TasksTagsRepo {
   constructor(
     @Inject(TasksTagsModel)
     private readonly taskTagsModel: typeof TasksTagsModel
