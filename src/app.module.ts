@@ -10,6 +10,7 @@ import {TasksModule} from './modules/tasks/tasks.module'
 import {ChecklistModule} from './modules/checklist/checklist.module'
 import {validateEnv} from './env.validation'
 import {TaskListsModule} from './modules/task-lists/task-lists.module'
+import {TagsModule} from './modules/tags/tags.module'
 
 const objectionOptions: ObjectionModuleOptions = {
   config: {
@@ -35,7 +36,8 @@ const objectionOptions: ObjectionModuleOptions = {
     ObjectionModule.register(objectionOptions),
     TasksModule,
     ChecklistModule,
-    TaskListsModule
+    TaskListsModule,
+    TagsModule
   ],
   controllers: [AppController],
   providers: [AppService]
