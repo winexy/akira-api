@@ -9,7 +9,7 @@ import {
 } from '@winexy/fuji'
 import {Model} from 'objection'
 
-type Tag = {
+export type Tag = {
   id: number
   uid: string
   title: string

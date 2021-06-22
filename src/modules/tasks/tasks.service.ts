@@ -7,10 +7,16 @@ import {
   CreateTaskDto,
   TasksQueryFiltersT
 } from './task.model'
+import {Tag} from '../tags/tag.model'
+import {TasksTagsRepository} from './task-tags.repository'
+import {TaskTag} from './task-tags.model'
 
 @Injectable()
 export class TasksService {
-  constructor(private readonly tasksRepo: TasksRepo) {}
+  constructor(
+    private readonly tasksRepo: TasksRepo,
+    private readonly taskTagsRepo: TasksTagsRepository
+  ) {}
 
   create(taskDto: CreateTaskDto) {
     return this.tasksRepo.create(taskDto)
@@ -63,5 +69,17 @@ export class TasksService {
     patch: TaskPatchT
   ): EitherP<DBException, TaskT> {
     return this.tasksRepo.update(taskId, uid, patch)
+  }
+
+  async createTag(
+    uid: UID,
+    taskId: TaskIdT,
+    tagId: Tag['id']
+  ): EitherP<DBException, TaskTag> {
+    const isAuthor = await this.ensureAuthority(taskId, uid)
+
+    return isAuthor.asyncMap(() => {
+      return this.taskTagsRepo.createTaskTag(taskId, tagId)
+    })
   }
 }

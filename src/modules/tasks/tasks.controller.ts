@@ -6,6 +6,7 @@ import {
   HttpCode,
   InternalServerErrorException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -16,6 +17,7 @@ import {AuthGuard} from '../../auth.guard'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
 import {TasksQueryFiltersT, tasksQueryFiltersSchema} from './task.model'
+import {Tag} from '../tags/tag.model'
 import {
   TaskPatchT,
   TaskT,
@@ -116,6 +118,21 @@ export class TasksController {
 
     if (!result.value) {
       throw new InternalServerErrorException('failed to delete task')
+    }
+
+    return result.value
+  }
+
+  @Post(':taskId/tag/:tagId')
+  async createTaskTag(
+    @User('uid') uid: UID,
+    @Param('taskId') taskId: TaskIdT,
+    @Param('tagId', ParseIntPipe) tagId: Tag['id']
+  ) {
+    const result = await this.taskService.createTag(uid, taskId, tagId)
+
+    if (result.isLeft) {
+      throw result.value
     }
 
     return result.value
