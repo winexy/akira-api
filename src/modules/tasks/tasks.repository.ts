@@ -15,10 +15,13 @@ export class TasksRepo {
   }
 
   findAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
-    const query = this.taskModel.query().where({
-      author_uid: uid,
-      ...params
-    })
+    const query = this.taskModel
+      .query()
+      .where({
+        author_uid: uid,
+        ...params
+      })
+      .withGraphFetched('checklist')
 
     if (is_today) {
       query.andWhereBetween('created_at', [

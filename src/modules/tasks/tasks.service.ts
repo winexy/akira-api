@@ -8,14 +8,14 @@ import {
   TasksQueryFiltersT
 } from './task.model'
 import {Tag} from '../tags/tag.model'
-import {TasksTagsRepository} from './task-tags.repository'
+import {TasksTagsRepo} from './task-tags.repository'
 import {TaskTag} from './task-tags.model'
 
 @Injectable()
 export class TasksService {
   constructor(
     private readonly tasksRepo: TasksRepo,
-    private readonly taskTagsRepo: TasksTagsRepository
+    private readonly taskTagsRepo: TasksTagsRepo
   ) {}
 
   create(taskDto: CreateTaskDto) {

@@ -11,6 +11,7 @@ import {
 } from '@winexy/fuji'
 import {isUndefined} from 'lodash'
 import {Model} from 'objection'
+import {ChecklistModel} from '../checklist/checklist.model'
 
 export type TaskT = {
   id: string
@@ -37,6 +38,19 @@ export class TaskModel extends Model implements TaskT {
   list_id: number | null
 
   static tableName = 'tasks'
+
+  static get relationMappings() {
+    return {
+      checklist: {
+        relation: Model.HasManyRelation,
+        modelClass: ChecklistModel,
+        join: {
+          from: 'tasks.id',
+          to: 'checklist.task_id'
+        }
+      }
+    }
+  }
 }
 
 const titleSchema = f(string(), required(), maxLength(255))
