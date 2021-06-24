@@ -123,7 +123,7 @@ export class TasksController {
     return result.value
   }
 
-  @Post(':taskId/tag/:tagId')
+  @Post(':taskId/tags/:tagId')
   async createTaskTag(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskIdT,
@@ -131,7 +131,7 @@ export class TasksController {
   ) {
     const result = await this.taskService.createTag(uid, taskId, tagId)
 
-    if (result.isLeft) {
+    if (result.isLeft()) {
       throw result.value
     }
 
