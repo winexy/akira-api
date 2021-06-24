@@ -6,10 +6,10 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable(table, t => {
     t.increments()
     t.string('uid').notNullable()
-    t.string('title', 60).notNullable()
+    t.string('name', 60).notNullable()
     t.string('hex_bg', 7).notNullable()
     t.string('hex_color', 7).notNullable()
-    t.unique(['uid', 'title'])
+    t.unique(['uid', 'name'])
   })
 }
 

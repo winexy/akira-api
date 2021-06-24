@@ -12,7 +12,7 @@ import {Model} from 'objection'
 export type Tag = {
   id: number
   uid: string
-  title: string
+  name: string
   hex_bg: string
   hex_color: string
 }
@@ -20,7 +20,7 @@ export type Tag = {
 export class TagModel extends Model implements Tag {
   id: number
   uid: string
-  title: string
+  name: string
   hex_bg: string
   hex_color: string
 
@@ -35,7 +35,7 @@ const hexSchema = f(
 )
 
 export const createTagSchema = f.shape({
-  title: f(string(), required(), maxLength(60)),
+  name: f(string(), required(), maxLength(60)),
   hex_bg: hexSchema,
   hex_color: hexSchema
 })
