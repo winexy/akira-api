@@ -8,8 +8,8 @@ import {
   TasksQueryFiltersT
 } from './task.model'
 import {Tag} from '../tags/tag.model'
-import {TasksTagsRepo} from './task-tags.repository'
-import {TaskTag} from './task-tags.model'
+import {TasksTagsRepo} from './tasks-tags.repository'
+import {TaskTag} from './tasks-tags.model'
 
 @Injectable()
 export class TasksService {

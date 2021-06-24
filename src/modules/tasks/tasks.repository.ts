@@ -21,7 +21,7 @@ export class TasksRepo {
         author_uid: uid,
         ...params
       })
-      .withGraphFetched('checklist')
+      .withGraphFetched('[checklist, tags]')
 
     if (is_today) {
       query.andWhereBetween('created_at', [
@@ -54,7 +54,7 @@ export class TasksRepo {
         .where({
           author_uid: uid
         })
-        .withGraphFetched('checklist')
+        .withGraphFetched('[checklist, tags]')
         .throwIfNotFound()
 
       return right(task)
@@ -73,7 +73,7 @@ export class TasksRepo {
         .query()
         .where({author_uid: uid})
         .patchAndFetchById(id, patch)
-        .withGraphFetched('checklist')
+        .withGraphFetched('[checklist, tags]')
         .throwIfNotFound()
 
       return right(task)

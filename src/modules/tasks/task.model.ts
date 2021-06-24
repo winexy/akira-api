@@ -12,6 +12,7 @@ import {
 import {isUndefined} from 'lodash'
 import {Model} from 'objection'
 import {ChecklistModel} from '../checklist/checklist.model'
+import {TagModel} from '../tags/tag.model'
 
 export type TaskT = {
   id: string
@@ -47,6 +48,18 @@ export class TaskModel extends Model implements TaskT {
         join: {
           from: 'tasks.id',
           to: 'checklist.task_id'
+        }
+      },
+      tags: {
+        relation: Model.ManyToManyRelation,
+        modelClass: TagModel,
+        join: {
+          from: 'tasks.id',
+          through: {
+            from: 'tasks_tags.task_id',
+            to: 'tasks_tags.tag_id'
+          },
+          to: 'tags.id'
         }
       }
     }

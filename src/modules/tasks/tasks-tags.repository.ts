@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TasksTagsModel} from './task-tags.model'
+import {TasksTagsModel} from './tasks-tags.model'
 import {Tag} from '../tags/tag.model'
 import {TaskT} from './task.model'
 
@@ -7,11 +7,11 @@ import {TaskT} from './task.model'
 export class TasksTagsRepo {
   constructor(
     @Inject(TasksTagsModel)
-    private readonly taskTagsModel: typeof TasksTagsModel
+    private readonly tasksTagsModel: typeof TasksTagsModel
   ) {}
 
   createTaskTag(taskId: TaskT['id'], tagId: Tag['id']) {
-    return this.taskTagsModel
+    return this.tasksTagsModel
       .query()
       .insert({
         task_id: taskId,

@@ -11,5 +11,5 @@ export class TasksTagsModel extends Model implements TaskTag {
   task_id: string
   tag_id: number
 
-  static tableName = 'task_tags'
+  static tableName = 'tasks_tags'
 }
