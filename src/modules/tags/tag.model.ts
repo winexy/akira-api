@@ -5,7 +5,8 @@ import {
   maxLength,
   pattern,
   fmap,
-  Infer
+  Infer,
+  minLength
 } from '@winexy/fuji'
 import {Model} from 'objection'
 
@@ -29,7 +30,8 @@ export class TagModel extends Model implements Tag {
 
 const hexSchema = f(
   required(),
-  pattern(/^#[a-z0-9]{6}$/),
+  pattern(/^#[a-z0-9]{3,6}$/),
+  minLength(4),
   maxLength(7),
   fmap(s => s.toLowerCase())
 )
