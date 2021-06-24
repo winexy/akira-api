@@ -54,6 +54,7 @@ export class TasksRepo {
         .where({
           author_uid: uid
         })
+        .withGraphFetched('checklist')
         .throwIfNotFound()
 
       return right(task)
@@ -72,6 +73,7 @@ export class TasksRepo {
         .query()
         .where({author_uid: uid})
         .patchAndFetchById(id, patch)
+        .withGraphFetched('checklist')
         .throwIfNotFound()
 
       return right(task)
