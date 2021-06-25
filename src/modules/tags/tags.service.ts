@@ -6,6 +6,10 @@ import {CreateTagDto} from './tag.model'
 export class TagsService {
   constructor(private readonly tagsRepo: TagsRepo) {}
 
+  findAll(uid: UID) {
+    return this.tagsRepo.findAllByUID(uid)
+  }
+
   createTag(uid: UID, dto: CreateTagDto) {
     return this.tagsRepo.createTag(uid, dto)
   }
