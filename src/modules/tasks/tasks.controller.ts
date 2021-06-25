@@ -137,4 +137,19 @@ export class TasksController {
 
     return result.value
   }
+
+  @Delete(':taskId/tags/:tagId')
+  async deleteTaskTag(
+    @User('uid') uid: UID,
+    @Param('taskId') taskId: TaskIdT,
+    @Param('tagId', ParseIntPipe) tagId: Tag['id']
+  ) {
+    const result = await this.taskService.deleteTag(uid, taskId, tagId)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
+  }
 }

@@ -82,4 +82,16 @@ export class TasksService {
       return this.taskTagsRepo.createTaskTag(taskId, tagId)
     })
   }
+
+  async deleteTag(
+    uid: UID,
+    taskId: TaskIdT,
+    tagId: Tag['id']
+  ): EitherP<DBException, number> {
+    const isAuthor = await this.ensureAuthority(taskId, uid)
+
+    return isAuthor.asyncChain(() => {
+      return this.taskTagsRepo.deleteTaskTag(taskId, tagId)
+    })
+  }
 }
