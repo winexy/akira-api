@@ -28,16 +28,18 @@ export class TagModel extends Model implements Tag {
   static tableName = 'tags'
 }
 
+const lower = fmap((s: string) => s.toLowerCase())
+
 const hexSchema = f(
   required(),
   pattern(/^#[a-z0-9]{3,6}$/),
   minLength(4),
   maxLength(7),
-  fmap(s => s.toLowerCase())
+  lower
 )
 
 export const createTagSchema = f.shape({
-  name: f(string(), required(), maxLength(60)),
+  name: f(string(), required(), maxLength(60), lower),
   hex_bg: hexSchema,
   hex_color: hexSchema
 })
