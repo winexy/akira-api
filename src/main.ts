@@ -4,6 +4,7 @@ import firebase, {ServiceAccount} from 'firebase-admin'
 import {AppModule} from './app.module'
 import * as serviceAccount from '../firebase-service-account.json'
 import {DbExceptionFilter} from './filters/db-exception.filter'
+import {UserErrorFilter} from './filters/user-error.exception.filter'
 import {AppConfig} from './env.validation'
 
 async function bootstrap() {
@@ -16,7 +17,7 @@ async function bootstrap() {
   })
 
   app.enableCors()
-  app.useGlobalFilters(new DbExceptionFilter(config))
+  app.useGlobalFilters(new DbExceptionFilter(config), new UserErrorFilter())
 
   await app.listen(port)
 

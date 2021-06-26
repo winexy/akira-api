@@ -33,7 +33,7 @@ export class DbExceptionFilter implements ExceptionFilter {
     }
 
     const extra =
-      this.configService.get('NODE_ENV') === 'development' ? {...exception} : {}
+      this.configService.get('NODE_ENV') === 'development' ? exception : {}
 
     return {
       ...base,
