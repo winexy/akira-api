@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common'
 import {TagsRepo} from './tags.repository'
-import {CreateTagDto} from './tag.model'
+import {CreateTagDto, Tag} from './tag.model'
 
 @Injectable()
 export class TagsService {
@@ -12,5 +12,9 @@ export class TagsService {
 
   createTag(uid: UID, dto: CreateTagDto) {
     return this.tagsRepo.createTag(uid, dto)
+  }
+
+  deleteTag(uid: UID, tagId: Tag['id']) {
+    return this.tagsRepo.deleteTag(uid, tagId)
   }
 }
