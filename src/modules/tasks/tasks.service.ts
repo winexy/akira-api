@@ -26,10 +26,6 @@ export class TasksService {
     return this.tasksRepo.findAllByUID(uid, query)
   }
 
-  findTodayTasksByUID(uid: UID) {
-    return this.tasksRepo.findTodayTasksByUID(uid)
-  }
-
   findOne(taskId: TaskIdT, uid: UID) {
     return this.tasksRepo.findOne(taskId, uid)
   }

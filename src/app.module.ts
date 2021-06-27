@@ -1,4 +1,5 @@
 import {Module} from '@nestjs/common'
+import {ScheduleModule} from '@nestjs/schedule'
 import {ConfigModule} from '@nestjs/config'
 import {
   ObjectionModule,
@@ -11,7 +12,7 @@ import {ChecklistModule} from './modules/checklist/checklist.module'
 import {validateEnv} from './env.validation'
 import {TaskListsModule} from './modules/task-lists/task-lists.module'
 import {TagsModule} from './modules/tags/tags.module'
-import {TodayModule} from './modules/today/today.module'
+import {MyDayModule} from './modules/myday/myday.module'
 
 const objectionOptions: ObjectionModuleOptions = {
   config: {
@@ -35,11 +36,12 @@ const objectionOptions: ObjectionModuleOptions = {
       validate: validateEnv
     }),
     ObjectionModule.register(objectionOptions),
+    ScheduleModule.forRoot(),
     TasksModule,
     ChecklistModule,
     TaskListsModule,
     TagsModule,
-    TodayModule
+    MyDayModule
   ],
   controllers: [AppController],
   providers: [AppService]

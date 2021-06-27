@@ -1,6 +1,6 @@
 import * as Knex from 'knex'
 
-const table = 'today_tasks'
+const table = 'myday'
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable(table, t => {

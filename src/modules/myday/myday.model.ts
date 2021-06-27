@@ -1,16 +1,14 @@
 import {Model} from 'objection'
 import {TaskModel} from '../tasks/task.model'
 
-type TodayEntity = {
-  id: number
+export type MyDay = {
   task_id: string
 }
 
-export class TodayModel extends Model implements TodayEntity {
-  id: number
+export class MyDayModel extends Model implements MyDay {
   task_id: string
 
-  static tableName = 'today_tasks'
+  static tableName = 'myday'
 
   static get relationMapping() {
     return {

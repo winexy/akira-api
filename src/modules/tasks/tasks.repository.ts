@@ -33,16 +33,6 @@ export class TasksRepo {
     return query
   }
 
-  findTodayTasksByUID(uid: UID) {
-    return this.taskModel
-      .query()
-      .where({author_uid: uid})
-      .whereBetween('created_at', [
-        this.taskModel.raw('CURRENT_DATE'),
-        this.taskModel.raw('CURRENT_DATE + 1')
-      ])
-  }
-
   async findOne(
     taskId: TaskT['id'],
     uid: UserRecord['uid']
