@@ -1,4 +1,5 @@
 import {Injectable} from '@nestjs/common'
+import {Cron} from '@nestjs/schedule'
 import {TaskIdT} from '../tasks/task.model'
 import {TasksService} from '../tasks/tasks.service'
 import {MyDayRepo} from './myday.repo'
@@ -24,5 +25,18 @@ export class MyDayService {
 
   findAll(uid: UID) {
     return this.myDayRepo.findTodayTasksByUID(uid)
+  }
+
+  @Cron('0 0 * * *')
+  async updateMyDay() {
+    try {
+      const count = await this.myDayRepo.resetMyDay()
+      global.console.log(
+        new Date().toTimeString(),
+        `:: removed ${count} tasks from myday`
+      )
+    } catch (error) {
+      global.console.error(error.message)
+    }
   }
 }

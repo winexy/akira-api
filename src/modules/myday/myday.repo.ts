@@ -69,4 +69,8 @@ export class MyDayRepo {
       return left(error)
     }
   }
+
+  resetMyDay() {
+    return this.myDayModel.query().delete()
+  }
 }
