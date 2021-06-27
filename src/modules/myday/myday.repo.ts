@@ -1,7 +1,8 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
-import {TaskIdT} from '../tasks/task.model'
-import {MyDayModel} from './myday.model'
+import {map} from 'lodash'
+import {TaskIdT, TaskT} from '../tasks/task.model'
+import {MyDayModel, MyDay} from './myday.model'
 
 @Injectable()
 export class MyDayRepo {
@@ -9,9 +10,11 @@ export class MyDayRepo {
     @Inject(MyDayModel) private readonly myDayModel: typeof MyDayModel
   ) {}
 
-  async create(taskId: TaskIdT) {
+  async create(uid: UID, taskId: TaskIdT) {
     try {
-      const result = await this.myDayModel.query().insert({task_id: taskId})
+      const result = await this.myDayModel
+        .query()
+        .insert({author_uid: uid, task_id: taskId})
 
       return right(result)
     } catch (error) {
@@ -32,7 +35,21 @@ export class MyDayRepo {
     }
   }
 
-  findTodayTasksByUID(uid: UID) {
-    return this.myDayModel.relatedQuery('task').where({uid})
+  async findTodayTasksByUID(uid: UID): EitherP<DBException, TaskT[]> {
+    try {
+      const result = await this.myDayModel
+        .query()
+        .where({author_uid: uid})
+        .withGraphFetched({
+          task: {
+            checklist: true,
+            tags: true
+          }
+        })
+
+      return right(map(result, 'task'))
+    } catch (error) {
+      return left(error)
+    }
   }
 }

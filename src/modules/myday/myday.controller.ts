@@ -1,4 +1,4 @@
-import {Controller, Post, Param, Delete, UseGuards} from '@nestjs/common'
+import {Controller, Post, Param, Delete, UseGuards, Get} from '@nestjs/common'
 import {MyDayService} from './myday.service'
 import {AuthGuard} from '../../auth.guard'
 import {User} from '../../decorators/user.decorator'
@@ -8,6 +8,17 @@ import {TaskIdT} from '../tasks/task.model'
 @UseGuards(AuthGuard)
 export class MyDayController {
   constructor(private readonly myDayService: MyDayService) {}
+
+  @Get()
+  async findAll(@User('uid') uid: UID) {
+    const result = await this.myDayService.findAll(uid)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
+  }
 
   @Post(':taskId')
   async create(@User('uid') uid: UID, @Param('taskId') taskId: TaskIdT) {
