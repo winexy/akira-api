@@ -1,8 +1,10 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
+import {UniqueViolationError} from 'db-errors'
 import {map} from 'lodash'
+import {UserError} from 'src/filters/user-error.exception.filter'
 import {TaskIdT, TaskT} from '../tasks/task.model'
-import {MyDayModel, MyDay} from './myday.model'
+import {MyDay, MyDayModel} from './myday.model'
 
 @Injectable()
 export class MyDayRepo {
@@ -10,7 +12,10 @@ export class MyDayRepo {
     @Inject(MyDayModel) private readonly myDayModel: typeof MyDayModel
   ) {}
 
-  async create(uid: UID, taskId: TaskIdT) {
+  async create(
+    uid: UID,
+    taskId: TaskIdT
+  ): EitherP<DBException | UserError, MyDay> {
     try {
       const result = await this.myDayModel
         .query()
@@ -18,6 +23,18 @@ export class MyDayRepo {
 
       return right(result)
     } catch (error) {
+      if (error instanceof UniqueViolationError) {
+        return left(
+          UserError.of({
+            type: UserError.DUPLICATE,
+            message: 'This task is already part of your day',
+            meta: {
+              taskId
+            }
+          })
+        )
+      }
+
       return left(error)
     }
   }
