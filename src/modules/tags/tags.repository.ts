@@ -27,8 +27,11 @@ export class TagsRepo {
       if (error instanceof UniqueViolationError) {
         return left(
           UserError.of({
-            type: 'unique-violation',
-            message: `tag "${dto.name}" is already exist`
+            type: UserError.DUPLICATE,
+            message: `tag "${dto.name}" is already exist`,
+            meta: {
+              name: dto.name
+            }
           })
         )
       }
