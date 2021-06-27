@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common'
+import {Inject, Injectable, forwardRef} from '@nestjs/common'
 import {TasksRepo} from './tasks.repository'
 import {
   TaskIdT,
@@ -10,16 +10,20 @@ import {
 import {Tag} from '../tags/tag.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
+import {MyDayService} from '../myday/myday.service'
 
 @Injectable()
 export class TasksService {
   constructor(
     private readonly tasksRepo: TasksRepo,
-    private readonly taskTagsRepo: TasksTagsRepo
+    private readonly taskTagsRepo: TasksTagsRepo,
+    @Inject(forwardRef(() => MyDayService))
+    private readonly myDateService: MyDayService
   ) {}
 
-  create(taskDto: CreateTaskDto) {
-    return this.tasksRepo.create(taskDto)
+  async create(taskDto: CreateTaskDto) {
+    const task = await this.tasksRepo.create(taskDto)
+    return this.myDateService.create(taskDto.author_uid, task.id)
   }
 
   findAllByUID(uid: UID, query: TasksQueryFiltersT) {

@@ -12,6 +12,7 @@ import {TasksModule} from '../tasks/tasks.module'
     forwardRef(() => TasksModule)
   ],
   controllers: [MyDayController],
-  providers: [MyDayService, MyDayRepo]
+  providers: [MyDayService, MyDayRepo],
+  exports: [MyDayService]
 })
 export class MyDayModule {}
