@@ -13,7 +13,7 @@ export class MyDayService {
   async create(uid: UID, taskId: TaskIdT) {
     const isAuthor = await this.taskService.ensureAuthority(taskId, uid)
 
-    return isAuthor.asyncChain(() => this.myDayRepo.create(taskId))
+    return isAuthor.asyncChain(() => this.myDayRepo.create(uid, taskId))
   }
 
   async remove(uid: UID, taskId: TaskIdT) {
@@ -22,8 +22,7 @@ export class MyDayService {
     return isAuthor.asyncChain(() => this.myDayRepo.remove(taskId))
   }
 
-  findTodayTasksByUID(uid: UID) {
+  findAll(uid: UID) {
     return this.myDayRepo.findTodayTasksByUID(uid)
   }
-
 }
