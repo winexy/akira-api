@@ -10,10 +10,13 @@ export class ListsRepo {
   ) {}
 
   async create(uid: UID, title: string) {
-    return this.listModel.query().insert({
-      author_uid: uid,
-      title
-    })
+    return this.listModel
+      .query()
+      .insert({
+        author_uid: uid,
+        title
+      })
+      .returning('*')
   }
 
   async findSimilarList(
