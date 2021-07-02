@@ -912,10 +912,10 @@
   resolved "https://registry.yarnpkg.com/@sweet-monads/interfaces/-/interfaces-2.3.0.tgz#3b8ade592630fe8e9666f227d84549203dafd264"
   integrity sha512-ou9GHjkca1Zh4dSeIG8nmKE7T6Eao2x4Ouj7YTq0nFHA+WwYfvTnhCiUh9+cRz0BTLBRYOLsFlyax05VegSsYQ==
 
-"@sweet-monads/maybe@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@sweet-monads/maybe/-/maybe-2.3.0.tgz#9606fac4638d1dfb362db0967334dfcc5fe00bfc"
-  integrity sha512-Ofj2mkLJ/+h5mvPvrdA6+MbAzdlmZXFPymIo4jIzvc21wYp/+hQRXi2DAY1CY+BWxxA7zwebeavGmsEeR4SC0Q==
+"@sweet-monads/maybe@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@sweet-monads/maybe/-/maybe-2.3.1.tgz#02993dc857d416d8d3930041ff6770c83e79c978"
+  integrity sha512-4fCHEievjOljO5HoXswkKO06aw10ctaeffmeo+22HxTZmn3v/rZ7Kxd6fotI5MIysjgcO8YhoZgv67QeV9jmHg==
   dependencies:
     "@sweet-monads/interfaces" "^2.3.0"
 
