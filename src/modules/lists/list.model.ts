@@ -1,17 +1,18 @@
 import {f, string, required, maxLength, Infer} from '@winexy/fuji'
 import {Model} from 'objection'
 
-type TaskListT = {
+export type TaskList = {
   id: number
   title: string
+  author_uid: string
 }
 
-export class TaskListModel extends Model implements TaskListT {
+export class ListModel extends Model implements TaskList {
   id: number
   title: string
   author_uid: string
 
-  static tableName = 'task-lists'
+  static tableName = 'task_lists'
 }
 
 export const createTaskListSchema = f.shape({

@@ -10,7 +10,7 @@ import {AppService} from './app.service'
 import {TasksModule} from './modules/tasks/tasks.module'
 import {ChecklistModule} from './modules/checklist/checklist.module'
 import {validateEnv} from './env.validation'
-import {TaskListsModule} from './modules/task-lists/task-lists.module'
+import {ListsModule} from './modules/lists/lists.module'
 import {TagsModule} from './modules/tags/tags.module'
 import {MyDayModule} from './modules/myday/myday.module'
 
@@ -39,7 +39,7 @@ const objectionOptions: ObjectionModuleOptions = {
     ScheduleModule.forRoot(),
     TasksModule,
     ChecklistModule,
-    TaskListsModule,
+    ListsModule,
     TagsModule,
     MyDayModule
   ],
