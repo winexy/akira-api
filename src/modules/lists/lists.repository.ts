@@ -22,15 +22,13 @@ export class ListsRepo {
     return this.listModel
       .query()
       .where('title', title)
-      .orderBy('title', 'DESC')
       .findOne('author_uid', uid)
   }
 
-  findDuplicate(uid: UID, title: string): Promise<TaskList | undefined> {
+  findDuplicates(uid: UID, title: string): Promise<TaskList[] | undefined> {
     return this.listModel
       .query()
       .where('title', 'LIKE', this.listModel.raw(`'${title}' || ' (%)'`))
-      .orderBy('title', 'DESC')
-      .findOne('author_uid', uid)
+      .where('author_uid', uid)
   }
 }

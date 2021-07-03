@@ -5,7 +5,7 @@ import {ListsRepo} from './lists.repository'
 describe('ListsService', () => {
   let service: ListsService
   const listsRepo = {
-    findDuplicate: jest.fn(),
+    findDuplicates: jest.fn(),
     findExactTitle: jest.fn(),
     create: jest.fn()
   }
@@ -25,7 +25,7 @@ describe('ListsService', () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test'
 
-    listsRepo.findDuplicate.mockResolvedValueOnce(undefined)
+    listsRepo.findDuplicates.mockResolvedValueOnce([])
     listsRepo.findExactTitle.mockResolvedValueOnce(undefined)
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
@@ -51,7 +51,7 @@ describe('ListsService', () => {
       title: TEST_TITLE
     }
 
-    listsRepo.findDuplicate.mockResolvedValueOnce(undefined)
+    listsRepo.findDuplicates.mockResolvedValueOnce([])
     listsRepo.findExactTitle.mockResolvedValueOnce(MOCK_EXACT_LIST)
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
@@ -78,7 +78,7 @@ describe('ListsService', () => {
       title: `${TEST_TITLE} ${DUPLICATE_POSTFIX}`
     }
 
-    listsRepo.findDuplicate.mockResolvedValueOnce(MOCK_SIMILAR_LIST)
+    listsRepo.findDuplicates.mockResolvedValueOnce([MOCK_SIMILAR_LIST])
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
       return Promise.resolve({
@@ -95,6 +95,29 @@ describe('ListsService', () => {
     })
   })
 
+  it('should return new duplicate title if has many duplicates', async () => {
+    const TEST_UID = 'test-uid'
+
+    listsRepo.findDuplicates.mockResolvedValueOnce([
+      {author_uid: TEST_UID, title: 'test (9)'},
+      {author_uid: TEST_UID, title: 'test (10)'}
+    ])
+
+    listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
+      return Promise.resolve({
+        author_uid: uid,
+        title
+      })
+    })
+
+    const result = await service.create(TEST_UID, 'test').toPromise()
+
+    expect(result).toEqual({
+      author_uid: TEST_UID,
+      title: `test (11)`
+    })
+  })
+
   it('should create next duplicate title for brokenlike duplicate title', async () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test (4)(2)'
@@ -103,7 +126,7 @@ describe('ListsService', () => {
       title: TEST_TITLE
     }
 
-    listsRepo.findDuplicate.mockResolvedValueOnce(MOCK_SIMILAR_LIST)
+    listsRepo.findDuplicates.mockResolvedValueOnce([MOCK_SIMILAR_LIST])
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
       return Promise.resolve({
