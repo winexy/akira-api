@@ -1,5 +1,4 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {left, right} from '@sweet-monads/either'
 import {ListModel, TaskList} from './list.model'
 
 @Injectable()
@@ -9,7 +8,7 @@ export class ListsRepo {
     private readonly listModel: typeof ListModel
   ) {}
 
-  async create(uid: UID, title: string) {
+  create(uid: UID, title: string): Promise<TaskList> {
     return this.listModel
       .query()
       .insert({
@@ -19,21 +18,19 @@ export class ListsRepo {
       .returning('*')
   }
 
-  async findSimilarList(
-    uid: UID,
-    title: string
-  ): EitherP<DBException, TaskList | undefined> {
-    try {
-      const result: TaskList = await this.listModel
-        .query()
-        .where('author_uid', uid)
-        .findOne('title', title)
-        .limit(1)
-        .orderBy('title', 'DESC')
+  findExactTitle(uid: UID, title: string): Promise<TaskList | undefined> {
+    return this.listModel
+      .query()
+      .where('title', title)
+      .orderBy('title', 'DESC')
+      .findOne('author_uid', uid)
+  }
 
-      return right(result)
-    } catch (error) {
-      return left(error)
-    }
+  findDuplicate(uid: UID, title: string): Promise<TaskList | undefined> {
+    return this.listModel
+      .query()
+      .where('title', 'LIKE', this.listModel.raw(`'${title}' || ' (%)'`))
+      .orderBy('title', 'DESC')
+      .findOne('author_uid', uid)
   }
 }

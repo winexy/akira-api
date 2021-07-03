@@ -12,16 +12,10 @@ export class ListsController {
 
   @Post()
   @HttpCode(201)
-  async create(
+  create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskListSchema)) dto: CreateTaskListDto
   ) {
-    const result = await this.listsService.create(uid, dto.title)
-
-    if (result.isLeft()) {
-      throw result.value
-    }
-
-    return result.value
+    return this.listsService.create(uid, dto.title)
   }
 }

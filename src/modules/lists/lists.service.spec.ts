@@ -1,12 +1,12 @@
 import {Test, TestingModule} from '@nestjs/testing'
-import {right} from '@sweet-monads/either'
 import {ListsService} from './lists.service'
 import {ListsRepo} from './lists.repository'
 
 describe('ListsService', () => {
   let service: ListsService
   const listsRepo = {
-    findSimilarList: jest.fn(),
+    findDuplicate: jest.fn(),
+    findExactTitle: jest.fn(),
     create: jest.fn()
   }
 
@@ -21,11 +21,12 @@ describe('ListsService', () => {
     service = module.get<ListsService>(ListsService)
   })
 
-  it('should create new list if has no similar list title', async () => {
+  it('should return new list if no duplicate', async () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test'
 
-    listsRepo.findSimilarList.mockResolvedValueOnce(right(undefined))
+    listsRepo.findDuplicate.mockResolvedValueOnce(undefined)
+    listsRepo.findExactTitle.mockResolvedValueOnce(undefined)
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
       return Promise.resolve({
@@ -34,25 +35,24 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE)
+    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
 
-    expect(result).toEqual(
-      right({
-        author_uid: TEST_UID,
-        title: TEST_TITLE
-      })
-    )
+    expect(result).toEqual({
+      author_uid: TEST_UID,
+      title: TEST_TITLE
+    })
   })
 
-  it('should create new duplicate title if has one duplicate', async () => {
+  it('should return new list if has has exact title', async () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test'
-    const MOCK_SIMILAR_LIST = {
+    const MOCK_EXACT_LIST = {
       author_uid: TEST_UID,
       title: TEST_TITLE
     }
 
-    listsRepo.findSimilarList.mockResolvedValueOnce(right(MOCK_SIMILAR_LIST))
+    listsRepo.findDuplicate.mockResolvedValueOnce(undefined)
+    listsRepo.findExactTitle.mockResolvedValueOnce(MOCK_EXACT_LIST)
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
       return Promise.resolve({
@@ -61,25 +61,24 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE)
+    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
 
-    expect(result).toEqual(
-      right({
-        author_uid: TEST_UID,
-        title: `${TEST_TITLE} (1)`
-      })
-    )
+    expect(result).toEqual({
+      author_uid: TEST_UID,
+      title: `${TEST_TITLE} (1)`
+    })
   })
 
-  it('should create next duplicate title if has many duplicates', async () => {
+  it('should return new duplicate title if has one duplicate', async () => {
     const TEST_UID = 'test-uid'
-    const TEST_TITLE = 'test (1)'
+    const TEST_TITLE = 'test'
+    const DUPLICATE_POSTFIX = '(1)'
     const MOCK_SIMILAR_LIST = {
       author_uid: TEST_UID,
-      title: TEST_TITLE
+      title: `${TEST_TITLE} ${DUPLICATE_POSTFIX}`
     }
 
-    listsRepo.findSimilarList.mockResolvedValueOnce(right(MOCK_SIMILAR_LIST))
+    listsRepo.findDuplicate.mockResolvedValueOnce(MOCK_SIMILAR_LIST)
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
       return Promise.resolve({
@@ -88,14 +87,12 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE)
+    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
 
-    expect(result).toEqual(
-      right({
-        author_uid: TEST_UID,
-        title: `${TEST_TITLE} (2)`
-      })
-    )
+    expect(result).toEqual({
+      author_uid: TEST_UID,
+      title: `${TEST_TITLE} (2)`
+    })
   })
 
   it('should create next duplicate title for brokenlike duplicate title', async () => {
@@ -106,7 +103,7 @@ describe('ListsService', () => {
       title: TEST_TITLE
     }
 
-    listsRepo.findSimilarList.mockResolvedValueOnce(right(MOCK_SIMILAR_LIST))
+    listsRepo.findDuplicate.mockResolvedValueOnce(MOCK_SIMILAR_LIST)
 
     listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
       return Promise.resolve({
@@ -115,13 +112,11 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE)
+    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
 
-    expect(result).toEqual(
-      right({
-        author_uid: TEST_UID,
-        title: `${TEST_TITLE} (1)`
-      })
-    )
+    expect(result).toEqual({
+      author_uid: TEST_UID,
+      title: `${TEST_TITLE} (1)`
+    })
   })
 })

@@ -1,33 +1,39 @@
 import {Injectable} from '@nestjs/common'
 import {fromNullable, just} from '@sweet-monads/maybe'
-import {get, isUndefined} from 'lodash'
+import {get, isUndefined} from 'lodash/fp'
 import {ListsRepo} from './lists.repository'
+import {from, of} from 'rxjs'
+import {map, mergeMap} from 'rxjs/operators'
 
 @Injectable()
 export class ListsService {
   constructor(private readonly listRepo: ListsRepo) {}
 
-  async create(uid: UID, title: string) {
-    const result = await this.listRepo.findSimilarList(uid, title)
-
-    return result.asyncMap(similar => {
-      const nextTitle = !isUndefined(similar)
-        ? this.getNextDuplicateTitle(title)
-        : title
-
-      return this.listRepo.create(uid, nextTitle)
-    })
+  create(uid: UID, title: string) {
+    return from(this.listRepo.findDuplicate(uid, title)).pipe(
+      mergeMap(duplicate => {
+        return isUndefined(duplicate)
+          ? from(this.listRepo.findExactTitle(uid, title))
+          : of(duplicate)
+      }),
+      map(duplicate => {
+        return fromNullable(duplicate)
+          .map(get('title'))
+          .map(this.getNextDuplicateTitle)
+          .or(just(title)).value
+      }),
+      mergeMap(title => this.listRepo.create(uid, title))
+    )
   }
 
-  private getNextDuplicateTitle(title: string) {
+  private getNextDuplicateTitle(title: string): string {
     const duplicateRegex = / \((\d+)\)$/
 
     const {value} = fromNullable(title.match(duplicateRegex))
-      .map(match => get(match, 1))
-      .map(n => parseInt(n, 10))
-      .or(just(0))
-      .map(n => n + 1)
-      .map(n => `${title} (${n})`)
+      .map(get(1))
+      .map(parseInt)
+      .map(n => title.replace(duplicateRegex, ` (${n + 1})`))
+      .or(just(`${title} (1)`))
 
     return value
   }
