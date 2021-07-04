@@ -79,8 +79,7 @@ export class TaskModel extends Model implements TaskT {
 const titleSchema = f(string(), required(), maxLength(255))
 
 export const createTaskDtoSchema = f.shape({
-  title: titleSchema,
-  author_uid: f(string(), required())
+  title: titleSchema
 })
 
 export type CreateTaskDto = Infer<typeof createTaskDtoSchema>

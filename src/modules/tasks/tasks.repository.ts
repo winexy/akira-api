@@ -10,9 +10,12 @@ export class TasksRepo {
 
   static DEFAULT_FETCH_GRAPH = '[checklist, tags, list]'
 
-  create(taskDto: CreateTaskDto) {
+  create(uid: UID, taskDto: CreateTaskDto) {
     return this.taskModel.transaction(trx => {
-      return this.taskModel.query(trx).insert(taskDto).returning('*')
+      return this.taskModel
+        .query(trx)
+        .insert({title: taskDto.title, author_uid: uid})
+        .returning('*')
     })
   }
 

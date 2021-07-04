@@ -35,10 +35,11 @@ export class TasksController {
   @Post()
   @HttpCode(201)
   create(
+    @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
   ) {
-    return this.taskService.create(taskDto)
+    return this.taskService.create(uid, taskDto)
   }
 
   @Get()
