@@ -28,7 +28,15 @@ export class ListsRepo {
   findDuplicates(uid: UID, title: string): Promise<TaskList[] | undefined> {
     return this.listModel
       .query()
-      .where('title', 'LIKE', this.listModel.raw(`'${title}' || ' (%)'`))
+      .where(
+        'title',
+        'LIKE',
+        this.listModel
+          .raw(`':title:' || ' (%)'`, {
+            title
+          })
+          .toString()
+      )
       .where('author_uid', uid)
   }
 
