@@ -5,6 +5,7 @@ import {map} from 'lodash'
 import {UserError} from 'src/filters/user-error.exception.filter'
 import {TaskIdT, TaskT} from '../tasks/task.model'
 import {MyDay, MyDayModel} from './myday.model'
+import {TasksRepo} from '../tasks/tasks.repository'
 
 @Injectable()
 export class MyDayRepo {
@@ -58,10 +59,7 @@ export class MyDayRepo {
         .query()
         .where({author_uid: uid})
         .withGraphFetched({
-          task: {
-            checklist: true,
-            tags: true
-          }
+          task: TasksRepo.DEFAULT_FETCH_GRAPH
         })
 
       return right(map(result, 'task'))

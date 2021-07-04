@@ -8,7 +8,11 @@ export class TasksRepo {
     @Inject(TaskModel) private readonly taskModel: typeof TaskModel
   ) {}
 
-  static DEFAULT_FETCH_GRAPH = '[checklist, tags, list]'
+  static DEFAULT_FETCH_GRAPH = {
+    checklist: true,
+    tags: true,
+    list: true
+  }
 
   create(uid: UID, taskDto: CreateTaskDto) {
     return this.taskModel.transaction(trx => {
