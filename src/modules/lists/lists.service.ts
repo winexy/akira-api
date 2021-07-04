@@ -28,6 +28,14 @@ export class ListsService {
     )
   }
 
+  findAll(uid: UID) {
+    return this.listRepo.findAll(uid)
+  }
+
+  remove(uid: UID, listId: TaskList['id']) {
+    return this.listRepo.remove(uid, listId)
+  }
+
   private getLastDuplicateTitle(duplicates: TaskList[]): string {
     const regex = ListsService.DUPLICATE_MARK_REGEX
 

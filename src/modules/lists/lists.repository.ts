@@ -31,4 +31,16 @@ export class ListsRepo {
       .where('title', 'LIKE', this.listModel.raw(`'${title}' || ' (%)'`))
       .where('author_uid', uid)
   }
+
+  findAll(uid: UID) {
+    return this.listModel.query().where('author_uid', uid)
+  }
+
+  remove(uid: UID, listId: TaskList['id']) {
+    return this.listModel
+      .query()
+      .where({author_uid: uid})
+      .deleteById(listId)
+      .throwIfNotFound()
+  }
 }
