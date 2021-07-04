@@ -8,6 +8,8 @@ export class TasksRepo {
     @Inject(TaskModel) private readonly taskModel: typeof TaskModel
   ) {}
 
+  static DEFAULT_FETCH_GRAPH = '[checklist, tags, list]'
+
   create(taskDto: CreateTaskDto) {
     return this.taskModel.transaction(trx => {
       return this.taskModel.query(trx).insert(taskDto).returning('*')
@@ -21,7 +23,7 @@ export class TasksRepo {
         author_uid: uid,
         ...params
       })
-      .withGraphFetched('[checklist, tags]')
+      .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
 
     if (is_today) {
       query.andWhereBetween('created_at', [
@@ -44,7 +46,7 @@ export class TasksRepo {
         .where({
           author_uid: uid
         })
-        .withGraphFetched('[checklist, tags]')
+        .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
         .throwIfNotFound()
 
       return right(task)
@@ -63,7 +65,7 @@ export class TasksRepo {
         .query()
         .where({author_uid: uid})
         .patchAndFetchById(id, patch)
-        .withGraphFetched('[checklist, tags]')
+        .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
         .throwIfNotFound()
 
       return right(task)

@@ -7,11 +7,13 @@ import {
   required,
   string,
   excludeRules,
-  oneOf
+  oneOf,
+  number
 } from '@winexy/fuji'
 import {isUndefined} from 'lodash'
 import {Model} from 'objection'
 import {ChecklistModel} from '../checklist/checklist.model'
+import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
 
 export type TaskT = {
@@ -50,6 +52,14 @@ export class TaskModel extends Model implements TaskT {
           to: 'checklist.task_id'
         }
       },
+      list: {
+        relation: Model.HasOneRelation,
+        modelClass: ListModel,
+        join: {
+          from: 'tasks.list_id',
+          to: 'task_lists.id'
+        }
+      },
       tags: {
         relation: Model.ManyToManyRelation,
         modelClass: TagModel,
@@ -82,7 +92,8 @@ export const taskPatchSchema = f.shape({
     fmap(s => s?.trim())
   ),
   is_completed: f(bool()),
-  is_important: f(bool())
+  is_important: f(bool()),
+  list_id: f(number())
 })
 
 export type TaskPatchT = Infer<typeof taskPatchSchema>
