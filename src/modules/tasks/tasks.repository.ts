@@ -31,6 +31,7 @@ export class TasksRepo {
         ...params
       })
       .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+      .orderBy('created_at', 'DESC')
 
     if (is_today) {
       query.andWhereBetween('created_at', [
