@@ -21,9 +21,13 @@ export class TasksService {
     private readonly myDateService: MyDayService
   ) {}
 
-  async create(uid: UID, taskDto: CreateTaskDto) {
+  async createForMyDay(uid: UID, taskDto: CreateTaskDto) {
     const task = await this.tasksRepo.create(uid, taskDto)
     return this.myDateService.create(uid, task.id)
+  }
+
+  async create(uid: UID, taskDto: CreateTaskDto) {
+    return this.tasksRepo.create(uid, taskDto)
   }
 
   findAllByUID(uid: UID, query: TasksQueryFiltersT) {

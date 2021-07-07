@@ -32,6 +32,16 @@ import {
 export class TasksController {
   constructor(private readonly taskService: TasksService) {}
 
+  @Post('myday')
+  @HttpCode(201)
+  createForMyDay(
+    @User('uid') uid: UID,
+    @Body(FujiPipe.of(createTaskDtoSchema))
+    taskDto: CreateTaskDto
+  ) {
+    return this.taskService.createForMyDay(uid, taskDto)
+  }
+
   @Post()
   @HttpCode(201)
   create(
