@@ -58,4 +58,8 @@ export class ListsService {
 
     return value
   }
+
+  findAllTasks(uid: UID, listId: TaskList['id']) {
+    return this.listRepo.queryWithTasks(uid, listId)
+  }
 }

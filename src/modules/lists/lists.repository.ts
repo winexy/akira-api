@@ -1,5 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {ListModel, TaskList} from './list.model'
+import {TasksRepo} from '../tasks/tasks.repository'
 
 @Injectable()
 export class ListsRepo {
@@ -49,6 +50,17 @@ export class ListsRepo {
       .query()
       .where({author_uid: uid})
       .deleteById(listId)
+      .throwIfNotFound()
+  }
+
+  queryWithTasks(uid: UID, listId: TaskList['id']) {
+    return this.listModel
+      .query()
+      .where({author_uid: uid})
+      .findById(listId)
+      .withGraphFetched({
+        tasks: TasksRepo.DEFAULT_FETCH_GRAPH
+      })
       .throwIfNotFound()
   }
 }

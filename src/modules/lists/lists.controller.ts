@@ -41,4 +41,12 @@ export class ListsController {
   ) {
     return this.listsService.remove(uid, listId)
   }
+
+  @Get(':listId/tasks')
+  findAllTasks(
+    @User('uid') uid: UID,
+    @Param('listId', ParseIntPipe) listId: TaskList['id']
+  ) {
+    return this.listsService.findAllTasks(uid, listId)
+  }
 }
