@@ -50,12 +50,18 @@ export class TasksController {
 
   @Post()
   @HttpCode(201)
-  create(
+  async create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
   ): Promise<TaskT> {
-    return this.taskService.create(uid, taskDto)
+    const result = await this.taskService.create(uid, taskDto)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
   }
 
   @Get()

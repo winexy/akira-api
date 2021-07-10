@@ -28,13 +28,13 @@ export class TasksRepo {
           title,
           author_uid: uid
         })
-        .returning('*')
+        .returning('id')
 
       if (!isEmpty(tagsIds)) {
         await this.tasksTagsRepo.addTags(task.id, tagsIds, trx)
       }
 
-      return task
+      return task.id
     })
   }
 

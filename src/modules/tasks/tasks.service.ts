@@ -11,6 +11,7 @@ import {Tag} from '../tags/tag.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
 import {MyDayService} from '../myday/myday.service'
+import {UserError} from '../../filters/user-error.exception.filter'
 
 @Injectable()
 export class TasksService {
@@ -21,15 +22,19 @@ export class TasksService {
     private readonly myDateService: MyDayService
   ) {}
 
-  async createForMyDay(uid: UID, taskDto: CreateTaskDto) {
-    const task = await this.tasksRepo.create(uid, taskDto)
-    const result = await this.myDateService.create(uid, task.id)
+  async createForMyDay(
+    uid: UID,
+    taskDto: CreateTaskDto
+  ): EitherP<DBException | UserError, TaskT> {
+    const taskId = await this.tasksRepo.create(uid, taskDto)
+    const result = await this.myDateService.create(uid, taskId)
 
-    return result.map(() => task)
+    return result.asyncChain(() => this.tasksRepo.findOne(taskId, uid))
   }
 
   async create(uid: UID, taskDto: CreateTaskDto) {
-    return this.tasksRepo.create(uid, taskDto)
+    const taskId = await this.tasksRepo.create(uid, taskDto)
+    return this.tasksRepo.findOne(taskId, uid)
   }
 
   findAllByUID(uid: UID, query: TasksQueryFiltersT) {
