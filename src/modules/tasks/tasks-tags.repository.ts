@@ -1,8 +1,9 @@
 import {Inject, Injectable} from '@nestjs/common'
+import {Transaction} from 'objection'
+import {left, right} from '@sweet-monads/either'
 import {TasksTagsModel} from './tasks-tags.model'
 import {Tag} from '../tags/tag.model'
 import {TaskT} from './task.model'
-import {left, right} from '@sweet-monads/either'
 
 @Injectable()
 export class TasksTagsRepo {
@@ -39,5 +40,14 @@ export class TasksTagsRepo {
     } catch (error) {
       return left(error)
     }
+  }
+
+  addTags(taskId: TaskT['id'], tags: Array<Tag['id']>, trx?: Transaction) {
+    return this.tasksTagsModel.query(trx).insertGraph(
+      tags.map(id => ({
+        task_id: taskId,
+        tag_id: id
+      }))
+    )
   }
 }

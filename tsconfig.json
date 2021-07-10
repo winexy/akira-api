@@ -12,6 +12,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "strictFunctionTypes": true
+    "strict": true,
+    "strictPropertyInitialization": false
   }
 }

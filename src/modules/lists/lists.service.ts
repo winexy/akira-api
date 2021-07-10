@@ -1,11 +1,12 @@
 import {Injectable} from '@nestjs/common'
-import {fromNullable, just} from '@sweet-monads/maybe'
-import {isEmpty, last, sortBy} from 'lodash'
+import {fromNullable} from '@sweet-monads/maybe'
+import {isEmpty, last, sortBy, isUndefined} from 'lodash'
 import {get} from 'lodash/fp'
 import {ListsRepo} from './lists.repository'
 import {from, of} from 'rxjs'
 import {map, mergeMap} from 'rxjs/operators'
 import {TaskList} from './list.model'
+import {assert} from 'console'
 @Injectable()
 export class ListsService {
   constructor(private readonly listRepo: ListsRepo) {}
@@ -15,14 +16,16 @@ export class ListsService {
   create(uid: UID, title: string) {
     return from(this.listRepo.findDuplicates(uid, title)).pipe(
       mergeMap(duplicates => {
-        return isEmpty(duplicates)
+        return isUndefined(duplicates) || isEmpty(duplicates)
           ? from(this.listRepo.findExactTitle(uid, title).then(get('title')))
           : of(this.getLastDuplicateTitle(duplicates))
       }),
       map(duplicateTitle => {
-        return fromNullable(duplicateTitle)
-          .map(this.getNextDuplicateTitle)
-          .or(just(title)).value
+        const nextTitle = fromNullable(duplicateTitle).map(
+          this.getNextDuplicateTitle
+        )
+
+        return nextTitle.isJust() ? nextTitle.value : title
       }),
       mergeMap(title => this.listRepo.create(uid, title))
     )
@@ -37,6 +40,8 @@ export class ListsService {
   }
 
   private getLastDuplicateTitle(duplicates: TaskList[]): string {
+    assert(!isEmpty(duplicates), 'duplicates should not be empty')
+
     const regex = ListsService.DUPLICATE_MARK_REGEX
 
     const transformed = duplicates.map(duplicate => ({
@@ -44,7 +49,9 @@ export class ListsService {
       title: duplicate.title
     }))
 
-    return last(sortBy(transformed, 'number')).title
+    const lastDuplicate = last(sortBy(transformed, 'number'))
+
+    return lastDuplicate?.title as string
   }
 
   private getNextDuplicateTitle(title: string): string {
@@ -54,9 +61,8 @@ export class ListsService {
       .map(get(1))
       .map(Number)
       .map(n => title.replace(regex, ` (${n + 1})`))
-      .or(just(`${title} (1)`))
 
-    return value
+    return value ?? `${title} (1)`
   }
 
   findAllTasks(uid: UID, listId: TaskList['id']) {

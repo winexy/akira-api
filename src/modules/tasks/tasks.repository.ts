@@ -1,11 +1,14 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {TaskModel, TaskT, CreateTaskDto, TasksQueryFiltersT} from './task.model'
 import {left, right} from '@sweet-monads/either'
+import {TasksTagsRepo} from './tasks-tags.repository'
+import {isEmpty} from 'lodash/fp'
 
 @Injectable()
 export class TasksRepo {
   constructor(
-    @Inject(TaskModel) private readonly taskModel: typeof TaskModel
+    @Inject(TaskModel) private readonly taskModel: typeof TaskModel,
+    private readonly tasksTagsRepo: TasksTagsRepo
   ) {}
 
   static DEFAULT_FETCH_GRAPH = {
@@ -15,11 +18,23 @@ export class TasksRepo {
   }
 
   create(uid: UID, taskDto: CreateTaskDto) {
-    return this.taskModel.transaction(trx => {
-      return this.taskModel
+    const {title, meta} = taskDto
+    const tagsIds = meta?.tags || []
+
+    return this.taskModel.transaction(async trx => {
+      const task = await this.taskModel
         .query(trx)
-        .insert({title: taskDto.title, author_uid: uid})
+        .insert({
+          title,
+          author_uid: uid
+        })
         .returning('*')
+
+      if (!isEmpty(tagsIds)) {
+        await this.tasksTagsRepo.addTags(task.id, tagsIds, trx)
+      }
+
+      return task
     })
   }
 

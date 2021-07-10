@@ -1,6 +1,6 @@
 import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common'
 import firebase from 'firebase-admin'
-import {isString} from 'lodash'
+import {isString, isUndefined} from 'lodash'
 import {Request} from 'express'
 import {Maybe, just, none} from '@sweet-monads/maybe'
 
@@ -16,6 +16,11 @@ export class AuthGuard implements CanActivate {
 
     const auth = firebase.auth()
     const idToken = await auth.verifyIdToken(token.value)
+
+    if (isUndefined(idToken.email)) {
+      return false
+    }
+
     const user = await auth.getUserByEmail(idToken.email)
 
     request.user = user
