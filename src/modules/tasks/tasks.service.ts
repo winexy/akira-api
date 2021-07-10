@@ -23,7 +23,9 @@ export class TasksService {
 
   async createForMyDay(uid: UID, taskDto: CreateTaskDto) {
     const task = await this.tasksRepo.create(uid, taskDto)
-    return this.myDateService.create(uid, task.id)
+    const result = await this.myDateService.create(uid, task.id)
+
+    return result.map(() => task)
   }
 
   async create(uid: UID, taskDto: CreateTaskDto) {

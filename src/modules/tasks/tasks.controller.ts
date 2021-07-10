@@ -34,12 +34,18 @@ export class TasksController {
 
   @Post('myday')
   @HttpCode(201)
-  createForMyDay(
+  async createForMyDay(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
-  ) {
-    return this.taskService.createForMyDay(uid, taskDto)
+  ): Promise<TaskT> {
+    const result = await this.taskService.createForMyDay(uid, taskDto)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
   }
 
   @Post()
@@ -48,7 +54,7 @@ export class TasksController {
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
-  ) {
+  ): Promise<TaskT> {
     return this.taskService.create(uid, taskDto)
   }
 
