@@ -42,7 +42,15 @@ export class ListsRepo {
   }
 
   findAll(uid: UID) {
-    return this.listModel.query().where('author_uid', uid)
+    const countQuery = this.listModel
+      .relatedQuery('tasks')
+      .count()
+      .as('tasksCount')
+
+    return this.listModel
+      .query()
+      .select('*', countQuery)
+      .where('author_uid', uid)
   }
 
   remove(uid: UID, listId: TaskList['id']) {
