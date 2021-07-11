@@ -11,7 +11,11 @@ import {
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {AuthGuard} from '../../auth.guard'
 import {TaskSchedulerService} from './task-scheduler.service'
-import {scheduleTaskSchema, ScheduleTaskDto} from './scheduled-task.model'
+import {
+  scheduleTaskSchema,
+  ScheduleTaskDto,
+  ScheduledTask
+} from './scheduled-task.model'
 import {User} from 'src/decorators/user.decorator'
 
 @Controller('task-scheduler')
@@ -20,12 +24,18 @@ export class TaskSchedulerController {
   constructor(private readonly taskSchedulerService: TaskSchedulerService) {}
 
   @Post('schedule')
-  create(
+  async create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(scheduleTaskSchema))
     dto: ScheduleTaskDto
-  ) {
-    return this.taskSchedulerService.create(uid, dto)
+  ): Promise<ScheduledTask> {
+    const result = await this.taskSchedulerService.create(uid, dto)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
   }
 
   @Get()
