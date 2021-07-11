@@ -19,7 +19,7 @@ import {User} from 'src/decorators/user.decorator'
 export class TaskSchedulerController {
   constructor(private readonly taskSchedulerService: TaskSchedulerService) {}
 
-  @Post()
+  @Post('schedule')
   create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(scheduleTaskSchema))
