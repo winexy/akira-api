@@ -14,7 +14,8 @@ export class TasksRepo {
   static DEFAULT_FETCH_GRAPH = {
     checklist: true,
     tags: true,
-    list: true
+    list: true,
+    schedule: true
   }
 
   create(uid: UID, taskDto: CreateTaskDto) {

@@ -15,6 +15,7 @@ import {Model} from 'objection'
 import {ChecklistModel} from '../checklist/checklist.model'
 import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
+import {ScheduledTaskModel} from '../task-scheduler/scheduled-task.model'
 
 export type TaskT = {
   id: string
@@ -70,6 +71,14 @@ export class TaskModel extends Model implements TaskT {
             to: 'tasks_tags.tag_id'
           },
           to: 'tags.id'
+        }
+      },
+      schedule: {
+        relation: Model.HasOneRelation,
+        modelClass: ScheduledTaskModel,
+        join: {
+          from: 'tasks.id',
+          to: 'scheduled_tasks.task_id'
         }
       }
     }
