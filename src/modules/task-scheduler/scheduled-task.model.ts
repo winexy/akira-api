@@ -17,7 +17,7 @@ export class ScheduledTaskModel extends Model implements ScheduledTask {
 
 export const scheduleTaskSchema = f.shape({
   task_id: f(string(), required()),
-  date: f(string(), pattern(/\^d{4}-\d{2}-\d{2}$/), required())
+  date: f(string(), pattern(/^\d{4}-\d{2}-\d{2}$/), required())
 })
 
 export type ScheduleTaskDto = Infer<typeof scheduleTaskSchema>
