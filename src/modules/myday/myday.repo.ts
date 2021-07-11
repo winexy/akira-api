@@ -1,3 +1,4 @@
+import {Transaction} from 'objection'
 import {Inject, Injectable} from '@nestjs/common'
 import {left, right} from '@sweet-monads/either'
 import {UniqueViolationError} from 'db-errors'
@@ -68,7 +69,16 @@ export class MyDayRepo {
     }
   }
 
-  resetMyDay() {
-    return this.myDayModel.query().delete()
+  resetMyDay(trx: Transaction) {
+    return this.myDayModel.query(trx).delete()
+  }
+
+  insertBatch(tasks: Array<TaskT>, trx: Transaction) {
+    return this.myDayModel.query(trx).insertGraph(
+      map(tasks, task => ({
+        task_id: task.id,
+        author_uid: task.author_uid
+      }))
+    )
   }
 }

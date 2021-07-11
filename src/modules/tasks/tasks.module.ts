@@ -15,6 +15,6 @@ import {MyDayModule} from '../myday/myday.module'
   ],
   providers: [TasksRepo, TasksService, TasksTagsRepo],
   controllers: [TasksController],
-  exports: [TasksService]
+  exports: [TasksService, TasksRepo]
 })
 export class TasksModule {}

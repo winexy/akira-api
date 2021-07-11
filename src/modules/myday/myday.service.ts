@@ -1,15 +1,19 @@
-import {Inject, Injectable, forwardRef} from '@nestjs/common'
+import {Inject, Injectable, forwardRef, Logger} from '@nestjs/common'
 import {Cron} from '@nestjs/schedule'
-import {TaskIdT} from '../tasks/task.model'
 import {TasksService} from '../tasks/tasks.service'
 import {MyDayRepo} from './myday.repo'
+import {MyDaySyncRepo} from './myday-sync.repo'
+import {TaskIdT} from '../tasks/task.model'
 
 @Injectable()
 export class MyDayService {
+  private readonly logger = new Logger(MyDayService.name)
+
   constructor(
     @Inject(forwardRef(() => TasksService))
     private readonly taskService: TasksService,
-    private readonly myDayRepo: MyDayRepo
+    private readonly myDayRepo: MyDayRepo,
+    private readonly myDaySyncRepo: MyDaySyncRepo
   ) {}
 
   async create(uid: UID, taskId: TaskIdT) {
@@ -31,13 +35,10 @@ export class MyDayService {
   @Cron('0 0 * * *')
   async updateMyDay() {
     try {
-      const count = await this.myDayRepo.resetMyDay()
-      global.console.log(
-        new Date().toTimeString(),
-        `:: removed ${count} tasks from myday`
-      )
+      await this.myDaySyncRepo.sync()
+      this.logger.log('Success MyDay sync')
     } catch (error) {
-      global.console.error(error.message)
+      this.logger.error(`Failed to sync MyDay: ${error.message}`)
     }
   }
 }

@@ -1,7 +1,7 @@
-import {f, Infer, number, pattern, required, string} from '@winexy/fuji'
+import {f, Infer, pattern, required, string} from '@winexy/fuji'
 import {Model} from 'objection'
 
-type ScheduledTask = {
+export type ScheduledTask = {
   id: number
   task_id: string
   date: string

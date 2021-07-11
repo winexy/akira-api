@@ -1,8 +1,15 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TaskModel, TaskT, CreateTaskDto, TasksQueryFiltersT} from './task.model'
+import {
+  TaskModel,
+  TaskT,
+  CreateTaskDto,
+  TasksQueryFiltersT,
+  TaskIdT
+} from './task.model'
 import {left, right} from '@sweet-monads/either'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {isEmpty} from 'lodash/fp'
+import {Transaction} from 'objection'
 
 @Injectable()
 export class TasksRepo {
@@ -77,6 +84,10 @@ export class TasksRepo {
     } catch (error) {
       return left(error)
     }
+  }
+
+  findAllByIds(taskIds: Array<TaskIdT>, trx: Transaction) {
+    return this.taskModel.query(trx).whereIn('id', taskIds)
   }
 
   async update(

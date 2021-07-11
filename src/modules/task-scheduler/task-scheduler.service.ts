@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common'
+import {forwardRef, Inject, Injectable} from '@nestjs/common'
 import {ScheduledTaskRepo} from './scheduled-task.repo'
 import {ScheduleTaskDto} from './scheduled-task.model'
 import {TasksService} from '../tasks/tasks.service'
@@ -6,6 +6,7 @@ import {TasksService} from '../tasks/tasks.service'
 @Injectable()
 export class TaskSchedulerService {
   constructor(
+    @Inject(forwardRef(() => TasksService))
     private readonly taskService: TasksService,
     private readonly scheduledTaskRepo: ScheduledTaskRepo
   ) {}
