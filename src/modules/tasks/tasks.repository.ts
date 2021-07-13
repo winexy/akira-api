@@ -86,6 +86,13 @@ export class TasksRepo {
     }
   }
 
+  search(uid: UID, query: string) {
+    return this.taskModel
+      .query()
+      .where('author_uid', uid)
+      .andWhereRaw('LOWER("title") LIKE ?', `%${query.toLowerCase()}%`)
+  }
+
   findAllByIds(taskIds: Array<TaskIdT>, trx: Transaction) {
     return this.taskModel.query(trx).whereIn('id', taskIds)
   }

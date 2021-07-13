@@ -45,6 +45,10 @@ export class TasksService {
     return this.tasksRepo.findOne(taskId, uid)
   }
 
+  search(uid: UID, query: string) {
+    return this.tasksRepo.search(uid, query)
+  }
+
   async toggleCompleted(taskId: TaskIdT, uid: UID) {
     const result = await this.findOne(taskId, uid)
 

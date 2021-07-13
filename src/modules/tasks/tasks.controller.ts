@@ -72,6 +72,11 @@ export class TasksController {
     return this.taskService.findAllByUID(user.uid, query)
   }
 
+  @Get('search')
+  search(@User('uid') uid: UID, @Query('query') query: string) {
+    return this.taskService.search(uid, query)
+  }
+
   @Get(':id')
   async findOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
     const task = await this.taskService.findOne(id, user.uid)
