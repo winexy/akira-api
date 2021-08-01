@@ -27,6 +27,13 @@ export class TasksService {
     taskDto: CreateTaskDto
   ): EitherP<DBException | UserError, TaskT> {
     const taskId = await this.tasksRepo.create(uid, taskDto)
+
+    const listId = taskDto.meta?.list_id
+
+    if (listId) {
+      this.tasksRepo.addToList(taskId, uid, listId)
+    }
+
     const result = await this.myDateService.create(uid, taskId)
 
     return result.asyncChain(() => this.tasksRepo.findOne(taskId, uid))

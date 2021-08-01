@@ -1,7 +1,7 @@
 import {Inject, Injectable, Logger} from '@nestjs/common'
 import {Transaction} from 'objection'
 import {left, right} from '@sweet-monads/either'
-import {isEmpty, isNumber} from 'lodash/fp'
+import {isEmpty} from 'lodash/fp'
 import {
   TaskModel,
   TaskT,
@@ -10,6 +10,7 @@ import {
   TaskIdT
 } from './task.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
+import {TaskList} from '../lists/list.model'
 
 @Injectable()
 export class TasksRepo {
@@ -30,7 +31,6 @@ export class TasksRepo {
   create(uid: UID, taskDto: CreateTaskDto) {
     const {title, meta} = taskDto
     const tagsIds = meta?.tags || []
-    const listId = meta?.list_id
 
     return this.taskModel.transaction(async trx => {
       const task = await this.taskModel
@@ -47,18 +47,7 @@ export class TasksRepo {
 
       if (!isEmpty(tagsIds)) {
         this.logger.log('add tags to task')
-
         promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
-      }
-
-      if (isNumber(listId)) {
-        this.logger.log('add task to list')
-
-        promises.push(
-          this.update(task.id, uid, {
-            list_id: listId
-          })
-        )
       }
 
       await Promise.all(promises)
@@ -139,6 +128,18 @@ export class TasksRepo {
     }
   }
 
+  private patch(
+    id: TaskT['id'],
+    uid: UserRecord['uid'],
+    patch: Partial<TaskT>
+  ) {
+    return this.taskModel
+      .query()
+      .findById(id)
+      .where({author_uid: uid})
+      .patch(patch)
+  }
+
   async deleteOne(
     taskId: TaskT['id'],
     uid: UserRecord['uid']
@@ -155,6 +156,21 @@ export class TasksRepo {
       return right(count !== 0)
     } catch (error) {
       return left(error)
+    }
+  }
+
+  async addToList(taskId: TaskIdT, uid: UID, listId: TaskList['id']) {
+    this.logger.log('add task to list', {
+      task_id: taskId,
+      list_id: listId
+    })
+
+    try {
+      await this.patch(taskId, uid, {list_id: listId})
+    } catch (error) {
+      this.logger.error('failed to add to list', error.stack, {
+        errorMessage: error.message
+      })
     }
   }
 }
