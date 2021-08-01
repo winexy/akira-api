@@ -7,7 +7,9 @@ services:
     ports:
       - 5432:5432
   akira-api:
-    build: ./Dockerfile.dev
+    build: 
+      context: .
+      dockerfile: ./Dockerfile.dev
     volumes: 
       - .:/code
     env_file: 
