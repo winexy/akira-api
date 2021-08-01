@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common'
+import {Inject, Injectable, Logger} from '@nestjs/common'
 import {Transaction} from 'objection'
 import {left, right} from '@sweet-monads/either'
 import {isEmpty, isNumber} from 'lodash/fp'
@@ -13,6 +13,8 @@ import {TasksTagsRepo} from './tasks-tags.repository'
 
 @Injectable()
 export class TasksRepo {
+  private readonly logger = new Logger(TasksRepo.name)
+
   constructor(
     @Inject(TaskModel) private readonly taskModel: typeof TaskModel,
     private readonly tasksTagsRepo: TasksTagsRepo
@@ -39,14 +41,19 @@ export class TasksRepo {
         })
         .returning('id')
 
+      this.logger.log('task created', `TaskId(${task.id})`)
+
       const promises: Array<Promise<unknown>> = []
 
       if (!isEmpty(tagsIds)) {
+        this.logger.log('add tags to task')
 
         promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
       }
 
       if (isNumber(listId)) {
+        this.logger.log('add task to list')
+
         promises.push(
           this.update(task.id, uid, {
             list_id: listId
@@ -55,6 +62,8 @@ export class TasksRepo {
       }
 
       await Promise.all(promises)
+
+      this.logger.log('all task meta created successfully')
 
       return task.id
     })
