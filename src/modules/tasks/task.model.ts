@@ -90,7 +90,8 @@ const titleSchema = f(string(), required(), maxLength(255))
 export const createTaskDtoSchema = f.shape({
   title: titleSchema,
   meta: f.shape({
-    tags: f.array(f(number()))
+    tags: f.array(f(number())),
+    list_id: f(number())
   })
 })
 

@@ -1,4 +1,7 @@
 import {Inject, Injectable} from '@nestjs/common'
+import {Transaction} from 'objection'
+import {left, right} from '@sweet-monads/either'
+import {isEmpty, isNumber} from 'lodash/fp'
 import {
   TaskModel,
   TaskT,
@@ -6,10 +9,7 @@ import {
   TasksQueryFiltersT,
   TaskIdT
 } from './task.model'
-import {left, right} from '@sweet-monads/either'
 import {TasksTagsRepo} from './tasks-tags.repository'
-import {isEmpty} from 'lodash/fp'
-import {Transaction} from 'objection'
 
 @Injectable()
 export class TasksRepo {
@@ -28,6 +28,7 @@ export class TasksRepo {
   create(uid: UID, taskDto: CreateTaskDto) {
     const {title, meta} = taskDto
     const tagsIds = meta?.tags || []
+    const listId = meta?.list_id
 
     return this.taskModel.transaction(async trx => {
       const task = await this.taskModel
@@ -38,9 +39,22 @@ export class TasksRepo {
         })
         .returning('id')
 
+      const promises: Array<Promise<unknown>> = []
+
       if (!isEmpty(tagsIds)) {
-        await this.tasksTagsRepo.addTags(task.id, tagsIds, trx)
+
+        promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
       }
+
+      if (isNumber(listId)) {
+        promises.push(
+          this.update(task.id, uid, {
+            list_id: listId
+          })
+        )
+      }
+
+      await Promise.all(promises)
 
       return task.id
     })
