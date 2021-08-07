@@ -1,9 +1,11 @@
-import {Inject, Injectable} from '@nestjs/common'
+import {Inject, Injectable, Logger} from '@nestjs/common'
 import {ListModel, TaskList} from './list.model'
 import {TasksRepo} from '../tasks/tasks.repository'
 
 @Injectable()
 export class ListsRepo {
+  private readonly logger = new Logger(ListsRepo.name)
+
   constructor(
     @Inject(ListModel)
     private readonly listModel: typeof ListModel
@@ -20,6 +22,11 @@ export class ListsRepo {
   }
 
   findExactTitle(uid: UID, title: string): Promise<TaskList | undefined> {
+    this.logger.log('[findExactTitle]', {
+      uid,
+      title
+    })
+
     return this.listModel
       .query()
       .where('title', title)
@@ -27,18 +34,23 @@ export class ListsRepo {
   }
 
   findDuplicates(uid: UID, title: string): Promise<TaskList[] | undefined> {
-    return this.listModel
+    /**
+     * 1) Concatenation
+     * :title || ' (%)' <- || is concatenation
+     * hello || ' (%)' => 'hello (%)'
+     * 2) Value binding
+     * :title
+     * https://github.com/knex/knex/issues/3288
+     * 3) :title not in quotes like ':title' due to PG error
+     * https://github.com/knex/knex/issues/1207
+     */
+    const rawExpression = this.listModel.raw(`:title || ' (%)'`, {title})
+    const query = this.listModel
       .query()
-      .where(
-        'title',
-        'LIKE',
-        this.listModel
-          .raw(`':title:' || ' (%)'`, {
-            title
-          })
-          .toString()
-      )
       .where('author_uid', uid)
+      .andWhere('title', 'LIKE', rawExpression)
+
+    return query
   }
 
   findAll(uid: UID) {
