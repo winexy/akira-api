@@ -1,6 +1,7 @@
 import {Test, TestingModule} from '@nestjs/testing'
 import {ListsService} from './lists.service'
 import {ListsRepo} from './lists.repository'
+import {firstValueFrom} from 'rxjs'
 
 describe('ListsService', () => {
   let service: ListsService
@@ -35,7 +36,7 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
+    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
 
     expect(result).toEqual({
       author_uid: TEST_UID,
@@ -61,7 +62,7 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
+    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
 
     expect(result).toEqual({
       author_uid: TEST_UID,
@@ -87,7 +88,7 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
+    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
 
     expect(result).toEqual({
       author_uid: TEST_UID,
@@ -110,7 +111,7 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, 'test').toPromise()
+    const result = await firstValueFrom(service.create(TEST_UID, 'test'))
 
     expect(result).toEqual({
       author_uid: TEST_UID,
@@ -135,7 +136,7 @@ describe('ListsService', () => {
       })
     })
 
-    const result = await service.create(TEST_UID, TEST_TITLE).toPromise()
+    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
 
     expect(result).toEqual({
       author_uid: TEST_UID,
