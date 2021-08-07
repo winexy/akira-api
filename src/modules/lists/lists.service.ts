@@ -1,24 +1,44 @@
-import {Injectable} from '@nestjs/common'
+import {Injectable, Logger} from '@nestjs/common'
 import {fromNullable} from '@sweet-monads/maybe'
-import {isEmpty, last, sortBy, isUndefined} from 'lodash'
+import {isEmpty, last, sortBy, isUndefined, size} from 'lodash'
 import {get} from 'lodash/fp'
 import {ListsRepo} from './lists.repository'
 import {from, of} from 'rxjs'
-import {map, mergeMap} from 'rxjs/operators'
+import {map, mergeMap, tap} from 'rxjs/operators'
 import {TaskList} from './list.model'
 import {assert} from 'console'
 @Injectable()
 export class ListsService {
+  private readonly logger = new Logger(ListsService.name)
+
   constructor(private readonly listRepo: ListsRepo) {}
 
   public static DUPLICATE_MARK_REGEX = / \((\d+)\)$/
 
   create(uid: UID, title: string) {
+    this.logger.log(`creating list "${title}"`)
+
     return from(this.listRepo.findDuplicates(uid, title)).pipe(
+      tap(duplicates => {
+        if (isUndefined(duplicates)) {
+          this.logger.log('no duplicates')
+        } else {
+          this.logger.log('found duplicates', {
+            count: size(duplicates)
+          })
+        }
+      }),
       mergeMap(duplicates => {
         return isUndefined(duplicates) || isEmpty(duplicates)
           ? from(this.listRepo.findExactTitle(uid, title).then(get('title')))
           : of(this.getLastDuplicateTitle(duplicates))
+      }),
+      tap(duplicateTitle => {
+        if (duplicateTitle) {
+          this.logger.log('found duplicate title', {
+            duplicateTitle
+          })
+        }
       }),
       map(duplicateTitle => {
         const nextTitle = fromNullable(duplicateTitle).map(
@@ -26,6 +46,11 @@ export class ListsService {
         )
 
         return nextTitle.isJust() ? nextTitle.value : title
+      }),
+      tap(title => {
+        this.logger.log('final title', {
+          title
+        })
       }),
       mergeMap(title => this.listRepo.create(uid, title))
     )
