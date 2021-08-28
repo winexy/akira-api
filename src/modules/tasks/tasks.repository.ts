@@ -173,4 +173,11 @@ export class TasksRepo {
       })
     }
   }
+
+  findByUpdatedDate(uid: UID, date: string) {
+    return this.taskModel
+      .query()
+      .where('author_uid', uid)
+      .andWhereRaw('CAST(updated_at AS DATE) = CAST(:date AS DATE)', {date})
+  }
 }

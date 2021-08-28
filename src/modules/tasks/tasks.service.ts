@@ -116,4 +116,8 @@ export class TasksService {
       return this.taskTagsRepo.deleteTaskTag(taskId, tagId)
     })
   }
+
+  async findByUpdatedAtDate(uid: UID, date: string) {
+    return this.tasksRepo.findByUpdatedDate(uid, date);
+  }
 }

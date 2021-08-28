@@ -10,8 +10,9 @@ import {
   oneOf,
   number
 } from '@winexy/fuji'
+import {formatISO} from 'date-fns'
 import {isUndefined} from 'lodash'
-import {Model} from 'objection'
+import {Model, ModelOptions, QueryContext} from 'objection'
 import {ChecklistModel} from '../checklist/checklist.model'
 import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
@@ -42,6 +43,14 @@ export class TaskModel extends Model implements TaskT {
   list_id: number | null
 
   static tableName = 'tasks'
+
+  async $beforeUpdate(opt: ModelOptions, queryContext: QueryContext) {
+    await super.$beforeUpdate(opt, queryContext)
+
+    if (opt.patch) {
+      this.updated_at = formatISO(new Date())
+    }
+  }
 
   static get relationMappings() {
     return {
