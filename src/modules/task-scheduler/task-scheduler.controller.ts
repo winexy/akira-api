@@ -38,6 +38,11 @@ export class TaskSchedulerController {
     return result.value
   }
 
+  @Get('week')
+  findWeekTasks(@User('uid') uid: UID) {
+    return this.taskSchedulerService.findWeekTasks(uid)
+  }
+
   @Get()
   findAll() {
     throw new NotImplementedException()

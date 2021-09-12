@@ -1,5 +1,6 @@
 import {f, Infer, pattern, required, string} from '@winexy/fuji'
 import {Model} from 'objection'
+import {TaskModel} from '../tasks/task.model'
 
 export type ScheduledTask = {
   id: number
@@ -13,6 +14,19 @@ export class ScheduledTaskModel extends Model implements ScheduledTask {
   date: string
 
   static tableName = 'scheduled_tasks'
+
+  static get relationMappings() {
+    return {
+      task: {
+        relation: Model.HasOneRelation,
+        modelClass: TaskModel,
+        join: {
+          from: 'scheduled_tasks.task_id',
+          to: 'tasks.id'
+        }
+      }
+    }
+  }
 }
 
 export const scheduleTaskSchema = f.shape({

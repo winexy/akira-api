@@ -1,7 +1,10 @@
 import {forwardRef, Inject, Injectable} from '@nestjs/common'
+import {format, startOfWeek, endOfWeek} from 'date-fns'
 import {ScheduledTaskRepo} from './scheduled-task.repo'
 import {ScheduleTaskDto} from './scheduled-task.model'
 import {TasksService} from '../tasks/tasks.service'
+import {map} from 'lodash'
+import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
 
 @Injectable()
 export class TaskSchedulerService {
@@ -15,6 +18,21 @@ export class TaskSchedulerService {
     const isAuthor = await this.taskService.ensureAuthority(dto.task_id, uid)
 
     return isAuthor.asyncMap(() => this.scheduledTaskRepo.create(dto))
+  }
+
+  async findWeekTasks(uid: UID): Promise<Array<DefaultFetchedTaskGraph>> {
+    const today = new Date()
+    const weekConfig = {weekStartsOn: 1} as const
+    const weekStart = format(startOfWeek(today, weekConfig), 'yyyy-MM-dd')
+    const weekEnd = format(endOfWeek(today, weekConfig), 'yyyy-MM-dd')
+
+    const tasks = await this.scheduledTaskRepo.findWeekTasks(
+      uid,
+      weekStart,
+      weekEnd
+    )
+
+    return map(tasks, 'task')
   }
 
   findAll() {

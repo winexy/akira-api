@@ -1,8 +1,9 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {isUndefined} from 'lodash'
-import {TaskIdT} from '../tasks/task.model'
+import {TaskIdT, TaskModel} from '../tasks/task.model'
 import {ScheduledTaskModel, ScheduleTaskDto} from './scheduled-task.model'
 import {Transaction} from 'objection'
+import {TasksRepo} from '../tasks/tasks.repository'
 
 @Injectable()
 export class ScheduledTaskRepo {
@@ -39,5 +40,23 @@ export class ScheduledTaskRepo {
       .query(trx)
       .delete()
       .whereIn('task_id', taskIds)
+  }
+
+  findWeekTasks(uid: UID, weekStart: string, weekEnd: string) {
+    return this.scheduledTaskModel
+      .query()
+      .where('date', '>=', weekStart)
+      .where('date', '<=', weekEnd)
+      .withGraphFetched({
+        task: {
+          ...TasksRepo.DEFAULT_FETCH_GRAPH,
+          $modify: ['filterTasks']
+        }
+      })
+      .modifiers({
+        filterTasks(builder) {
+          builder.where(TaskModel.ref('author_uid'), uid)
+        }
+      })
   }
 }

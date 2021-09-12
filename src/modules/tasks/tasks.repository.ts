@@ -11,6 +11,16 @@ import {
 } from './task.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskList} from '../lists/list.model'
+import {TodoT} from '../checklist/checklist.model'
+import {TaskTag} from './tasks-tags.model'
+import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
+
+export type DefaultFetchedTaskGraph = TaskT & {
+  checklist: Array<TodoT>
+  tags: Array<TaskTag>
+  list: Array<TaskList>
+  schedule: ScheduledTask
+}
 
 @Injectable()
 export class TasksRepo {
