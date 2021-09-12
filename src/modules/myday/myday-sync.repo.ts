@@ -44,9 +44,6 @@ export class MyDaySyncRepo {
       await this.myDayRepo.insertBatch(tasks, trx)
 
       this.logger.log(`Inserted ${size(tasks)} to MyDay`)
-
-      await this.scheduledTaskRepo.removeBatch(taskIds, trx)
-      this.logger.log(`Removed ${size(taskIds)} scheduled tasks`)
     })
   }
 }
