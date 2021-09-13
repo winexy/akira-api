@@ -32,10 +32,11 @@ export class MyDayService {
     return this.myDayRepo.findTodayTasksByUID(uid)
   }
 
-  @Cron('0 0 * * *')
+  // @Cron('0 0 * * *')
   async updateMyDay() {
     try {
-      await this.myDaySyncRepo.sync()
+      // Task Scheduler is more prefered way
+      // await this.myDaySyncRepo.sync()
       this.logger.log('Success MyDay sync')
     } catch (error) {
       this.logger.error(`Failed to sync MyDay: ${error.message}`)
