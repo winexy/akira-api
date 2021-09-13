@@ -1,9 +1,19 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {isUndefined} from 'lodash'
 import {TaskIdT, TaskModel} from '../tasks/task.model'
-import {ScheduledTaskModel, ScheduleTaskDto} from './scheduled-task.model'
+import {
+  ScheduledTask,
+  ScheduledTaskModel,
+  ScheduleTaskDto
+} from './scheduled-task.model'
 import {Transaction} from 'objection'
-import {TasksRepo} from '../tasks/tasks.repository'
+import {TasksRepo, DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
+import {Either, left, right} from '@sweet-monads/either'
+import {DBError} from 'db-errors'
+
+type QueriedTask = ScheduledTask & {
+  task: DefaultFetchedTaskGraph
+}
 
 @Injectable()
 export class ScheduledTaskRepo {
@@ -42,21 +52,31 @@ export class ScheduledTaskRepo {
       .whereIn('task_id', taskIds)
   }
 
-  findWeekTasks(uid: UID, weekStart: string, weekEnd: string) {
-    return this.scheduledTaskModel
-      .query()
-      .where('date', '>=', weekStart)
-      .where('date', '<=', weekEnd)
-      .withGraphFetched({
-        task: {
-          ...TasksRepo.DEFAULT_FETCH_GRAPH,
-          $modify: ['filterTasks']
-        }
-      })
-      .modifiers({
-        filterTasks(builder) {
-          builder.where(TaskModel.ref('author_uid'), uid)
-        }
-      })
+  async findWeekTasks(
+    uid: UID,
+    weekStart: string,
+    weekEnd: string
+  ): Promise<Either<DBError, Array<QueriedTask>>> {
+    try {
+      const result = await this.scheduledTaskModel
+        .query()
+        .where('date', '>=', weekStart)
+        .where('date', '<=', weekEnd)
+        .withGraphFetched({
+          task: {
+            ...TasksRepo.DEFAULT_FETCH_GRAPH,
+            $modify: ['filterTasks']
+          }
+        })
+        .modifiers({
+          filterTasks(builder) {
+            builder.where(TaskModel.ref('author_uid'), uid)
+          }
+        })
+
+      return right((result as unknown) as Array<QueriedTask>)
+    } catch (error) {
+      return left(error)
+    }
   }
 }

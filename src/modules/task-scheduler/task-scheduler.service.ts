@@ -20,19 +20,23 @@ export class TaskSchedulerService {
     return isAuthor.asyncMap(() => this.scheduledTaskRepo.create(dto))
   }
 
-  async findWeekTasks(uid: UID): Promise<Array<DefaultFetchedTaskGraph>> {
-    const today = new Date()
+  private getWeekRange(date: Date) {
     const weekConfig = {weekStartsOn: 1} as const
-    const weekStart = format(startOfWeek(today, weekConfig), 'yyyy-MM-dd')
-    const weekEnd = format(endOfWeek(today, weekConfig), 'yyyy-MM-dd')
 
-    const tasks = await this.scheduledTaskRepo.findWeekTasks(
-      uid,
-      weekStart,
-      weekEnd
-    )
+    return [
+      format(startOfWeek(date, weekConfig), DEFAULT_DATE_FORMAT),
+      format(endOfWeek(date, weekConfig), DEFAULT_DATE_FORMAT)
+    ]
+  }
 
-    return map(tasks, 'task')
+  async findWeekTasks(
+    uid: UID
+  ): EitherP<Error | DBException, Array<DefaultFetchedTaskGraph>> {
+    const [start, end] = this.getWeekRange(new Date())
+
+    const result = await this.scheduledTaskRepo.findWeekTasks(uid, start, end)
+
+    return result.map(map('task'))
   }
 
   findAll() {
