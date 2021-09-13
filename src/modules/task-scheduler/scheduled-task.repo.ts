@@ -45,6 +45,35 @@ export class ScheduledTaskRepo {
     })
   }
 
+  async findUserTasksByDate(
+    uid: UID,
+    date: string
+  ): Promise<Either<DBError, Array<QueriedTask>>> {
+    try {
+      const result = await this.scheduledTaskModel
+        .query()
+        .where({
+          date
+        })
+        .withGraphFetched({
+          task: {
+            ...TasksRepo.DEFAULT_FETCH_GRAPH,
+            $modify: ['filterTask']
+          }
+        })
+        .modifiers({
+          filterTask(builder) {
+            builder.where(TaskModel.ref('author_uid'), uid)
+          }
+        })
+        .throwIfNotFound()
+
+      return right((result as unknown) as Array<QueriedTask>)
+    } catch (error) {
+      return left(error)
+    }
+  }
+
   removeBatch(taskIds: Array<TaskIdT>, trx: Transaction) {
     return this.scheduledTaskModel
       .query(trx)

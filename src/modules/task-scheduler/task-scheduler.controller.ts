@@ -38,6 +38,17 @@ export class TaskSchedulerController {
     return result.value
   }
 
+  @Get('today')
+  async findTodayTasks(@User('uid') uid: UID) {
+    const result = await this.taskSchedulerService.findTodayTasks(uid)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
+  }
+
   @Get('week')
   async findWeekTasks(@User('uid') uid: UID) {
     const result = await this.taskSchedulerService.findWeekTasks(uid)

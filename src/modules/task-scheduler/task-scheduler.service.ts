@@ -3,8 +3,11 @@ import {format, startOfWeek, endOfWeek} from 'date-fns'
 import {ScheduledTaskRepo} from './scheduled-task.repo'
 import {ScheduleTaskDto} from './scheduled-task.model'
 import {TasksService} from '../tasks/tasks.service'
-import {map} from 'lodash'
+import map from 'lodash/fp/map'
 import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
+import { DBError } from 'db-errors'
+
+const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
 
 @Injectable()
 export class TaskSchedulerService {
@@ -18,6 +21,16 @@ export class TaskSchedulerService {
     const isAuthor = await this.taskService.ensureAuthority(dto.task_id, uid)
 
     return isAuthor.asyncMap(() => this.scheduledTaskRepo.create(dto))
+  }
+
+  async findTodayTasks(
+    uid: UID
+  ): EitherP<DBError, Array<DefaultFetchedTaskGraph>> {
+    const today = format(new Date(), DEFAULT_DATE_FORMAT)
+
+    const result = await this.scheduledTaskRepo.findUserTasksByDate(uid, today)
+
+    return result.map(map('task'))
   }
 
   private getWeekRange(date: Date) {
