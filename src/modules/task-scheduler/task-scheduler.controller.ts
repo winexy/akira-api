@@ -6,7 +6,8 @@ import {
   Patch,
   Delete,
   NotImplementedException,
-  UseGuards
+  UseGuards,
+  Param
 } from '@nestjs/common'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {AuthGuard} from '../../auth.guard'
@@ -17,6 +18,8 @@ import {
   ScheduledTask
 } from './scheduled-task.model'
 import {User} from 'src/decorators/user.decorator'
+import {TaskIdT} from '../tasks/task.model'
+import {format} from 'date-fns'
 
 @Controller('task-scheduler')
 @UseGuards(AuthGuard)
@@ -30,6 +33,40 @@ export class TaskSchedulerController {
     dto: ScheduleTaskDto
   ): Promise<ScheduledTask> {
     const result = await this.taskSchedulerService.create(uid, dto)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
+  }
+
+  @Post('schedule/today/:taskId')
+  async scheduleForToday(
+    @User('uid') uid: UID,
+    @Param('taskId') taskId: TaskIdT
+  ): Promise<ScheduledTask> {
+    const result = await this.taskSchedulerService.create(uid, {
+      task_id: taskId,
+      date: format(new Date(), 'yyyy-MM-dd')
+    })
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
+  }
+
+  @Delete('schedule/:taskId')
+  async unScheduleForToday(
+    @User('uid') uid: UID,
+    @Param('taskId') taskId: TaskIdT
+  ): Promise<number> {
+    const result = await this.taskSchedulerService.delete(uid, {
+      task_id: taskId,
+      date: format(new Date(), 'yyyy-MM-dd')
+    })
 
     if (result.isLeft()) {
       throw result.value

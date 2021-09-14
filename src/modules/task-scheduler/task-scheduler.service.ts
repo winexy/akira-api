@@ -3,9 +3,9 @@ import {format, startOfWeek, endOfWeek} from 'date-fns'
 import {ScheduledTaskRepo} from './scheduled-task.repo'
 import {ScheduleTaskDto} from './scheduled-task.model'
 import {TasksService} from '../tasks/tasks.service'
-import map from 'lodash/fp/map'
+import {map} from 'lodash/fp'
 import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
-import { DBError } from 'db-errors'
+import {DBError} from 'db-errors'
 
 const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
 
@@ -21,6 +21,12 @@ export class TaskSchedulerService {
     const isAuthor = await this.taskService.ensureAuthority(dto.task_id, uid)
 
     return isAuthor.asyncMap(() => this.scheduledTaskRepo.create(dto))
+  }
+
+  async delete(uid: UID, dto: ScheduleTaskDto) {
+    const isAuthor = await this.taskService.ensureAuthority(dto.task_id, uid)
+
+    return isAuthor.asyncMap(() => this.scheduledTaskRepo.delete(dto))
   }
 
   async findTodayTasks(

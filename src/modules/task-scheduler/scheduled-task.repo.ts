@@ -39,6 +39,14 @@ export class ScheduledTaskRepo {
     })
   }
 
+  async delete(dto: ScheduleTaskDto) {
+    return await this.scheduledTaskModel
+      .query()
+      .delete()
+      .limit(1)
+      .where('task_id', dto.task_id)
+  }
+
   findByDate(date: string, trx: Transaction) {
     return this.scheduledTaskModel.query(trx).where({
       date
