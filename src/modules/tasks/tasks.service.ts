@@ -12,6 +12,8 @@ import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
 import {MyDayService} from '../myday/myday.service'
 import {UserError} from '../../filters/user-error.exception.filter'
+import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
+import {format} from 'date-fns'
 
 @Injectable()
 export class TasksService {
@@ -19,7 +21,8 @@ export class TasksService {
     private readonly tasksRepo: TasksRepo,
     private readonly taskTagsRepo: TasksTagsRepo,
     @Inject(forwardRef(() => MyDayService))
-    private readonly myDateService: MyDayService
+    private readonly myDateService: MyDayService,
+    private readonly taskSchedulerService: TaskSchedulerService
   ) {}
 
   async createForMyDay(
@@ -34,7 +37,10 @@ export class TasksService {
       this.tasksRepo.addToList(taskId, uid, listId)
     }
 
-    const result = await this.myDateService.create(uid, taskId)
+    const result = await this.taskSchedulerService.create(uid, {
+      date: format(new Date(), 'yyyy-MM-dd'),
+      task_id: taskId
+    })
 
     return result.asyncChain(() => this.tasksRepo.findOne(taskId, uid))
   }
@@ -118,6 +124,6 @@ export class TasksService {
   }
 
   async findByUpdatedAtDate(uid: UID, date: string) {
-    return this.tasksRepo.findByUpdatedDate(uid, date);
+    return this.tasksRepo.findByUpdatedDate(uid, date)
   }
 }
