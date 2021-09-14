@@ -1,10 +1,10 @@
 import {Module} from '@nestjs/common'
 import {ReportsService} from './reports.service'
 import {ReportsController} from './reports.controller'
-import {TasksModule} from '../tasks/tasks.module'
+import {TaskSchedulerModule} from '../task-scheduler/task-scheduler.module'
 
 @Module({
-  imports: [TasksModule],
+  imports: [TaskSchedulerModule],
   controllers: [ReportsController],
   providers: [ReportsService]
 })

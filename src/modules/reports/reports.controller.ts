@@ -13,10 +13,16 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('')
-  findOne(
+  async findOne(
     @User('uid') uid: UID,
     @Query('date', FujiPipe.of(dateSchema)) date: string
   ) {
-    return this.reportsService.findFor(uid, date)
+    const result = await this.reportsService.findFor(uid, date)
+
+    if (result.isLeft()) {
+      throw result.value
+    }
+
+    return result.value
   }
 }

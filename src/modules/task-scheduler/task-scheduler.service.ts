@@ -29,6 +29,12 @@ export class TaskSchedulerService {
     return isAuthor.asyncMap(() => this.scheduledTaskRepo.delete(dto))
   }
 
+  async findByDate(uid: UID, date: string) {
+    const result = await this.scheduledTaskRepo.findUserTasksByDate(uid, date)
+
+    return result.map(map('task'))
+  }
+
   async findTodayTasks(
     uid: UID
   ): EitherP<DBError, Array<DefaultFetchedTaskGraph>> {
