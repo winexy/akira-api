@@ -3,7 +3,7 @@ import {format, startOfWeek, endOfWeek} from 'date-fns'
 import {ScheduledTaskRepo} from './scheduled-task.repo'
 import {ScheduleTaskDto} from './scheduled-task.model'
 import {TasksService} from '../tasks/tasks.service'
-import {map} from 'lodash/fp'
+import {isNull, reduce} from 'lodash/fp'
 import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
 import {DBError} from 'db-errors'
 
@@ -31,18 +31,32 @@ export class TaskSchedulerService {
 
   async findByDate(uid: UID, date: string) {
     const result = await this.scheduledTaskRepo.findUserTasksByDate(uid, date)
+    return result.map(this.temporary_extractTasks)
+  }
 
-    return result.map(map('task'))
+  private temporary_extractTasks(
+    scheduledTasks: Array<{task: DefaultFetchedTaskGraph | null}>
+  ): Array<DefaultFetchedTaskGraph> {
+    return reduce(
+      (tasks, scheduled) => {
+        if (!isNull(scheduled.task)) {
+          tasks.push(scheduled.task)
+        }
+
+        return tasks
+      },
+      [] as Array<DefaultFetchedTaskGraph>,
+      scheduledTasks
+    )
   }
 
   async findTodayTasks(
     uid: UID
   ): EitherP<DBError, Array<DefaultFetchedTaskGraph>> {
     const today = format(new Date(), DEFAULT_DATE_FORMAT)
-
     const result = await this.scheduledTaskRepo.findUserTasksByDate(uid, today)
 
-    return result.map(map('task'))
+    return result.map(this.temporary_extractTasks)
   }
 
   private getWeekRange(date: Date) {
@@ -58,10 +72,9 @@ export class TaskSchedulerService {
     uid: UID
   ): EitherP<Error | DBException, Array<DefaultFetchedTaskGraph>> {
     const [start, end] = this.getWeekRange(new Date())
-
     const result = await this.scheduledTaskRepo.findWeekTasks(uid, start, end)
 
-    return result.map(map('task'))
+    return result.map(this.temporary_extractTasks)
   }
 
   findAll() {
