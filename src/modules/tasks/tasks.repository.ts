@@ -39,14 +39,15 @@ export class TasksRepo {
   }
 
   create(uid: UID, taskDto: CreateTaskDto) {
-    const {title, meta} = taskDto
+    const {task: taskInfo, meta} = taskDto
     const tagsIds = meta?.tags || []
 
     return this.taskModel.transaction(async trx => {
       const task = await this.taskModel
         .query(trx)
         .insert({
-          title,
+          title: taskInfo.title,
+          description: taskInfo?.description,
           author_uid: uid
         })
         .returning('id')

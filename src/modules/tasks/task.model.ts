@@ -97,7 +97,13 @@ export class TaskModel extends Model implements TaskT {
 const titleSchema = f(string(), required(), maxLength(255))
 
 export const createTaskDtoSchema = f.shape({
-  title: titleSchema,
+  task: f.shapeRequired({
+    title: titleSchema,
+    description: f(
+      string(),
+      fmap(s => s?.trim())
+    )
+  }),
   meta: f.shape({
     tags: f.array(f(number())),
     list_id: f(number())
