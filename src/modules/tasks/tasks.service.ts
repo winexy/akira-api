@@ -10,9 +10,7 @@ import {
 import {Tag} from '../tags/tag.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
-import {UserError} from '../../filters/user-error.exception.filter'
 import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
-import {format} from 'date-fns'
 
 @Injectable()
 export class TasksService {
@@ -21,26 +19,6 @@ export class TasksService {
     private readonly taskTagsRepo: TasksTagsRepo,
     private readonly taskSchedulerService: TaskSchedulerService
   ) {}
-
-  async createForMyDay(
-    uid: UID,
-    taskDto: CreateTaskDto
-  ): EitherP<DBException | UserError, TaskT> {
-    const taskId = await this.tasksRepo.create(uid, taskDto)
-
-    const listId = taskDto.meta?.list_id
-
-    if (listId) {
-      this.tasksRepo.addToList(taskId, uid, listId)
-    }
-
-    const result = await this.taskSchedulerService.create(uid, {
-      date: format(new Date(), 'yyyy-MM-dd'),
-      task_id: taskId
-    })
-
-    return result.asyncChain(() => this.tasksRepo.findOne(taskId, uid))
-  }
 
   async create(uid: UID, taskDto: CreateTaskDto) {
     const taskId = await this.tasksRepo.create(uid, taskDto)

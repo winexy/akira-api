@@ -14,6 +14,7 @@ import {TaskList} from '../lists/list.model'
 import {TodoT} from '../checklist/checklist.model'
 import {TaskTag} from './tasks-tags.model'
 import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
+import {ScheduledTaskRepo} from '../task-scheduler/scheduled-task.repo'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
@@ -28,7 +29,8 @@ export class TasksRepo {
 
   constructor(
     @Inject(TaskModel) private readonly taskModel: typeof TaskModel,
-    private readonly tasksTagsRepo: TasksTagsRepo
+    private readonly tasksTagsRepo: TasksTagsRepo,
+    private readonly scheduledTaskRepo: ScheduledTaskRepo
   ) {}
 
   static DEFAULT_FETCH_GRAPH = {
@@ -48,6 +50,7 @@ export class TasksRepo {
         .insert({
           title: taskInfo.title,
           description: taskInfo?.description,
+          list_id: meta.list_id,
           author_uid: uid
         })
         .returning('id')
@@ -60,6 +63,16 @@ export class TasksRepo {
         this.logger.log('add tags to task')
         promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
       }
+
+      promises.push(
+        this.scheduledTaskRepo.create(
+          {
+            date: meta.date,
+            task_id: task.id
+          },
+          trx
+        )
+      )
 
       await Promise.all(promises)
 

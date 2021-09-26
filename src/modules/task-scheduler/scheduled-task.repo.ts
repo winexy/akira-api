@@ -22,19 +22,19 @@ export class ScheduledTaskRepo {
     private readonly scheduledTaskModel: typeof ScheduledTaskModel
   ) {}
 
-  async create(dto: ScheduleTaskDto) {
+  async create(dto: ScheduleTaskDto, trx?: Transaction) {
     const entity = await this.scheduledTaskModel
-      .query()
+      .query(trx)
       .findOne('task_id', dto.task_id)
 
     if (isUndefined(entity)) {
-      return this.scheduledTaskModel.query().insert({
+      return this.scheduledTaskModel.query(trx).insert({
         task_id: dto.task_id,
         date: dto.date
       })
     }
 
-    return this.scheduledTaskModel.query().patchAndFetchById(entity.id, {
+    return this.scheduledTaskModel.query(trx).patchAndFetchById(entity.id, {
       date: dto.date
     })
   }

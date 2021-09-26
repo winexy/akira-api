@@ -8,7 +8,8 @@ import {
   string,
   excludeRules,
   oneOf,
-  number
+  number,
+  pattern
 } from '@winexy/fuji'
 import {formatISO} from 'date-fns'
 import {isUndefined} from 'lodash'
@@ -104,7 +105,8 @@ export const createTaskDtoSchema = f.shape({
       fmap(s => s?.trim())
     )
   }),
-  meta: f.shape({
+  meta: f.shapeRequired({
+    date: f(required(), pattern(/\d{4}-\d{2}-\d{2}/)),
     tags: f.array(f(number())),
     list_id: f(number())
   })

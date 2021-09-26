@@ -32,22 +32,6 @@ import {
 export class TasksController {
   constructor(private readonly taskService: TasksService) {}
 
-  @Post('myday')
-  @HttpCode(201)
-  async createForMyDay(
-    @User('uid') uid: UID,
-    @Body(FujiPipe.of(createTaskDtoSchema))
-    taskDto: CreateTaskDto
-  ): Promise<TaskT> {
-    const result = await this.taskService.createForMyDay(uid, taskDto)
-
-    if (result.isLeft()) {
-      throw result.value
-    }
-
-    return result.value
-  }
-
   @Post()
   @HttpCode(201)
   async create(
