@@ -74,7 +74,6 @@ export class ScheduledTaskRepo {
             builder.where(TaskModel.ref('author_uid'), uid)
           }
         })
-        .throwIfNotFound()
 
       return right((result as unknown) as Array<QueriedTask>)
     } catch (error) {
