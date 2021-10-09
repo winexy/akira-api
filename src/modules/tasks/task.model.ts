@@ -96,6 +96,7 @@ export class TaskModel extends Model implements TaskT {
 }
 
 const titleSchema = f(string(), required(), maxLength(255))
+const datePattern = pattern(/\d{4}-\d{2}-\d{2}/)
 
 export const createTaskDtoSchema = f.shape({
   task: f.shapeRequired({
@@ -106,7 +107,7 @@ export const createTaskDtoSchema = f.shape({
     )
   }),
   meta: f.shapeRequired({
-    date: f(required(), pattern(/\d{4}-\d{2}-\d{2}/)),
+    date: f(required(), datePattern),
     tags: f.array(f(number())),
     list_id: f(number())
   })
@@ -122,7 +123,8 @@ export const taskPatchSchema = f.shape({
   ),
   is_completed: f(bool()),
   is_important: f(bool()),
-  list_id: f(number())
+  list_id: f(number()),
+  due_date: f(datePattern)
 })
 
 export type TaskPatchT = Infer<typeof taskPatchSchema>
