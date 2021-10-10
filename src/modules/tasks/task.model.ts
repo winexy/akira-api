@@ -9,7 +9,8 @@ import {
   excludeRules,
   oneOf,
   number,
-  pattern
+  pattern,
+  nullable
 } from '@winexy/fuji'
 import {formatISO} from 'date-fns'
 import {isUndefined} from 'lodash'
@@ -107,7 +108,7 @@ export const createTaskDtoSchema = f.shape({
     )
   }),
   meta: f.shapeRequired({
-    date: f(required(), datePattern),
+    date: f(required(), nullable(), datePattern),
     tags: f.array(f(number())),
     list_id: f(number())
   })
@@ -124,7 +125,7 @@ export const taskPatchSchema = f.shape({
   is_completed: f(bool()),
   is_important: f(bool()),
   list_id: f(number()),
-  due_date: f(datePattern)
+  due_date: f(nullable(), datePattern)
 })
 
 export type TaskPatchT = Infer<typeof taskPatchSchema>

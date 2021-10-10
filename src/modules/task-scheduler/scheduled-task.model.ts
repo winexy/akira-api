@@ -1,4 +1,4 @@
-import {f, Infer, pattern, required, string} from '@winexy/fuji'
+import {f, Infer, nullable, pattern, required, string} from '@winexy/fuji'
 import {Model} from 'objection'
 import {TaskModel} from '../tasks/task.model'
 
@@ -31,7 +31,7 @@ export class ScheduledTaskModel extends Model implements ScheduledTask {
 
 export const scheduleTaskSchema = f.shape({
   task_id: f(string(), required()),
-  date: f(string(), pattern(/^\d{4}-\d{2}-\d{2}$/), required())
+  date: f(string(), pattern(/^\d{4}-\d{2}-\d{2}$/), required(), nullable())
 })
 
 export type ScheduleTaskDto = Infer<typeof scheduleTaskSchema>
