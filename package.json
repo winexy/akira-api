@@ -44,7 +44,7 @@
     "firebase-admin": "^9.7.0",
     "knex": "^0.21.2",
     "lodash": "^4.17.21",
-    "objection": "^2.2.15",
+    "objection": "2.2.15",
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

@@ -5,13 +5,13 @@ import {TaskModel} from '../tasks/task.model'
 export type ScheduledTask = {
   id: number
   task_id: string
-  date: string
+  date: string | null
 }
 
 export class ScheduledTaskModel extends Model implements ScheduledTask {
   id: number
   task_id: string
-  date: string
+  date: string | null
 
   static tableName = 'scheduled_tasks'
 

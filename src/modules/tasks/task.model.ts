@@ -30,6 +30,7 @@ export type TaskT = {
   created_at: string
   updated_at: string
   list_id: number | null
+  due_date: string | null
 }
 
 export type TaskIdT = TaskT['id']
@@ -43,6 +44,7 @@ export class TaskModel extends Model implements TaskT {
   created_at: string
   updated_at: string
   list_id: number | null
+  due_date: string | null
 
   static tableName = 'tasks'
 
