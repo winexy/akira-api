@@ -1,7 +1,9 @@
 import {Test, TestingModule} from '@nestjs/testing'
+import * as TE from 'fp-ts/lib/TaskEither'
+import * as E from 'fp-ts/lib/Either'
+import * as O from 'fp-ts/lib/Option'
 import {ListsService} from './lists.service'
 import {ListsRepo} from './lists.repository'
-import {firstValueFrom} from 'rxjs'
 
 describe('ListsService', () => {
   let service: ListsService
@@ -26,19 +28,21 @@ describe('ListsService', () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test'
 
-    listsRepo.findDuplicates.mockResolvedValueOnce([])
-    listsRepo.findExactTitle.mockResolvedValueOnce(undefined)
+    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([]))
+    listsRepo.findExactTitle.mockReturnValueOnce(TE.of(O.none))
 
-    listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
-      return Promise.resolve({
-        author_uid: uid,
-        title
-      })
-    })
+    listsRepo.create.mockImplementationOnce(
+      (uid: string) => (title: string) => {
+        return TE.of({
+          author_uid: uid,
+          title
+        })
+      }
+    )
 
-    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
+    const result = await service.create(TEST_UID, TEST_TITLE)()
 
-    expect(result).toEqual({
+    expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
       title: TEST_TITLE
     })
@@ -47,24 +51,25 @@ describe('ListsService', () => {
   it('should return new list if has has exact title', async () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test'
-    const MOCK_EXACT_LIST = {
-      author_uid: TEST_UID,
-      title: TEST_TITLE
-    }
+    const MOCK_EXACT_TITLE = TEST_TITLE
 
-    listsRepo.findDuplicates.mockResolvedValueOnce([])
-    listsRepo.findExactTitle.mockResolvedValueOnce(MOCK_EXACT_LIST)
+    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([]))
+    listsRepo.findExactTitle.mockReturnValueOnce(
+      TE.of(O.some(MOCK_EXACT_TITLE))
+    )
 
-    listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
-      return Promise.resolve({
-        author_uid: uid,
-        title
-      })
-    })
+    listsRepo.create.mockImplementationOnce(
+      (uid: string) => (title: string) => {
+        return TE.of({
+          author_uid: uid,
+          title
+        })
+      }
+    )
 
-    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
+    const result = await service.create(TEST_UID, TEST_TITLE)()
 
-    expect(result).toEqual({
+    expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
       title: `${TEST_TITLE} (1)`
     })
@@ -79,18 +84,20 @@ describe('ListsService', () => {
       title: `${TEST_TITLE} ${DUPLICATE_POSTFIX}`
     }
 
-    listsRepo.findDuplicates.mockResolvedValueOnce([MOCK_SIMILAR_LIST])
+    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([MOCK_SIMILAR_LIST]))
 
-    listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
-      return Promise.resolve({
-        author_uid: uid,
-        title
-      })
-    })
+    listsRepo.create.mockImplementationOnce(
+      (uid: string) => (title: string) => {
+        return TE.of({
+          author_uid: uid,
+          title
+        })
+      }
+    )
 
-    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
+    const result = await service.create(TEST_UID, TEST_TITLE)()
 
-    expect(result).toEqual({
+    expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
       title: `${TEST_TITLE} (2)`
     })
@@ -99,21 +106,25 @@ describe('ListsService', () => {
   it('should return new duplicate title if has many duplicates', async () => {
     const TEST_UID = 'test-uid'
 
-    listsRepo.findDuplicates.mockResolvedValueOnce([
-      {author_uid: TEST_UID, title: 'test (9)'},
-      {author_uid: TEST_UID, title: 'test (10)'}
-    ])
+    listsRepo.findDuplicates.mockReturnValueOnce(
+      TE.of([
+        {author_uid: TEST_UID, title: 'test (9)'},
+        {author_uid: TEST_UID, title: 'test (10)'}
+      ])
+    )
 
-    listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
-      return Promise.resolve({
-        author_uid: uid,
-        title
-      })
-    })
+    listsRepo.create.mockImplementationOnce(
+      (uid: string) => (title: string) => {
+        return TE.of({
+          author_uid: uid,
+          title
+        })
+      }
+    )
 
-    const result = await firstValueFrom(service.create(TEST_UID, 'test'))
+    const result = await service.create(TEST_UID, 'test')()
 
-    expect(result).toEqual({
+    expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
       title: `test (11)`
     })
@@ -127,18 +138,20 @@ describe('ListsService', () => {
       title: TEST_TITLE
     }
 
-    listsRepo.findDuplicates.mockResolvedValueOnce([MOCK_SIMILAR_LIST])
+    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([MOCK_SIMILAR_LIST]))
 
-    listsRepo.create.mockImplementationOnce((uid: string, title: string) => {
-      return Promise.resolve({
-        author_uid: uid,
-        title
-      })
-    })
+    listsRepo.create.mockImplementationOnce(
+      (uid: string) => (title: string) => {
+        return TE.of({
+          author_uid: uid,
+          title
+        })
+      }
+    )
 
-    const result = await firstValueFrom(service.create(TEST_UID, TEST_TITLE))
+    const result = await service.create(TEST_UID, TEST_TITLE)()
 
-    expect(result).toEqual({
+    expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
       title: `${TEST_TITLE} (1)`
     })

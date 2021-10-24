@@ -1,6 +1,13 @@
 import {Inject, Injectable, Logger} from '@nestjs/common'
 import {ListModel, TaskList} from './list.model'
 import {TasksRepo} from '../tasks/tasks.repository'
+import * as TE from 'fp-ts/lib/TaskEither'
+import {
+  transformRejectReason,
+  RejectedQueryError
+} from '../../shared/transform-reject-reason'
+import {flow, pipe} from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
 @Injectable()
 export class ListsRepo {
@@ -11,29 +18,44 @@ export class ListsRepo {
     private readonly listModel: typeof ListModel
   ) {}
 
-  create(uid: UID, title: string): Promise<TaskList> {
-    return this.listModel
-      .query()
-      .insert({
-        author_uid: uid,
-        title
-      })
-      .returning('*')
+  create(uid: UID) {
+    return (title: string): TE.TaskEither<RejectedQueryError, TaskList> => {
+      return TE.tryCatch(() => {
+        return this.listModel
+          .query()
+          .insert({
+            author_uid: uid,
+            title
+          })
+          .returning('*')
+      }, transformRejectReason)
+    }
   }
 
-  findExactTitle(uid: UID, title: string): Promise<TaskList | undefined> {
-    this.logger.log('[findExactTitle]', {
-      uid,
-      title
-    })
-
-    return this.listModel
-      .query()
-      .where('title', title)
-      .findOne('author_uid', uid)
+  findExactTitle(
+    uid: UID,
+    title: string
+  ): TE.TaskEither<RejectedQueryError, O.Option<string>> {
+    return pipe(
+      TE.tryCatch(() => {
+        return this.listModel
+          .query()
+          .where('title', title)
+          .findOne('author_uid', uid)
+      }, transformRejectReason),
+      TE.map(
+        flow(
+          O.fromNullable,
+          O.map(taskList => taskList.title)
+        )
+      )
+    )
   }
 
-  findDuplicates(uid: UID, title: string): Promise<TaskList[] | undefined> {
+  findDuplicates(
+    uid: UID,
+    title: string
+  ): TE.TaskEither<RejectedQueryError, TaskList[]> {
     /**
      * 1) Concatenation
      * :title || ' (%)' <- || is concatenation
@@ -45,12 +67,13 @@ export class ListsRepo {
      * https://github.com/knex/knex/issues/1207
      */
     const rawExpression = this.listModel.raw(`:title || ' (%)'`, {title})
-    const query = this.listModel
-      .query()
-      .where('author_uid', uid)
-      .andWhere('title', 'LIKE', rawExpression)
 
-    return query
+    return TE.tryCatch(() => {
+      return this.listModel
+        .query()
+        .where('author_uid', uid)
+        .andWhere('title', 'LIKE', rawExpression)
+    }, transformRejectReason)
   }
 
   findAll(uid: UID) {

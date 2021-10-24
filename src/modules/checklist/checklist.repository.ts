@@ -1,6 +1,10 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {left, right} from '@sweet-monads/either'
 import {TaskIdT} from '../tasks/task.model'
+import * as TE from 'fp-ts/lib/TaskEither'
+import {
+  RejectedQueryError,
+  transformRejectReason
+} from '../../shared/transform-reject-reason'
 import {
   ChecklistModel,
   CreateTodoDto,
@@ -16,64 +20,48 @@ export class ChecklistRepo {
     private readonly checklistModel: typeof ChecklistModel
   ) {}
 
-  async addTodo(dto: CreateTodoDto) {
-    try {
-      const todo = await this.checklistModel
+  addTodo(dto: CreateTodoDto): TE.TaskEither<RejectedQueryError, TodoT> {
+    return TE.tryCatch(() => {
+      return this.checklistModel
         .query()
         .insert({
           task_id: dto.taskId,
           title: dto.title
         })
         .returning('*')
-
-      return right(todo)
-    } catch (error) {
-      return left(error)
-    }
+    }, transformRejectReason)
   }
 
-  async removeTodo(taskId: TaskIdT, todoId: TodoIdT) {
-    try {
-      const result = await this.checklistModel
+  removeTodo(taskId: TaskIdT, todoId: TodoIdT) {
+    return TE.tryCatch(() => {
+      return this.checklistModel
         .query()
         .deleteById(todoId)
         .where({task_id: taskId})
         .throwIfNotFound()
-
-      return right(result)
-    } catch (error) {
-      return left(error)
-    }
+    }, transformRejectReason)
   }
 
-  async findAllByTaskId(taskId: TaskIdT): EitherP<DBException, TodoT[]> {
-    try {
-      const result = await this.checklistModel
+  findAllByTaskId(taskId: TaskIdT): TE.TaskEither<DBException, TodoT[]> {
+    return TE.tryCatch(() => {
+      return this.checklistModel
         .query()
         .where({
           task_id: taskId
         })
         .limit(100)
-
-      return right(result)
-    } catch (error) {
-      return left(error)
-    }
+    }, transformRejectReason)
   }
 
-  async patchTodo(
+  patchTodo(
     todoId: TodoIdT,
     patch: TodoPatchT
-  ): EitherP<DBException, TodoT> {
-    try {
-      const result = await this.checklistModel
+  ): TE.TaskEither<DBException, TodoT> {
+    return TE.tryCatch(() => {
+      return this.checklistModel
         .query()
         .patchAndFetchById(todoId, patch)
         .throwIfNotFound()
-
-      return right(result)
-    } catch (error) {
-      return left(error)
-    }
+    }, transformRejectReason)
   }
 }

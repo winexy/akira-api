@@ -1,9 +1,13 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {Transaction} from 'objection'
-import {left, right} from '@sweet-monads/either'
-import {TasksTagsModel} from './tasks-tags.model'
+import {TasksTagsModel, TaskTag} from './tasks-tags.model'
 import {Tag} from '../tags/tag.model'
 import {TaskT} from './task.model'
+import * as TE from 'fp-ts/lib/TaskEither'
+import {
+  RejectedQueryError,
+  transformRejectReason
+} from '../../shared/transform-reject-reason'
 
 @Injectable()
 export class TasksTagsRepo {
@@ -12,22 +16,27 @@ export class TasksTagsRepo {
     private readonly tasksTagsModel: typeof TasksTagsModel
   ) {}
 
-  createTaskTag(taskId: TaskT['id'], tagId: Tag['id']) {
-    return this.tasksTagsModel
-      .query()
-      .insert({
-        task_id: taskId,
-        tag_id: tagId
-      })
-      .returning('*')
-  }
-
-  async deleteTaskTag(
+  createTaskTag(
     taskId: TaskT['id'],
     tagId: Tag['id']
-  ): EitherP<DBException, number> {
-    try {
-      const result = await this.tasksTagsModel
+  ): TE.TaskEither<RejectedQueryError, TaskTag> {
+    return TE.tryCatch(() => {
+      return this.tasksTagsModel
+        .query()
+        .insert({
+          task_id: taskId,
+          tag_id: tagId
+        })
+        .returning('*')
+    }, transformRejectReason)
+  }
+
+  deleteTaskTag(
+    taskId: TaskT['id'],
+    tagId: Tag['id']
+  ): TE.TaskEither<DBException, number> {
+    return TE.tryCatch(() => {
+      return this.tasksTagsModel
         .query()
         .delete()
         .where({
@@ -35,11 +44,7 @@ export class TasksTagsRepo {
           tag_id: tagId
         })
         .throwIfNotFound()
-
-      return right(result)
-    } catch (error) {
-      return left(error)
-    }
+    }, transformRejectReason)
   }
 
   addTags(taskId: TaskT['id'], tags: Array<Tag['id']>, trx?: Transaction) {

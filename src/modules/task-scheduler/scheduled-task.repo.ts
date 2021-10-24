@@ -8,8 +8,12 @@ import {
 } from './scheduled-task.model'
 import {Transaction} from 'objection'
 import {TasksRepo, DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
-import {Either, left, right} from '@sweet-monads/either'
-import {DBError} from 'db-errors'
+import {pipe} from 'fp-ts/lib/function'
+import * as TE from 'fp-ts/lib/TaskEither'
+import {
+  transformRejectReason,
+  RejectedQueryError
+} from '../../shared/transform-reject-reason'
 
 type QueriedTask = ScheduledTask & {
   task: DefaultFetchedTaskGraph
@@ -22,29 +26,52 @@ export class ScheduledTaskRepo {
     private readonly scheduledTaskModel: typeof ScheduledTaskModel
   ) {}
 
-  async create(dto: ScheduleTaskDto, trx?: Transaction) {
-    const entity = await this.scheduledTaskModel
-      .query(trx)
-      .findOne('task_id', dto.task_id)
+  create(dto: ScheduleTaskDto, trx?: Transaction) {
+    return pipe(
+      this.findScheduledTask(dto.task_id, trx),
+      TE.chain(entity => {
+        return isUndefined(entity)
+          ? this.insertNewScheduledTask(dto, trx)
+          : this.patchAlreadyScheduledTask(entity, dto, trx)
+      })
+    )
+  }
 
-    if (isUndefined(entity)) {
+  findScheduledTask(taskId: TaskIdT, trx?: Transaction) {
+    return TE.tryCatch(() => {
+      return this.scheduledTaskModel.query(trx).findOne('task_id', taskId)
+    }, transformRejectReason)
+  }
+
+  insertNewScheduledTask(dto: ScheduleTaskDto, trx?: Transaction) {
+    return TE.tryCatch(() => {
       return this.scheduledTaskModel.query(trx).insert({
         task_id: dto.task_id,
         date: dto.date
       })
-    }
-
-    return this.scheduledTaskModel.query(trx).patchAndFetchById(entity.id, {
-      date: dto.date
-    })
+    }, transformRejectReason)
   }
 
-  async delete(dto: ScheduleTaskDto) {
-    return await this.scheduledTaskModel
-      .query()
-      .delete()
-      .limit(1)
-      .where('task_id', dto.task_id)
+  patchAlreadyScheduledTask(
+    entity: ScheduledTask,
+    dto: ScheduleTaskDto,
+    trx?: Transaction
+  ) {
+    return TE.tryCatch(() => {
+      return this.scheduledTaskModel.query(trx).patchAndFetchById(entity.id, {
+        date: dto.date
+      })
+    }, transformRejectReason)
+  }
+
+  delete(dto: ScheduleTaskDto) {
+    return TE.tryCatch(() => {
+      return this.scheduledTaskModel
+        .query()
+        .delete()
+        .limit(1)
+        .where('task_id', dto.task_id)
+    }, transformRejectReason)
   }
 
   findByDate(date: string, trx: Transaction) {
@@ -53,12 +80,12 @@ export class ScheduledTaskRepo {
     })
   }
 
-  async findUserTasksByDate(
+  findUserTasksByDate(
     uid: UID,
     date: string
-  ): Promise<Either<DBError, Array<QueriedTask>>> {
-    try {
-      const result = await this.scheduledTaskModel
+  ): TE.TaskEither<RejectedQueryError, Array<QueriedTask>> {
+    return TE.tryCatch(() => {
+      return (this.scheduledTaskModel
         .query()
         .where({
           date
@@ -73,12 +100,8 @@ export class ScheduledTaskRepo {
           filterTask(builder) {
             builder.where(TaskModel.ref('author_uid'), uid)
           }
-        })
-
-      return right((result as unknown) as Array<QueriedTask>)
-    } catch (error) {
-      return left(error)
-    }
+        }) as unknown) as Promise<Array<QueriedTask>>
+    }, transformRejectReason)
   }
 
   removeBatch(taskIds: Array<TaskIdT>, trx: Transaction) {
@@ -88,13 +111,13 @@ export class ScheduledTaskRepo {
       .whereIn('task_id', taskIds)
   }
 
-  async findWeekTasks(
+  findWeekTasks(
     uid: UID,
     weekStart: string,
     weekEnd: string
-  ): Promise<Either<DBError, Array<QueriedTask>>> {
-    try {
-      const result = await this.scheduledTaskModel
+  ): TE.TaskEither<RejectedQueryError, Array<QueriedTask>> {
+    return TE.tryCatch(() => {
+      return (this.scheduledTaskModel
         .query()
         .where('date', '>=', weekStart)
         .where('date', '<=', weekEnd)
@@ -108,11 +131,7 @@ export class ScheduledTaskRepo {
           filterTasks(builder) {
             builder.where(TaskModel.ref('author_uid'), uid)
           }
-        })
-
-      return right((result as unknown) as Array<QueriedTask>)
-    } catch (error) {
-      return left(error)
-    }
+        }) as unknown) as Promise<Array<QueriedTask>>
+    }, transformRejectReason)
   }
 }

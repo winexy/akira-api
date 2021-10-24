@@ -12,6 +12,7 @@ import {
   Query,
   UseGuards
 } from '@nestjs/common'
+import * as E from 'fp-ts/lib/Either'
 import {TasksService} from './tasks.service'
 import {AuthGuard} from '../../auth.guard'
 import {FujiPipe} from '../../pipes/fuji.pipe'
@@ -39,13 +40,13 @@ export class TasksController {
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
   ): Promise<TaskT> {
-    const result = await this.taskService.create(uid, taskDto)
+    const result = await this.taskService.create(uid, taskDto)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Get()
@@ -63,13 +64,13 @@ export class TasksController {
 
   @Get(':id')
   async findOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
-    const task = await this.taskService.findOne(id, user.uid)
+    const task = await this.taskService.findOne(id, user.uid)()
 
-    if (task.isLeft()) {
-      throw task.value
+    if (E.isLeft(task)) {
+      throw task.left
     }
 
-    return task.value
+    return task.right
   }
 
   @Patch(':id')
@@ -78,13 +79,13 @@ export class TasksController {
     @Param('id') id: TaskIdT,
     @Body(FujiPipe.of(taskPatchSchema)) patch: TaskPatchT
   ) {
-    const result = await this.taskService.patchTask(uid, id, patch)
+    const result = await this.taskService.patchTask(uid, id, patch)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Patch(':id/complete/toggle')
@@ -92,13 +93,13 @@ export class TasksController {
     @User() user: UserRecord,
     @Param('id') taskId: TaskT['id']
   ) {
-    const task = await this.taskService.toggleCompleted(taskId, user.uid)
+    const task = await this.taskService.toggleCompleted(taskId, user.uid)()
 
-    if (task.isLeft()) {
-      throw task.value
+    if (E.isLeft(task)) {
+      throw task.left
     }
 
-    return task.value
+    return task.right
   }
 
   @Patch(':id/important/toggle')
@@ -106,28 +107,28 @@ export class TasksController {
     @User() user: UserRecord,
     @Param('id') taskId: TaskT['id']
   ) {
-    const task = await this.taskService.toggleImportant(taskId, user.uid)
+    const task = await this.taskService.toggleImportant(taskId, user.uid)()
 
-    if (task.isLeft()) {
-      throw task.value
+    if (E.isLeft(task)) {
+      throw task.left
     }
 
-    return task.value
+    return task.right
   }
 
   @Delete(':id')
   async deleteOne(@User() user: UserRecord, @Param('id') taskId: TaskT['id']) {
-    const result = await this.taskService.deleteOne(taskId, user.uid)
+    const result = await this.taskService.deleteOne(taskId, user.uid)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    if (!result.value) {
+    if (!result.right) {
       throw new InternalServerErrorException('failed to delete task')
     }
 
-    return result.value
+    return result.right
   }
 
   @Post(':taskId/tags/:tagId')
@@ -136,13 +137,13 @@ export class TasksController {
     @Param('taskId') taskId: TaskIdT,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.taskService.createTag(uid, taskId, tagId)
+    const result = await this.taskService.createTag(uid, taskId, tagId)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Delete(':taskId/tags/:tagId')
@@ -151,12 +152,12 @@ export class TasksController {
     @Param('taskId') taskId: TaskIdT,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.taskService.deleteTag(uid, taskId, tagId)
+    const result = await this.taskService.deleteTag(uid, taskId, tagId)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 }

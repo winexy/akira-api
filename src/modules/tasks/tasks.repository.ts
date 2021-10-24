@@ -1,7 +1,7 @@
 import {Inject, Injectable, Logger} from '@nestjs/common'
 import {Transaction} from 'objection'
-import {left, right} from '@sweet-monads/either'
 import {isEmpty} from 'lodash/fp'
+import * as TE from 'fp-ts/lib/TaskEither'
 import {
   TaskModel,
   TaskT,
@@ -15,6 +15,11 @@ import {TodoT} from '../checklist/checklist.model'
 import {TaskTag} from './tasks-tags.model'
 import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
 import {ScheduledTaskRepo} from '../task-scheduler/scheduled-task.repo'
+import {
+  RejectedQueryError,
+  transformRejectReason
+} from '../../shared/transform-reject-reason'
+import {pipe} from 'fp-ts/lib/function'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
@@ -41,45 +46,47 @@ export class TasksRepo {
   }
 
   create(uid: UID, taskDto: CreateTaskDto) {
-    const {task: taskInfo, meta} = taskDto
-    const tagsIds = meta?.tags || []
+    return TE.tryCatch(() => {
+      const {task: taskInfo, meta} = taskDto
+      const tagsIds = meta?.tags || []
 
-    return this.taskModel.transaction(async trx => {
-      const task = await this.taskModel
-        .query(trx)
-        .insert({
-          title: taskInfo.title,
-          description: taskInfo?.description,
-          list_id: meta.list_id,
-          author_uid: uid
-        })
-        .returning('id')
+      return this.taskModel.transaction(async trx => {
+        const task = await this.taskModel
+          .query(trx)
+          .insert({
+            title: taskInfo.title,
+            description: taskInfo?.description,
+            list_id: meta.list_id,
+            author_uid: uid
+          })
+          .returning('id')
 
-      this.logger.log('task created', `TaskId(${task.id})`)
+        this.logger.log('task created', `TaskId(${task.id})`)
 
-      const promises: Array<Promise<unknown>> = []
+        const promises: Array<Promise<unknown>> = []
 
-      if (!isEmpty(tagsIds)) {
-        this.logger.log('add tags to task')
-        promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
-      }
+        if (!isEmpty(tagsIds)) {
+          this.logger.log('add tags to task')
+          promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
+        }
 
-      promises.push(
-        this.scheduledTaskRepo.create(
-          {
-            date: meta.date,
-            task_id: task.id
-          },
-          trx
+        promises.push(
+          this.scheduledTaskRepo.create(
+            {
+              date: meta.date,
+              task_id: task.id
+            },
+            trx
+          )()
         )
-      )
 
-      await Promise.all(promises)
+        await Promise.all(promises)
 
-      this.logger.log('all task meta created successfully')
+        this.logger.log('all task meta created successfully')
 
-      return task.id
-    })
+        return task.id
+      })
+    }, transformRejectReason)
   }
 
   findAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
@@ -102,23 +109,18 @@ export class TasksRepo {
     return query
   }
 
-  async findOne(
-    taskId: TaskT['id'],
-    uid: UserRecord['uid']
-  ): EitherP<DBException, TaskT> {
-    try {
-      const task = await this.taskModel
-        .query()
-        .findOne('id', taskId)
-        .where({
-          author_uid: uid
-        })
-        .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
-        .throwIfNotFound()
-
-      return right(task)
-    } catch (error) {
-      return left(error)
+  findOne(uid: UserRecord['uid']) {
+    return (taskId: TaskT['id']) => {
+      return TE.tryCatch<DBException, TaskT>(() => {
+        return this.taskModel
+          .query()
+          .findOne('id', taskId)
+          .where({
+            author_uid: uid
+          })
+          .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+          .throwIfNotFound()
+      }, transformRejectReason)
     }
   }
 
@@ -133,23 +135,19 @@ export class TasksRepo {
     return this.taskModel.query(trx).whereIn('id', taskIds)
   }
 
-  async update(
+  update(
     id: TaskT['id'],
     uid: UserRecord['uid'],
     patch: Partial<TaskT>
-  ): EitherP<DBException, TaskT> {
-    try {
-      const task = await this.taskModel
+  ): TE.TaskEither<RejectedQueryError, TaskT> {
+    return TE.tryCatch(() => {
+      return this.taskModel
         .query()
         .where({author_uid: uid})
         .patchAndFetchById(id, patch)
         .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
         .throwIfNotFound()
-
-      return right(task)
-    } catch (error) {
-      return left(error)
-    }
+    }, transformRejectReason)
   }
 
   private patch(
@@ -164,23 +162,22 @@ export class TasksRepo {
       .patch(patch)
   }
 
-  async deleteOne(
+  deleteOne(
     taskId: TaskT['id'],
     uid: UserRecord['uid']
-  ): EitherP<DBException, boolean> {
-    try {
-      const count = await this.taskModel
-        .query()
-        .deleteById(taskId)
-        .where({
-          author_uid: uid
-        })
-        .throwIfNotFound()
-
-      return right(count !== 0)
-    } catch (error) {
-      return left(error)
-    }
+  ): TE.TaskEither<DBException, boolean> {
+    return pipe(
+      TE.tryCatch(() => {
+        return this.taskModel
+          .query()
+          .deleteById(taskId)
+          .where({
+            author_uid: uid
+          })
+          .throwIfNotFound()
+      }, transformRejectReason),
+      TE.map(count => count !== 0)
+    )
   }
 
   async addToList(taskId: TaskIdT, uid: UID, listId: TaskList['id']) {

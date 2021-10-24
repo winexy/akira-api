@@ -14,6 +14,7 @@ import {ListsService} from './lists.service'
 import {AuthGuard} from '../../auth.guard'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {CreateTaskListDto, createTaskListSchema, TaskList} from './list.model'
+import * as E from 'fp-ts/lib/Either'
 
 @Controller('lists')
 @UseGuards(AuthGuard)
@@ -22,11 +23,17 @@ export class ListsController {
 
   @Post()
   @HttpCode(201)
-  create(
+  async create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskListSchema)) dto: CreateTaskListDto
   ) {
-    return this.listsService.create(uid, dto.title)
+    const result = await this.listsService.create(uid, dto.title)()
+
+    if (E.isLeft(result)) {
+      throw result.left
+    }
+
+    return result.right
   }
 
   @Get()

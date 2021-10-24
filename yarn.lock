@@ -894,25 +894,6 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@sweet-monads/either@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@sweet-monads/either/-/either-2.3.0.tgz#71664e479cf537a3df3996a399e1a369dd4c1858"
-  integrity sha512-I44sGdGqJAx8NT5jq4Y6TLL3nVpWpqSKuhj3a/Vwgb4bWMiYUX762F+2lovdGUbiDBWni04MUA7/ZWo4y9Z6bA==
-  dependencies:
-    "@sweet-monads/interfaces" "^2.3.0"
-
-"@sweet-monads/interfaces@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@sweet-monads/interfaces/-/interfaces-2.3.0.tgz#3b8ade592630fe8e9666f227d84549203dafd264"
-  integrity sha512-ou9GHjkca1Zh4dSeIG8nmKE7T6Eao2x4Ouj7YTq0nFHA+WwYfvTnhCiUh9+cRz0BTLBRYOLsFlyax05VegSsYQ==
-
-"@sweet-monads/maybe@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@sweet-monads/maybe/-/maybe-2.3.1.tgz#02993dc857d416d8d3930041ff6770c83e79c978"
-  integrity sha512-4fCHEievjOljO5HoXswkKO06aw10ctaeffmeo+22HxTZmn3v/rZ7Kxd6fotI5MIysjgcO8YhoZgv67QeV9jmHg==
-  dependencies:
-    "@sweet-monads/interfaces" "^2.3.0"
-
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -3250,6 +3231,16 @@ forwarded@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
+
+fp-ts-std@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/fp-ts-std/-/fp-ts-std-0.11.0.tgz#8fd7c81eb26bfdadc400dea8620e024947fd8ed2"
+  integrity sha512-9MjsA/cKjH/qxz+OYO4Wij0h5Hfr/PfnFaV4m3G+FAg8SlTbFNiCTX6eC1gHQO0Ilgyp9xkh7H4GufUMhYVq4A==
+
+fp-ts@^2.11.5:
+  version "2.11.5"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.11.5.tgz#97cceb26655b1452d7088d6fb0864f84cceffbe4"
+  integrity sha512-OqlwJq1BdpB83BZXTqI+dNcA6uYk6qk4u9Cgnt64Y+XS7dwdbp/mobx8S2KXf2AXH+scNmA/UVK3SEFHR3vHZA==
 
 fragment-cache@^0.2.1:
   version "0.2.1"

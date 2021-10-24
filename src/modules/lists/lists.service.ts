@@ -1,12 +1,14 @@
-import {Injectable, Logger} from '@nestjs/common'
-import {fromNullable} from '@sweet-monads/maybe'
-import {isEmpty, last, sortBy, isUndefined, size} from 'lodash'
-import {get} from 'lodash/fp'
+import {Logger, Injectable} from '@nestjs/common'
+import {constant, flow, pipe} from 'fp-ts/lib/function'
+import * as TE from 'fp-ts/lib/TaskEither'
+import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/lib/Array'
+import * as N from 'fp-ts/lib/number'
+import * as S from 'fp-ts/lib/string'
+import {tap} from 'fp-ts-std/IO'
+import {contramap} from 'fp-ts/lib/Ord'
 import {ListsRepo} from './lists.repository'
-import {from, of} from 'rxjs'
-import {map, mergeMap, tap} from 'rxjs/operators'
 import {TaskList} from './list.model'
-import {assert} from 'console'
 @Injectable()
 export class ListsService {
   private readonly logger = new Logger(ListsService.name)
@@ -16,43 +18,46 @@ export class ListsService {
   public static DUPLICATE_MARK_REGEX = / \((\d+)\)$/
 
   create(uid: UID, title: string) {
-    this.logger.log(`creating list "${title}"`)
-
-    return from(this.listRepo.findDuplicates(uid, title)).pipe(
-      tap(duplicates => {
-        if (isUndefined(duplicates)) {
-          this.logger.log('no duplicates')
-        } else {
-          this.logger.log('found duplicates', {
-            count: size(duplicates)
-          })
-        }
-      }),
-      mergeMap(duplicates => {
-        return isUndefined(duplicates) || isEmpty(duplicates)
-          ? from(this.listRepo.findExactTitle(uid, title).then(get('title')))
-          : of(this.getLastDuplicateTitle(duplicates))
-      }),
-      tap(duplicateTitle => {
-        if (duplicateTitle) {
-          this.logger.log('found duplicate title', {
-            duplicateTitle
-          })
-        }
-      }),
-      map(duplicateTitle => {
-        const nextTitle = fromNullable(duplicateTitle).map(
-          this.getNextDuplicateTitle
-        )
-
-        return nextTitle.isJust() ? nextTitle.value : title
-      }),
-      tap(title => {
-        this.logger.log('final title', {
-          title
+    return pipe(
+      () => this.logger.log(`creating list "${title}"`),
+      TE.fromIO,
+      TE.chain(() => this.listRepo.findDuplicates(uid, title)),
+      TE.chainFirstIOK(
+        tap(duplicates => () => {
+          if (A.isEmpty(duplicates)) {
+            this.logger.log('no duplicates')
+          } else {
+            this.logger.log('found duplicates', {
+              count: A.size(duplicates)
+            })
+          }
         })
+      ),
+      TE.chain(duplicates => {
+        return A.isEmpty(duplicates)
+          ? this.listRepo.findExactTitle(uid, title)
+          : TE.of(this.getLastDuplicateTitle(duplicates))
       }),
-      mergeMap(title => this.listRepo.create(uid, title))
+      TE.chainFirstIOK(
+        tap(duplicateTitle => () => {
+          if (O.isSome(duplicateTitle)) {
+            this.logger.log('found duplicate title', {
+              duplicateTitle
+            })
+          }
+        })
+      ),
+      TE.map(
+        flow(O.map(this.getNextDuplicateTitle), O.getOrElse(constant(title)))
+      ),
+      TE.chainFirstIOK(
+        tap(title => () => {
+          this.logger.log('final title', {
+            title
+          })
+        })
+      ),
+      TE.chain(this.listRepo.create(uid))
     )
   }
 
@@ -64,30 +69,52 @@ export class ListsService {
     return this.listRepo.remove(uid, listId)
   }
 
-  private getLastDuplicateTitle(duplicates: TaskList[]): string {
-    assert(!isEmpty(duplicates), 'duplicates should not be empty')
-
+  private getLastDuplicateTitle(duplicates: TaskList[]): O.Option<string> {
     const regex = ListsService.DUPLICATE_MARK_REGEX
 
-    const transformed = duplicates.map(duplicate => ({
-      number: Number(get(1, duplicate.title.match(regex))),
-      title: duplicate.title
-    }))
+    type DuplicateMeta = {
+      number: number
+      title: string
+    }
 
-    const lastDuplicate = last(sortBy(transformed, 'number'))
+    const byNumber = pipe(
+      N.Ord,
+      contramap(({number}: DuplicateMeta) => number)
+    )
 
-    return lastDuplicate?.title as string
+    return pipe(
+      duplicates,
+      A.map(duplicate => {
+        const number = pipe(
+          duplicate.title.match(regex),
+          O.fromNullable,
+          O.chain(A.lookup(1)),
+          O.map(Number),
+          O.getOrElse(() => Infinity)
+        )
+
+        return {
+          number,
+          title: duplicate.title
+        }
+      }),
+      A.sortBy([byNumber]),
+      A.last,
+      O.map(duplicate => duplicate.title)
+    )
   }
 
   private getNextDuplicateTitle(title: string): string {
     const regex = ListsService.DUPLICATE_MARK_REGEX
 
-    const {value} = fromNullable(title.match(regex))
-      .map(get(1))
-      .map(Number)
-      .map(n => title.replace(regex, ` (${n + 1})`))
-
-    return value ?? `${title} (1)`
+    return pipe(
+      title.match(regex),
+      O.fromNullable,
+      O.chain(A.lookup(1)),
+      O.map(Number),
+      O.map(n => S.replace(regex, ` (${n + 1})`)(title)),
+      O.getOrElse(() => `${title} (1)`)
+    )
   }
 
   findAllTasks(uid: UID, listId: TaskList['id']) {

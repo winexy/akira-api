@@ -1,4 +1,5 @@
 import {Controller, Get, Query, UseGuards} from '@nestjs/common'
+import * as E from 'fp-ts/lib/Either'
 import {f, string, pattern} from '@winexy/fuji'
 import {ReportsService} from './reports.service'
 import {FujiPipe} from '../../pipes/fuji.pipe'
@@ -17,12 +18,12 @@ export class ReportsController {
     @User('uid') uid: UID,
     @Query('date', FujiPipe.of(dateSchema)) date: string
   ) {
-    const result = await this.reportsService.findFor(uid, date)
+    const result = await this.reportsService.findFor(uid, date)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 }

@@ -14,6 +14,7 @@ import {FujiPipe} from 'src/pipes/fuji.pipe'
 import {createTagSchema, CreateTagDto, Tag} from './tag.model'
 import {TagsService} from './tags.service'
 import {AuthGuard} from '../../auth.guard'
+import * as E from 'fp-ts/lib/Either'
 
 @UseGuards(AuthGuard)
 @Controller('tags')
@@ -31,13 +32,13 @@ export class TagsController {
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTagSchema)) dto: CreateTagDto
   ) {
-    const result = await this.tagsService.createTag(uid, dto)
+    const result = await this.tagsService.createTag(uid, dto)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Delete(':tagId')
@@ -45,12 +46,12 @@ export class TagsController {
     @User('uid') uid: UID,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.tagsService.deleteTag(uid, tagId)
+    const result = await this.tagsService.deleteTag(uid, tagId)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 }

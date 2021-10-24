@@ -5,7 +5,9 @@ import {ScheduleTaskDto} from './scheduled-task.model'
 import {TasksService} from '../tasks/tasks.service'
 import {isNull, reduce} from 'lodash/fp'
 import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
-import {DBError} from 'db-errors'
+import * as TE from 'fp-ts/lib/TaskEither'
+import {pipe} from 'fp-ts/lib/function'
+import {RejectedQueryError} from '../../shared/transform-reject-reason'
 
 const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
 
@@ -17,21 +19,25 @@ export class TaskSchedulerService {
     private readonly scheduledTaskRepo: ScheduledTaskRepo
   ) {}
 
-  async create(uid: UID, dto: ScheduleTaskDto) {
-    const isAuthor = await this.taskService.ensureAuthority(dto.task_id, uid)
-
-    return isAuthor.asyncMap(() => this.scheduledTaskRepo.create(dto))
+  create(uid: UID, dto: ScheduleTaskDto) {
+    return pipe(
+      this.taskService.ensureAuthority(dto.task_id, uid),
+      TE.chain(() => this.scheduledTaskRepo.create(dto))
+    )
   }
 
-  async delete(uid: UID, dto: ScheduleTaskDto) {
-    const isAuthor = await this.taskService.ensureAuthority(dto.task_id, uid)
-
-    return isAuthor.asyncMap(() => this.scheduledTaskRepo.delete(dto))
+  delete(uid: UID, dto: ScheduleTaskDto) {
+    return pipe(
+      this.taskService.ensureAuthority(dto.task_id, uid),
+      TE.chain(() => this.scheduledTaskRepo.delete(dto))
+    )
   }
 
-  async findByDate(uid: UID, date: string) {
-    const result = await this.scheduledTaskRepo.findUserTasksByDate(uid, date)
-    return result.map(this.temporary_extractTasks)
+  findByDate(uid: UID, date: string) {
+    return pipe(
+      this.scheduledTaskRepo.findUserTasksByDate(uid, date),
+      TE.map(this.temporary_extractTasks)
+    )
   }
 
   private temporary_extractTasks(
@@ -50,13 +56,14 @@ export class TaskSchedulerService {
     )
   }
 
-  async findTodayTasks(
+  findTodayTasks(
     uid: UID
-  ): EitherP<DBError, Array<DefaultFetchedTaskGraph>> {
+  ): TE.TaskEither<RejectedQueryError, Array<DefaultFetchedTaskGraph>> {
     const today = format(new Date(), DEFAULT_DATE_FORMAT)
-    const result = await this.scheduledTaskRepo.findUserTasksByDate(uid, today)
-
-    return result.map(this.temporary_extractTasks)
+    return pipe(
+      this.scheduledTaskRepo.findUserTasksByDate(uid, today),
+      TE.map(this.temporary_extractTasks)
+    )
   }
 
   private getWeekRange(date: Date) {
@@ -68,13 +75,15 @@ export class TaskSchedulerService {
     ]
   }
 
-  async findWeekTasks(
+  findWeekTasks(
     uid: UID
-  ): EitherP<Error | DBException, Array<DefaultFetchedTaskGraph>> {
+  ): TE.TaskEither<RejectedQueryError, Array<DefaultFetchedTaskGraph>> {
     const [start, end] = this.getWeekRange(new Date())
-    const result = await this.scheduledTaskRepo.findWeekTasks(uid, start, end)
 
-    return result.map(this.temporary_extractTasks)
+    return pipe(
+      this.scheduledTaskRepo.findWeekTasks(uid, start, end),
+      TE.map(this.temporary_extractTasks)
+    )
   }
 
   findAll() {

@@ -1,41 +1,57 @@
 import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common'
 import firebase from 'firebase-admin'
-import {isString, isUndefined} from 'lodash'
 import {Request} from 'express'
-import {Maybe, just, none} from '@sweet-monads/maybe'
+import * as O from 'fp-ts/lib/Option'
+import * as S from 'fp-ts/lib/string'
+import {constant, pipe} from 'fp-ts/lib/function'
+import {dropLeft} from 'fp-ts-std/String'
+import * as TO from 'fp-ts/lib/TaskOption'
+import {tap} from 'fp-ts-std/IO'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest()
-    const token = this.extractToken(request)
-
-    if (token.isNone()) {
-      return false
-    }
-
     const auth = firebase.auth()
-    const idToken = await auth.verifyIdToken(token.value)
 
-    if (isUndefined(idToken.email)) {
-      return false
-    }
+    const runTask = pipe(
+      this.extractToken(request),
+      TO.fromOption,
+      TO.chain(this.verifyToken(auth)),
+      TO.map(idToken => idToken.email),
+      TO.filter(S.isString),
+      TO.chain(this.getUserByEmail(auth)),
+      TO.chainFirstIOK(
+        tap(user => () => {
+          request.user = user
+        })
+      ),
+      TO.match(constant(false), constant(true))
+    )
 
-    const user = await auth.getUserByEmail(idToken.email)
-
-    request.user = user
-
-    return true
+    return runTask()
   }
 
-  extractToken(request: Request): Maybe<string> {
-    const header = request.header('authorization')
+  private extractToken(request: Request): O.Option<string> {
     const prefix = 'Bearer '
 
-    if (isString(header) && header.startsWith(prefix)) {
-      return just(header.slice(prefix.length))
-    }
+    return pipe(
+      request.header('authorization'),
+      O.fromPredicate(S.isString),
+      O.filter(S.startsWith(prefix)),
+      O.map(dropLeft(S.size(prefix)))
+    )
+  }
 
-    return none()
+  private verifyToken(auth: firebase.auth.Auth) {
+    return (token: string) => {
+      return TO.tryCatch(() => auth.verifyIdToken(token))
+    }
+  }
+
+  private getUserByEmail(auth: firebase.auth.Auth) {
+    return (email: string) => {
+      return TO.tryCatch(() => auth.getUserByEmail(email))
+    }
   }
 }

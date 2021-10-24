@@ -14,6 +14,7 @@ import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
 import {TaskIdT} from '../tasks/task.model'
 import {AuthGuard} from '../../auth.guard'
+import * as E from 'fp-ts/lib/Either'
 import {
   CreateTodoDto,
   createTodoDtoSchema,
@@ -29,13 +30,13 @@ export class ChecklistController {
 
   @Post()
   async addTodo(@Body(FujiPipe.of(createTodoDtoSchema)) body: CreateTodoDto) {
-    const result = await this.checklistService.addTodo(body)
+    const result = await this.checklistService.addTodo(body)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Get('/:taskId')
@@ -43,13 +44,13 @@ export class ChecklistController {
     @User() user: UserRecord,
     @Param('taskId') taskId: TaskIdT
   ) {
-    const result = await this.checklistService.findAllByTaskId(user, taskId)
+    const result = await this.checklistService.findAllByTaskId(user, taskId)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Delete('/:taskId/:todoId')
@@ -62,13 +63,13 @@ export class ChecklistController {
       user.uid,
       taskId,
       todoId
-    )
+    )()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Patch(':taskId/:todoId')
@@ -83,12 +84,12 @@ export class ChecklistController {
       taskId,
       todoId,
       patch
-    )
+    )()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 }

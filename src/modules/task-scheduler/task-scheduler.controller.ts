@@ -20,6 +20,7 @@ import {
 import {User} from 'src/decorators/user.decorator'
 import {TaskIdT} from '../tasks/task.model'
 import {format} from 'date-fns'
+import * as E from 'fp-ts/lib/Either'
 
 @Controller('task-scheduler')
 @UseGuards(AuthGuard)
@@ -32,13 +33,13 @@ export class TaskSchedulerController {
     @Body(FujiPipe.of(scheduleTaskSchema))
     dto: ScheduleTaskDto
   ): Promise<ScheduledTask> {
-    const result = await this.taskSchedulerService.create(uid, dto)
+    const result = await this.taskSchedulerService.create(uid, dto)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Post('schedule/today/:taskId')
@@ -49,13 +50,13 @@ export class TaskSchedulerController {
     const result = await this.taskSchedulerService.create(uid, {
       task_id: taskId,
       date: format(new Date(), 'yyyy-MM-dd')
-    })
+    })()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Delete('schedule/:taskId')
@@ -66,35 +67,35 @@ export class TaskSchedulerController {
     const result = await this.taskSchedulerService.delete(uid, {
       task_id: taskId,
       date: format(new Date(), 'yyyy-MM-dd')
-    })
+    })()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Get('today')
   async findTodayTasks(@User('uid') uid: UID) {
-    const result = await this.taskSchedulerService.findTodayTasks(uid)
+    const result = await this.taskSchedulerService.findTodayTasks(uid)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Get('week')
   async findWeekTasks(@User('uid') uid: UID) {
-    const result = await this.taskSchedulerService.findWeekTasks(uid)
+    const result = await this.taskSchedulerService.findWeekTasks(uid)()
 
-    if (result.isLeft()) {
-      throw result.value
+    if (E.isLeft(result)) {
+      throw result.left
     }
 
-    return result.value
+    return result.right
   }
 
   @Get()

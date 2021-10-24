@@ -11,6 +11,9 @@ import {Tag} from '../tags/tag.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
 import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
+import {pipe} from 'fp-ts/lib/function'
+import * as TE from 'fp-ts/lib/TaskEither'
+import {RejectedQueryError} from 'src/shared/transform-reject-reason'
 
 @Injectable()
 export class TasksService {
@@ -20,9 +23,11 @@ export class TasksService {
     private readonly taskSchedulerService: TaskSchedulerService
   ) {}
 
-  async create(uid: UID, taskDto: CreateTaskDto) {
-    const taskId = await this.tasksRepo.create(uid, taskDto)
-    return this.tasksRepo.findOne(taskId, uid)
+  create(uid: UID, taskDto: CreateTaskDto) {
+    return pipe(
+      this.tasksRepo.create(uid, taskDto),
+      TE.chain(this.tasksRepo.findOne(uid))
+    )
   }
 
   findAllByUID(uid: UID, query: TasksQueryFiltersT) {
@@ -30,72 +35,77 @@ export class TasksService {
   }
 
   findOne(taskId: TaskIdT, uid: UID) {
-    return this.tasksRepo.findOne(taskId, uid)
+    return this.tasksRepo.findOne(uid)(taskId)
   }
 
   search(uid: UID, query: string) {
     return this.tasksRepo.search(uid, query)
   }
 
-  async toggleCompleted(taskId: TaskIdT, uid: UID) {
-    const result = await this.findOne(taskId, uid)
-
-    return result.asyncChain(task =>
-      this.tasksRepo.update(taskId, uid, {
-        is_completed: !task.is_completed
+  toggleCompleted(taskId: TaskIdT, uid: UID) {
+    return pipe(
+      this.findOne(taskId, uid),
+      TE.chain(task => {
+        return this.tasksRepo.update(taskId, uid, {
+          is_completed: !task.is_completed
+        })
       })
     )
   }
 
-  async toggleImportant(taskId: TaskIdT, uid: UID) {
-    const result = await this.findOne(taskId, uid)
-
-    return result.asyncChain(task =>
-      this.tasksRepo.update(taskId, uid, {
-        is_important: !task.is_important
+  toggleImportant(taskId: TaskIdT, uid: UID) {
+    return pipe(
+      this.findOne(taskId, uid),
+      TE.chain(task => {
+        return this.tasksRepo.update(taskId, uid, {
+          is_important: !task.is_important
+        })
       })
     )
   }
 
-  deleteOne(taskId: TaskIdT, uid: UID) {
+  deleteOne(
+    taskId: TaskIdT,
+    uid: UID
+  ): TE.TaskEither<RejectedQueryError, boolean> {
     return this.tasksRepo.deleteOne(taskId, uid)
   }
 
-  async ensureAuthority(taskId: TaskIdT, uid: UID): EitherP<DBException, true> {
-    const res = await this.findOne(taskId, uid)
-    return res.map(() => true)
+  ensureAuthority(taskId: TaskIdT, uid: UID): TE.TaskEither<DBException, true> {
+    return pipe(
+      this.findOne(taskId, uid),
+      TE.map(() => true)
+    )
   }
 
   patchTask(
     uid: UID,
     taskId: TaskIdT,
     patch: TaskPatchT
-  ): EitherP<DBException, TaskT> {
+  ): TE.TaskEither<DBException, TaskT> {
     return this.tasksRepo.update(taskId, uid, patch)
   }
 
-  async createTag(
+  createTag(
     uid: UID,
     taskId: TaskIdT,
     tagId: Tag['id']
-  ): EitherP<DBException, TaskTag> {
-    const isAuthor = await this.ensureAuthority(taskId, uid)
-
-    return isAuthor.asyncMap(() => {
-      return this.taskTagsRepo.createTaskTag(taskId, tagId)
-    })
+  ): TE.TaskEither<DBException, TaskTag> {
+    return pipe(
+      this.ensureAuthority(taskId, uid),
+      TE.chain(() => this.taskTagsRepo.createTaskTag(taskId, tagId))
+    )
   }
 
-  async deleteTag(
+  deleteTag(
     uid: UID,
     taskId: TaskIdT,
     tagId: Tag['id']
-  ): EitherP<DBException, number> {
-    const isAuthor = await this.ensureAuthority(taskId, uid)
-
-    return isAuthor.asyncChain(() => {
-      return this.taskTagsRepo.deleteTaskTag(taskId, tagId)
-    })
+  ): TE.TaskEither<DBException, number> {
+    return pipe(
+      this.ensureAuthority(taskId, uid),
+      TE.chain(() => this.taskTagsRepo.deleteTaskTag(taskId, tagId))
+    )
   }
 
   async findByUpdatedAtDate(uid: UID, date: string) {
