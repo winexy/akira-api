@@ -31,6 +31,7 @@ export type TaskT = {
   updated_at: string
   list_id: number | null
   due_date: string | null
+  recurrence_id: number | null
 }
 
 export type TaskIdT = TaskT['id']
@@ -45,6 +46,7 @@ export class TaskModel extends Model implements TaskT {
   updated_at: string
   list_id: number | null
   due_date: string | null
+  recurrence_id: number | null
 
   static tableName = 'tasks'
 
