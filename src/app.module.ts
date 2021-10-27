@@ -14,6 +14,7 @@ import {ListsModule} from './modules/lists/lists.module'
 import {TagsModule} from './modules/tags/tags.module'
 import {TaskSchedulerModule} from './modules/task-scheduler/task-scheduler.module'
 import {ReportsModule} from './modules/reports/reports.module'
+import {RecurrenceModule} from './modules/recurrence/recurrence.module'
 
 const objectionOptions: ObjectionModuleOptions = {
   config: {
@@ -43,7 +44,8 @@ const objectionOptions: ObjectionModuleOptions = {
     ListsModule,
     TagsModule,
     TaskSchedulerModule,
-    ReportsModule
+    ReportsModule,
+    RecurrenceModule
   ],
   controllers: [AppController],
   providers: [AppService]
