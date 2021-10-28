@@ -1,6 +1,6 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {isUndefined} from 'lodash'
-import {TaskIdT, TaskModel} from '../tasks/task.model'
+import {TaskId, TaskModel} from '../tasks/task.model'
 import {
   ScheduledTask,
   ScheduledTaskModel,
@@ -37,7 +37,7 @@ export class ScheduledTaskRepo {
     )
   }
 
-  findScheduledTask(taskId: TaskIdT, trx?: Transaction) {
+  findScheduledTask(taskId: TaskId, trx?: Transaction) {
     return TE.tryCatch(() => {
       return this.scheduledTaskModel.query(trx).findOne('task_id', taskId)
     }, transformRejectReason)
@@ -104,7 +104,7 @@ export class ScheduledTaskRepo {
     }, transformRejectReason)
   }
 
-  removeBatch(taskIds: Array<TaskIdT>, trx: Transaction) {
+  removeBatch(taskIds: Array<TaskId>, trx: Transaction) {
     return this.scheduledTaskModel
       .query(trx)
       .delete()

@@ -18,7 +18,7 @@ import {
   ScheduledTask
 } from './scheduled-task.model'
 import {User} from 'src/decorators/user.decorator'
-import {TaskIdT} from '../tasks/task.model'
+import {TaskId} from '../tasks/task.model'
 import {format} from 'date-fns'
 import * as E from 'fp-ts/lib/Either'
 
@@ -45,7 +45,7 @@ export class TaskSchedulerController {
   @Post('schedule/today/:taskId')
   async scheduleForToday(
     @User('uid') uid: UID,
-    @Param('taskId') taskId: TaskIdT
+    @Param('taskId') taskId: TaskId
   ): Promise<ScheduledTask> {
     const result = await this.taskSchedulerService.create(uid, {
       task_id: taskId,
@@ -62,7 +62,7 @@ export class TaskSchedulerController {
   @Delete('schedule/:taskId')
   async unScheduleForToday(
     @User('uid') uid: UID,
-    @Param('taskId') taskId: TaskIdT
+    @Param('taskId') taskId: TaskId
   ): Promise<number> {
     const result = await this.taskSchedulerService.delete(uid, {
       task_id: taskId,

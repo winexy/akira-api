@@ -22,7 +22,7 @@ import {Tag} from '../tags/tag.model'
 import {
   TaskPatchT,
   TaskT,
-  TaskIdT,
+  TaskId,
   taskPatchSchema,
   CreateTaskDto,
   createTaskDtoSchema
@@ -76,7 +76,7 @@ export class TasksController {
   @Patch(':id')
   async patchTask(
     @User('uid') uid: UID,
-    @Param('id') id: TaskIdT,
+    @Param('id') id: TaskId,
     @Body(FujiPipe.of(taskPatchSchema)) patch: TaskPatchT
   ) {
     const result = await this.taskService.patchTask(uid, id, patch)()
@@ -134,7 +134,7 @@ export class TasksController {
   @Post(':taskId/tags/:tagId')
   async createTaskTag(
     @User('uid') uid: UID,
-    @Param('taskId') taskId: TaskIdT,
+    @Param('taskId') taskId: TaskId,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
     const result = await this.taskService.createTag(uid, taskId, tagId)()
@@ -149,7 +149,7 @@ export class TasksController {
   @Delete(':taskId/tags/:tagId')
   async deleteTaskTag(
     @User('uid') uid: UID,
-    @Param('taskId') taskId: TaskIdT,
+    @Param('taskId') taskId: TaskId,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
     const result = await this.taskService.deleteTag(uid, taskId, tagId)()

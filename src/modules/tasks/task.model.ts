@@ -34,7 +34,7 @@ export type TaskT = {
   recurrence_id: number | null
 }
 
-export type TaskIdT = TaskT['id']
+export type TaskId = TaskT['id']
 export class TaskModel extends Model implements TaskT {
   id: string
   author_uid: string

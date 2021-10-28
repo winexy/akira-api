@@ -7,7 +7,7 @@ import {
   TaskT,
   CreateTaskDto,
   TasksQueryFiltersT,
-  TaskIdT
+  TaskId
 } from './task.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskList} from '../lists/list.model'
@@ -131,7 +131,7 @@ export class TasksRepo {
       .andWhereRaw('LOWER("title") LIKE ?', `%${query.toLowerCase()}%`)
   }
 
-  findAllByIds(taskIds: Array<TaskIdT>, trx: Transaction) {
+  findAllByIds(taskIds: Array<TaskId>, trx: Transaction) {
     return this.taskModel.query(trx).whereIn('id', taskIds)
   }
 
@@ -180,7 +180,7 @@ export class TasksRepo {
     )
   }
 
-  async addToList(taskId: TaskIdT, uid: UID, listId: TaskList['id']) {
+  async addToList(taskId: TaskId, uid: UID, listId: TaskList['id']) {
     this.logger.log('add task to list', {
       task_id: taskId,
       list_id: listId
