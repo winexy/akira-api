@@ -12,7 +12,7 @@ import {
 import {ChecklistService} from './checklist.service'
 import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
-import {TaskIdT} from '../tasks/task.model'
+import {TaskId} from '../tasks/task.model'
 import {AuthGuard} from '../../auth.guard'
 import * as E from 'fp-ts/lib/Either'
 import {
@@ -42,7 +42,7 @@ export class ChecklistController {
   @Get('/:taskId')
   async findAllByTaskId(
     @User() user: UserRecord,
-    @Param('taskId') taskId: TaskIdT
+    @Param('taskId') taskId: TaskId
   ) {
     const result = await this.checklistService.findAllByTaskId(user, taskId)()
 
@@ -56,7 +56,7 @@ export class ChecklistController {
   @Delete('/:taskId/:todoId')
   async removeTodo(
     @User() user: UserRecord,
-    @Param('taskId') taskId: TaskIdT,
+    @Param('taskId') taskId: TaskId,
     @Param('todoId', ParseIntPipe) todoId: TodoIdT
   ) {
     const result = await this.checklistService.removeTodo(
@@ -75,7 +75,7 @@ export class ChecklistController {
   @Patch(':taskId/:todoId')
   async patchTodo(
     @User('uid') uid: UID,
-    @Param('taskId') taskId: TaskIdT,
+    @Param('taskId') taskId: TaskId,
     @Param('todoId', ParseIntPipe) todoId: TodoIdT,
     @Body(FujiPipe.of(todoPatchSchema)) patch: TodoPatchT
   ) {

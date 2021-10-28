@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@nestjs/common'
-import {TaskIdT} from '../tasks/task.model'
+import {TaskId} from '../tasks/task.model'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {
   RejectedQueryError,
@@ -32,7 +32,7 @@ export class ChecklistRepo {
     }, transformRejectReason)
   }
 
-  removeTodo(taskId: TaskIdT, todoId: TodoIdT) {
+  removeTodo(taskId: TaskId, todoId: TodoIdT) {
     return TE.tryCatch(() => {
       return this.checklistModel
         .query()
@@ -42,7 +42,7 @@ export class ChecklistRepo {
     }, transformRejectReason)
   }
 
-  findAllByTaskId(taskId: TaskIdT): TE.TaskEither<DBException, TodoT[]> {
+  findAllByTaskId(taskId: TaskId): TE.TaskEither<DBException, TodoT[]> {
     return TE.tryCatch(() => {
       return this.checklistModel
         .query()

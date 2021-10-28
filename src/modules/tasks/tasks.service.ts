@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common'
 import {TasksRepo} from './tasks.repository'
 import {
-  TaskIdT,
+  TaskId,
   TaskPatchT,
   TaskT,
   CreateTaskDto,
@@ -34,7 +34,7 @@ export class TasksService {
     return this.tasksRepo.findAllByUID(uid, query)
   }
 
-  findOne(taskId: TaskIdT, uid: UID) {
+  findOne(taskId: TaskId, uid: UID) {
     return this.tasksRepo.findOne(uid)(taskId)
   }
 
@@ -42,7 +42,7 @@ export class TasksService {
     return this.tasksRepo.search(uid, query)
   }
 
-  toggleCompleted(taskId: TaskIdT, uid: UID) {
+  toggleCompleted(taskId: TaskId, uid: UID) {
     return pipe(
       this.findOne(taskId, uid),
       TE.chain(task => {
@@ -53,7 +53,7 @@ export class TasksService {
     )
   }
 
-  toggleImportant(taskId: TaskIdT, uid: UID) {
+  toggleImportant(taskId: TaskId, uid: UID) {
     return pipe(
       this.findOne(taskId, uid),
       TE.chain(task => {
@@ -65,13 +65,13 @@ export class TasksService {
   }
 
   deleteOne(
-    taskId: TaskIdT,
+    taskId: TaskId,
     uid: UID
   ): TE.TaskEither<RejectedQueryError, boolean> {
     return this.tasksRepo.deleteOne(taskId, uid)
   }
 
-  ensureAuthority(taskId: TaskIdT, uid: UID): TE.TaskEither<DBException, true> {
+  ensureAuthority(taskId: TaskId, uid: UID): TE.TaskEither<DBException, true> {
     return pipe(
       this.findOne(taskId, uid),
       TE.map(() => true)
@@ -80,7 +80,7 @@ export class TasksService {
 
   patchTask(
     uid: UID,
-    taskId: TaskIdT,
+    taskId: TaskId,
     patch: TaskPatchT
   ): TE.TaskEither<DBException, TaskT> {
     return this.tasksRepo.update(taskId, uid, patch)
@@ -88,7 +88,7 @@ export class TasksService {
 
   createTag(
     uid: UID,
-    taskId: TaskIdT,
+    taskId: TaskId,
     tagId: Tag['id']
   ): TE.TaskEither<DBException, TaskTag> {
     return pipe(
@@ -99,7 +99,7 @@ export class TasksService {
 
   deleteTag(
     uid: UID,
-    taskId: TaskIdT,
+    taskId: TaskId,
     tagId: Tag['id']
   ): TE.TaskEither<DBException, number> {
     return pipe(
