@@ -5,7 +5,7 @@ import {TasksService} from '../tasks/tasks.service'
 import {CreateTodoDto, TodoIdT, TodoPatchT, TodoT} from './checklist.model'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {pipe} from 'fp-ts/lib/function'
-import {RejectedQueryError} from 'src/shared/transform-reject-reason'
+import {UserError} from 'src/filters/user-error.exception.filter'
 
 @Injectable()
 export class ChecklistService {
@@ -14,7 +14,7 @@ export class ChecklistService {
     private readonly tasksService: TasksService
   ) {}
 
-  addTodo(dto: CreateTodoDto): TE.TaskEither<RejectedQueryError, TodoT> {
+  addTodo(dto: CreateTodoDto): TE.TaskEither<UserError, TodoT> {
     return this.checklistRepo.addTodo(dto)
   }
 

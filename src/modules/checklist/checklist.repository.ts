@@ -1,10 +1,8 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {TaskId} from '../tasks/task.model'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {
-  RejectedQueryError,
-  transformRejectReason
-} from '../../shared/transform-reject-reason'
+import {UserError} from '../../filters/user-error.exception.filter'
+import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {
   ChecklistModel,
   CreateTodoDto,
@@ -20,7 +18,7 @@ export class ChecklistRepo {
     private readonly checklistModel: typeof ChecklistModel
   ) {}
 
-  addTodo(dto: CreateTodoDto): TE.TaskEither<RejectedQueryError, TodoT> {
+  addTodo(dto: CreateTodoDto): TE.TaskEither<UserError, TodoT> {
     return TE.tryCatch(() => {
       return this.checklistModel
         .query()
@@ -42,7 +40,7 @@ export class ChecklistRepo {
     }, transformRejectReason)
   }
 
-  findAllByTaskId(taskId: TaskId): TE.TaskEither<DBException, TodoT[]> {
+  findAllByTaskId(taskId: TaskId): TE.TaskEither<UserError, TodoT[]> {
     return TE.tryCatch(() => {
       return this.checklistModel
         .query()
@@ -56,7 +54,7 @@ export class ChecklistRepo {
   patchTodo(
     todoId: TodoIdT,
     patch: TodoPatchT
-  ): TE.TaskEither<DBException, TodoT> {
+  ): TE.TaskEither<UserError, TodoT> {
     return TE.tryCatch(() => {
       return this.checklistModel
         .query()

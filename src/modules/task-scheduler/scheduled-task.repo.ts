@@ -10,10 +10,8 @@ import {Transaction} from 'objection'
 import {TasksRepo, DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
 import {pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {
-  transformRejectReason,
-  RejectedQueryError
-} from '../../shared/transform-reject-reason'
+import {transformRejectReason} from '../../shared/transform-reject-reason'
+import {UserError} from 'src/filters/user-error.exception.filter'
 
 type QueriedTask = ScheduledTask & {
   task: DefaultFetchedTaskGraph
@@ -83,7 +81,7 @@ export class ScheduledTaskRepo {
   findUserTasksByDate(
     uid: UID,
     date: string
-  ): TE.TaskEither<RejectedQueryError, Array<QueriedTask>> {
+  ): TE.TaskEither<UserError, Array<QueriedTask>> {
     return TE.tryCatch(() => {
       return (this.scheduledTaskModel
         .query()
@@ -115,7 +113,7 @@ export class ScheduledTaskRepo {
     uid: UID,
     weekStart: string,
     weekEnd: string
-  ): TE.TaskEither<RejectedQueryError, Array<QueriedTask>> {
+  ): TE.TaskEither<UserError, Array<QueriedTask>> {
     return TE.tryCatch(() => {
       return (this.scheduledTaskModel
         .query()

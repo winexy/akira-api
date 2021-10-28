@@ -11,9 +11,10 @@ import {Tag} from '../tags/tag.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
 import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
-import {pipe} from 'fp-ts/lib/function'
+import {constant, pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {RejectedQueryError} from 'src/shared/transform-reject-reason'
+import {UserError} from 'src/filters/user-error.exception.filter'
+import {NotFoundError} from 'objection'
 
 @Injectable()
 export class TasksService {
@@ -64,17 +65,33 @@ export class TasksService {
     )
   }
 
-  deleteOne(
-    taskId: TaskId,
-    uid: UID
-  ): TE.TaskEither<RejectedQueryError, boolean> {
+  deleteOne(taskId: TaskId, uid: UID): TE.TaskEither<UserError, boolean> {
     return this.tasksRepo.deleteOne(taskId, uid)
   }
 
-  ensureAuthority(taskId: TaskId, uid: UID): TE.TaskEither<DBException, true> {
+  ensureAuthority(taskId: TaskId, uid: UID): TE.TaskEither<UserError, true> {
     return pipe(
       this.findOne(taskId, uid),
-      TE.map(() => true)
+      TE.mapLeft(error => {
+        if (error instanceof NotFoundError) {
+          return UserError.of({
+            type: UserError.NoAccess,
+            message: `User(${uid}) has no access to Task(${taskId})`,
+            meta: {
+              error
+            }
+          })
+        }
+
+        return UserError.of({
+          type: UserError.Internal,
+          message: '...',
+          meta: {
+            error
+          }
+        })
+      }),
+      TE.map(constant(true))
     )
   }
 
@@ -82,7 +99,7 @@ export class TasksService {
     uid: UID,
     taskId: TaskId,
     patch: TaskPatchT
-  ): TE.TaskEither<DBException, TaskT> {
+  ): TE.TaskEither<UserError, TaskT> {
     return this.tasksRepo.update(taskId, uid, patch)
   }
 
@@ -90,7 +107,7 @@ export class TasksService {
     uid: UID,
     taskId: TaskId,
     tagId: Tag['id']
-  ): TE.TaskEither<DBException, TaskTag> {
+  ): TE.TaskEither<UserError, TaskTag> {
     return pipe(
       this.ensureAuthority(taskId, uid),
       TE.chain(() => this.taskTagsRepo.createTaskTag(taskId, tagId))
@@ -101,7 +118,7 @@ export class TasksService {
     uid: UID,
     taskId: TaskId,
     tagId: Tag['id']
-  ): TE.TaskEither<DBException, number> {
+  ): TE.TaskEither<UserError, number> {
     return pipe(
       this.ensureAuthority(taskId, uid),
       TE.chain(() => this.taskTagsRepo.deleteTaskTag(taskId, tagId))

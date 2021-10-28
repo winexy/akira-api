@@ -12,7 +12,13 @@ export class UserError {
   private readonly type: string
   private readonly meta: Record<any, unknown> | null
 
-  static DUPLICATE = 'duplicate'
+  static Duplicate = 'duplicate'
+  static BadRequest = 'bad-request'
+  static Internal = 'internal'
+  static NoAccess = 'no-access'
+  static NotFound = 'not-found'
+  static DbQuery = 'db-query'
+  static UnknownDbQuery = 'unknown-db-query'
 
   static of(params: Params) {
     return new UserError(params)
@@ -33,11 +39,16 @@ export class UserError {
   }
 
   getHttpCode() {
-    if (this.type === UserError.DUPLICATE) {
-      return HttpStatus.CONFLICT
+    switch (this.type) {
+      case UserError.Duplicate:
+        return HttpStatus.CONFLICT
+      case UserError.Internal:
+        return HttpStatus.INTERNAL_SERVER_ERROR
+      case UserError.NoAccess:
+        return HttpStatus.FORBIDDEN
+      default:
+        return HttpStatus.BAD_REQUEST
     }
-
-    return HttpStatus.BAD_REQUEST
   }
 }
 

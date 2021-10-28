@@ -3,7 +3,7 @@ import {pipe} from 'fp-ts/lib/function'
 import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
 import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {RejectedQueryError} from '../../shared/transform-reject-reason'
+import {UserError} from 'src/filters/user-error.exception.filter'
 
 @Injectable()
 export class ReportsService {
@@ -13,7 +13,7 @@ export class ReportsService {
     uid: UID,
     date: string
   ): TE.TaskEither<
-    RejectedQueryError,
+    UserError,
     {date: string; tasks: Array<DefaultFetchedTaskGraph>}
   > {
     return pipe(

@@ -2,12 +2,10 @@ import {Inject, Injectable, Logger} from '@nestjs/common'
 import {ListModel, TaskList} from './list.model'
 import {TasksRepo} from '../tasks/tasks.repository'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {
-  transformRejectReason,
-  RejectedQueryError
-} from '../../shared/transform-reject-reason'
+import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {flow, pipe} from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import {UserError} from 'src/filters/user-error.exception.filter'
 
 @Injectable()
 export class ListsRepo {
@@ -19,7 +17,7 @@ export class ListsRepo {
   ) {}
 
   create(uid: UID) {
-    return (title: string): TE.TaskEither<RejectedQueryError, TaskList> => {
+    return (title: string): TE.TaskEither<UserError, TaskList> => {
       return TE.tryCatch(() => {
         return this.listModel
           .query()
@@ -35,7 +33,7 @@ export class ListsRepo {
   findExactTitle(
     uid: UID,
     title: string
-  ): TE.TaskEither<RejectedQueryError, O.Option<string>> {
+  ): TE.TaskEither<UserError, O.Option<string>> {
     return pipe(
       TE.tryCatch(() => {
         return this.listModel
@@ -55,7 +53,7 @@ export class ListsRepo {
   findDuplicates(
     uid: UID,
     title: string
-  ): TE.TaskEither<RejectedQueryError, TaskList[]> {
+  ): TE.TaskEither<UserError, TaskList[]> {
     /**
      * 1) Concatenation
      * :title || ' (%)' <- || is concatenation

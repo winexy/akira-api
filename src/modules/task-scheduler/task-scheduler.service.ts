@@ -7,7 +7,7 @@ import {isNull, reduce} from 'lodash/fp'
 import {DefaultFetchedTaskGraph} from '../tasks/tasks.repository'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {pipe} from 'fp-ts/lib/function'
-import {RejectedQueryError} from '../../shared/transform-reject-reason'
+import {UserError} from 'src/filters/user-error.exception.filter'
 
 const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
 
@@ -58,7 +58,7 @@ export class TaskSchedulerService {
 
   findTodayTasks(
     uid: UID
-  ): TE.TaskEither<RejectedQueryError, Array<DefaultFetchedTaskGraph>> {
+  ): TE.TaskEither<UserError, Array<DefaultFetchedTaskGraph>> {
     const today = format(new Date(), DEFAULT_DATE_FORMAT)
     return pipe(
       this.scheduledTaskRepo.findUserTasksByDate(uid, today),
@@ -77,7 +77,7 @@ export class TaskSchedulerService {
 
   findWeekTasks(
     uid: UID
-  ): TE.TaskEither<RejectedQueryError, Array<DefaultFetchedTaskGraph>> {
+  ): TE.TaskEither<UserError, Array<DefaultFetchedTaskGraph>> {
     const [start, end] = this.getWeekRange(new Date())
 
     return pipe(

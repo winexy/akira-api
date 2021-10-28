@@ -2,10 +2,7 @@ import {Inject, Injectable} from '@nestjs/common'
 import {UniqueViolationError} from 'db-errors'
 import {TagModel, CreateTagDto, Tag} from './tag.model'
 import {UserError} from '../../filters/user-error.exception.filter'
-import {
-  RejectedQueryError,
-  transformRejectReason
-} from '../../shared/transform-reject-reason'
+import {transformRejectReason} from '../../shared/transform-reject-reason'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {pipe} from 'fp-ts/lib/function'
 
@@ -17,10 +14,7 @@ export class TagsRepo {
     return this.tagModel.query().where({uid})
   }
 
-  createTag(
-    uid: UID,
-    dto: CreateTagDto
-  ): TE.TaskEither<DBException | UserError, Tag> {
+  createTag(uid: UID, dto: CreateTagDto): TE.TaskEither<UserError, Tag> {
     return pipe(
       TE.tryCatch(() => {
         return this.tagModel.query().insert({...dto, uid})
@@ -28,7 +22,7 @@ export class TagsRepo {
       TE.mapLeft(error => {
         if (error instanceof UniqueViolationError) {
           return UserError.of({
-            type: UserError.DUPLICATE,
+            type: UserError.Duplicate,
             message: `tag "${dto.name}" is already exist`,
             meta: {
               name: dto.name
@@ -41,10 +35,7 @@ export class TagsRepo {
     )
   }
 
-  deleteTag(
-    uid: UID,
-    tagId: Tag['id']
-  ): TE.TaskEither<RejectedQueryError, number> {
+  deleteTag(uid: UID, tagId: Tag['id']): TE.TaskEither<UserError, number> {
     return TE.tryCatch(() => {
       return this.tagModel
         .query()

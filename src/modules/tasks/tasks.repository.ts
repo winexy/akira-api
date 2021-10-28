@@ -15,11 +15,9 @@ import {TodoT} from '../checklist/checklist.model'
 import {TaskTag} from './tasks-tags.model'
 import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
 import {ScheduledTaskRepo} from '../task-scheduler/scheduled-task.repo'
-import {
-  RejectedQueryError,
-  transformRejectReason
-} from '../../shared/transform-reject-reason'
+import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {pipe} from 'fp-ts/lib/function'
+import {UserError} from '../../filters/user-error.exception.filter'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
@@ -111,7 +109,7 @@ export class TasksRepo {
 
   findOne(uid: UserRecord['uid']) {
     return (taskId: TaskT['id']) => {
-      return TE.tryCatch<DBException, TaskT>(() => {
+      return TE.tryCatch<UserError, TaskT>(() => {
         return this.taskModel
           .query()
           .findOne('id', taskId)
@@ -138,11 +136,12 @@ export class TasksRepo {
   update(
     id: TaskT['id'],
     uid: UserRecord['uid'],
-    patch: Partial<TaskT>
-  ): TE.TaskEither<RejectedQueryError, TaskT> {
+    patch: Partial<TaskT>,
+    trx?: Transaction
+  ): TE.TaskEither<UserError, TaskT> {
     return TE.tryCatch(() => {
       return this.taskModel
-        .query()
+        .query(trx)
         .where({author_uid: uid})
         .patchAndFetchById(id, patch)
         .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
@@ -165,7 +164,7 @@ export class TasksRepo {
   deleteOne(
     taskId: TaskT['id'],
     uid: UserRecord['uid']
-  ): TE.TaskEither<DBException, boolean> {
+  ): TE.TaskEither<UserError, boolean> {
     return pipe(
       TE.tryCatch(() => {
         return this.taskModel
