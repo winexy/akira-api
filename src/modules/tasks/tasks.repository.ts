@@ -18,12 +18,14 @@ import {ScheduledTaskRepo} from '../task-scheduler/scheduled-task.repo'
 import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {pipe} from 'fp-ts/lib/function'
 import {UserError} from '../../filters/user-error.exception.filter'
+import {Recurrence} from '../recurrence/recurrence.model'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
   tags: Array<TaskTag>
   list: Array<TaskList>
-  schedule: ScheduledTask
+  schedule: ScheduledTask | null
+  recurrence: Recurrence | null
 }
 
 @Injectable()
@@ -40,7 +42,8 @@ export class TasksRepo {
     checklist: true,
     tags: true,
     list: true,
-    schedule: true
+    schedule: true,
+    recurrence: true
   }
 
   create(uid: UID, taskDto: CreateTaskDto) {

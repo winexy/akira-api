@@ -19,6 +19,7 @@ import {ChecklistModel} from '../checklist/checklist.model'
 import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
 import {ScheduledTaskModel} from '../task-scheduler/scheduled-task.model'
+import {RecurrenceModel} from '../recurrence/recurrence.model'
 
 export type TaskT = {
   id: string
@@ -94,6 +95,14 @@ export class TaskModel extends Model implements TaskT {
         join: {
           from: 'tasks.id',
           to: 'scheduled_tasks.task_id'
+        }
+      },
+      recurrence: {
+        relation: Model.HasOneRelation,
+        modelClass: RecurrenceModel,
+        join: {
+          from: 'tasks.recurrence_id',
+          to: 'recurrences.id'
         }
       }
     }
