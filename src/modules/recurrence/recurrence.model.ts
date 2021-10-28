@@ -12,11 +12,12 @@ import {
 } from '@winexy/fuji'
 import {Model} from 'objection'
 
-type Recurrence = {
+export type Recurrence = {
   id: number
   rule: string
   next_date: string
   source_task_id: string
+  author_uid: string
 }
 
 export class RecurrenceModel extends Model implements Recurrence {
@@ -26,6 +27,7 @@ export class RecurrenceModel extends Model implements Recurrence {
   rule: string
   next_date: string
   source_task_id: string
+  author_uid: string
 }
 
 export const ruleSchema = f.shape({
