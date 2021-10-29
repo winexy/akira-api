@@ -7,6 +7,7 @@ import {TasksService} from '../tasks/tasks.service'
 import {RecurrenceRepo} from './recurrence.repository'
 import {mapToInsertableRule} from './utils/map-to-insertable-rule'
 import {UserError} from 'src/filters/user-error.exception.filter'
+import {startOfToday} from 'date-fns'
 
 @Injectable()
 export class RecurrenceService {
@@ -24,6 +25,12 @@ export class RecurrenceService {
       this.taskService.ensureAuthority(taskId, uid),
       TE.chainEitherK(() => mapToInsertableRule(dto)),
       TE.chain(rule => this.recurrenceRepo.createRecurrence(uid, taskId, rule))
+    )
+  }
+
+  findRecurrenceTasksForToday() {
+    return pipe(
+      this.recurrenceRepo.findByNextDateWithGraphFetched(startOfToday())
     )
   }
 
