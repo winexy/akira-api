@@ -11,6 +11,7 @@ import {
   oneOf
 } from '@winexy/fuji'
 import {Model} from 'objection'
+import {TaskModel, TaskT} from '../tasks/task.model'
 
 export type Recurrence = {
   id: number
@@ -28,6 +29,19 @@ export class RecurrenceModel extends Model implements Recurrence {
   next_date: string
   source_task_id: string
   author_uid: string
+
+  static get relationMappings() {
+    return {
+      task: {
+        relation: Model.HasOneRelation,
+        modelClass: TaskModel,
+        join: {
+          from: 'recurrences.source_task_id',
+          to: 'tasks.id'
+        }
+      }
+    }
+  }
 }
 
 export const ruleSchema = f.shape({
@@ -41,3 +55,5 @@ export const ruleSchema = f.shape({
 })
 
 export type RuleSchema = Infer<typeof ruleSchema>
+
+export type RecurrenceWithTask = Recurrence & {task: TaskT}
