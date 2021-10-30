@@ -14,7 +14,9 @@ import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
 import {constant, pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {UserError} from 'src/filters/user-error.exception.filter'
-import {NotFoundError} from 'objection'
+import {NotFoundError, Transaction} from 'objection'
+import {getCloneTaskPayload} from './utils/get-clone-task-payload'
+import {Recurrence} from '../recurrence/recurrence.model'
 
 @Injectable()
 export class TasksService {
@@ -127,5 +129,15 @@ export class TasksService {
 
   async findByUpdatedAtDate(uid: UID, date: string) {
     return this.tasksRepo.findByUpdatedDate(uid, date)
+  }
+
+  InternalCloneTask(trx?: Transaction) {
+    return (recurrence: Recurrence) => {
+      return pipe(
+        this.tasksRepo.InternalFindOne(trx)(recurrence.source_task_id),
+        TE.map(getCloneTaskPayload),
+        TE.chain(this.tasksRepo.InsertClonedTask(trx))
+      )
+    }
   }
 }

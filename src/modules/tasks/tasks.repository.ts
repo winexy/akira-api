@@ -2,13 +2,16 @@ import {Inject, Injectable, Logger} from '@nestjs/common'
 import {Transaction} from 'objection'
 import {isEmpty} from 'lodash/fp'
 import * as TE from 'fp-ts/lib/TaskEither'
+import {pipe} from 'fp-ts/lib/function'
+import {taskEitherQuery} from 'src/shared/task-either-query'
 import {
   TaskModel,
   TaskT,
   CreateTaskDto,
   TasksQueryFiltersT,
   TaskId,
-  InsertNewTaskDto
+  InsertNewTaskDto,
+  InsertClonedTaskDto
 } from './task.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskList} from '../lists/list.model'
@@ -17,7 +20,6 @@ import {TaskTag} from './tasks-tags.model'
 import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
 import {ScheduledTaskRepo} from '../task-scheduler/scheduled-task.repo'
 import {transformRejectReason} from '../../shared/transform-reject-reason'
-import {pipe} from 'fp-ts/lib/function'
 import {UserError} from '../../filters/user-error.exception.filter'
 import {Recurrence} from '../recurrence/recurrence.model'
 
@@ -116,7 +118,7 @@ export class TasksRepo {
 
   findOne(uid: UserRecord['uid']) {
     return (taskId: TaskT['id']) => {
-      return TE.tryCatch<UserError, TaskT>(() => {
+      return taskEitherQuery(() => {
         return this.taskModel
           .query()
           .findOne('id', taskId)
@@ -125,7 +127,7 @@ export class TasksRepo {
           })
           .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
           .throwIfNotFound()
-      }, transformRejectReason)
+      })
     }
   }
 
@@ -146,14 +148,14 @@ export class TasksRepo {
     patch: Partial<TaskT>,
     trx?: Transaction
   ): TE.TaskEither<UserError, TaskT> {
-    return TE.tryCatch(() => {
+    return taskEitherQuery(() => {
       return this.taskModel
         .query(trx)
         .where({author_uid: uid})
         .patchAndFetchById(id, patch)
         .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
         .throwIfNotFound()
-    }, transformRejectReason)
+    })
   }
 
   private patch(
@@ -173,7 +175,7 @@ export class TasksRepo {
     uid: UserRecord['uid']
   ): TE.TaskEither<UserError, boolean> {
     return pipe(
-      TE.tryCatch(() => {
+      taskEitherQuery(() => {
         return this.taskModel
           .query()
           .deleteById(taskId)
@@ -181,7 +183,7 @@ export class TasksRepo {
             author_uid: uid
           })
           .throwIfNotFound()
-      }, transformRejectReason),
+      }),
       TE.map(count => count !== 0)
     )
   }
@@ -208,9 +210,19 @@ export class TasksRepo {
       .andWhereRaw('CAST(updated_at AS DATE) = CAST(:date AS DATE)', {date})
   }
 
-  InternalFindOne(id: TaskId): TE.TaskEither<UserError, TaskT> {
-    return TE.tryCatch(() => {
-      return this.taskModel.query().findById(id).throwIfNotFound()
-    }, transformRejectReason)
+  InternalFindOne(trx?: Transaction) {
+    return (id: TaskId): TE.TaskEither<UserError, TaskT> => {
+      return taskEitherQuery(() => {
+        return this.taskModel.query(trx).findById(id).throwIfNotFound()
+      })
+    }
+  }
+
+  InsertClonedTask(trx?: Transaction) {
+    return (dto: InsertClonedTaskDto) => {
+      return taskEitherQuery(() => {
+        return this.taskModel.query(trx).insert(dto).returning('*')
+      })
+    }
   }
 }

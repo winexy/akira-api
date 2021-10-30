@@ -7,7 +7,7 @@ import {TasksService} from '../tasks/tasks.service'
 import {RecurrenceRepo} from './recurrence.repository'
 import {mapToInsertableRule} from './utils/map-to-insertable-rule'
 import {UserError} from 'src/filters/user-error.exception.filter'
-import {startOfToday} from 'date-fns'
+import {Transaction} from 'objection'
 
 @Injectable()
 export class RecurrenceService {
@@ -28,10 +28,15 @@ export class RecurrenceService {
     )
   }
 
-  findRecurrenceTasksForToday() {
+  FindRecurrentForToday(trx?: Transaction) {
     return pipe(
-      this.recurrenceRepo.findByNextDateWithGraphFetched(startOfToday())
+      new Date().toISOString(),
+      this.recurrenceRepo.FindByNextDate(trx)
     )
+  }
+
+  UpdateNextDate(trx?: Transaction) {
+    return this.recurrenceRepo.UpdateNextDate(trx)
   }
 
   findAll() {

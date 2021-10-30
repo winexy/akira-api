@@ -165,3 +165,15 @@ export type InsertNewTaskDto = {
   author_uid: string
   list_id?: number
 }
+
+export type InsertClonedTaskDto = Pick<
+  TaskT,
+  | 'title'
+  | 'description'
+  | 'author_uid'
+  | 'list_id'
+  | 'is_important'
+  | 'recurrence_id'
+> & {
+  source_task_id: string
+}
