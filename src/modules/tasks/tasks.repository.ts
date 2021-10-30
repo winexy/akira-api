@@ -49,7 +49,7 @@ export class TasksRepo {
     recurrence: true
   }
 
-  create(uid: UID, taskDto: CreateTaskDto) {
+  Create(uid: UID, taskDto: CreateTaskDto) {
     return TE.tryCatch(() => {
       const {task: taskInfo, meta} = taskDto
       const tagsIds = meta?.tags || []
@@ -68,7 +68,7 @@ export class TasksRepo {
 
         if (!isEmpty(tagsIds)) {
           this.logger.log('add tags to task')
-          promises.push(this.tasksTagsRepo.addTags(task.id, tagsIds, trx))
+          promises.push(this.tasksTagsRepo.AddTags(task.id, tagsIds, trx))
         }
 
         promises.push(
@@ -96,7 +96,7 @@ export class TasksRepo {
     }
   }
 
-  findAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
+  FindAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
     const query = this.taskModel
       .query()
       .where({
@@ -116,7 +116,7 @@ export class TasksRepo {
     return query
   }
 
-  findOne(uid: UserRecord['uid']) {
+  FindOne(uid: UserRecord['uid']) {
     return (taskId: TaskT['id']) => {
       return taskEitherQuery(() => {
         return this.taskModel
@@ -131,18 +131,18 @@ export class TasksRepo {
     }
   }
 
-  search(uid: UID, query: string) {
+  Search(uid: UID, query: string) {
     return this.taskModel
       .query()
       .where('author_uid', uid)
       .andWhereRaw('LOWER("title") LIKE ?', `%${query.toLowerCase()}%`)
   }
 
-  findAllByIds(taskIds: Array<TaskId>, trx: Transaction) {
+  FindAllByIds(taskIds: Array<TaskId>, trx: Transaction) {
     return this.taskModel.query(trx).whereIn('id', taskIds)
   }
 
-  update(
+  Update(
     id: TaskT['id'],
     uid: UserRecord['uid'],
     patch: Partial<TaskT>,
@@ -158,7 +158,7 @@ export class TasksRepo {
     })
   }
 
-  private patch(
+  private Patch(
     id: TaskT['id'],
     uid: UserRecord['uid'],
     patch: Partial<TaskT>
@@ -170,7 +170,7 @@ export class TasksRepo {
       .patch(patch)
   }
 
-  deleteOne(
+  DeleteOne(
     taskId: TaskT['id'],
     uid: UserRecord['uid']
   ): TE.TaskEither<UserError, boolean> {
@@ -188,14 +188,14 @@ export class TasksRepo {
     )
   }
 
-  async addToList(taskId: TaskId, uid: UID, listId: TaskList['id']) {
+  async AddToList(taskId: TaskId, uid: UID, listId: TaskList['id']) {
     this.logger.log('add task to list', {
       task_id: taskId,
       list_id: listId
     })
 
     try {
-      await this.patch(taskId, uid, {list_id: listId})
+      await this.Patch(taskId, uid, {list_id: listId})
     } catch (error) {
       this.logger.error('failed to add to list', error.stack, {
         errorMessage: error.message
@@ -203,7 +203,7 @@ export class TasksRepo {
     }
   }
 
-  findByUpdatedDate(uid: UID, date: string) {
+  FindByUpdatedDate(uid: UID, date: string) {
     return this.taskModel
       .query()
       .where('author_uid', uid)

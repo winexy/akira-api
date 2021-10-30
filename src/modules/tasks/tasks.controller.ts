@@ -35,12 +35,12 @@ export class TasksController {
 
   @Post()
   @HttpCode(201)
-  async create(
+  async Create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
   ): Promise<TaskT> {
-    const result = await this.taskService.create(uid, taskDto)()
+    const result = await this.taskService.Create(uid, taskDto)()
 
     if (E.isLeft(result)) {
       throw result.left
@@ -50,21 +50,21 @@ export class TasksController {
   }
 
   @Get()
-  findAll(
+  FindAll(
     @User() user: UserRecord,
     @Query(FujiPipe.of(tasksQueryFiltersSchema)) query: TasksQueryFiltersT
   ) {
-    return this.taskService.findAllByUID(user.uid, query)
+    return this.taskService.FindAllByUID(user.uid, query)
   }
 
   @Get('search')
-  search(@User('uid') uid: UID, @Query('query') query: string) {
-    return this.taskService.search(uid, query)
+  Search(@User('uid') uid: UID, @Query('query') query: string) {
+    return this.taskService.Search(uid, query)
   }
 
   @Get(':id')
-  async findOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
-    const task = await this.taskService.findOne(id, user.uid)()
+  async FindOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
+    const task = await this.taskService.FindOne(id, user.uid)()
 
     if (E.isLeft(task)) {
       throw task.left
@@ -74,12 +74,12 @@ export class TasksController {
   }
 
   @Patch(':id')
-  async patchTask(
+  async PatchTask(
     @User('uid') uid: UID,
     @Param('id') id: TaskId,
     @Body(FujiPipe.of(taskPatchSchema)) patch: TaskPatchT
   ) {
-    const result = await this.taskService.patchTask(uid, id, patch)()
+    const result = await this.taskService.PatchTask(uid, id, patch)()
 
     if (E.isLeft(result)) {
       throw result.left
@@ -89,11 +89,11 @@ export class TasksController {
   }
 
   @Patch(':id/complete/toggle')
-  async toggleCompleted(
+  async ToggleCompleted(
     @User() user: UserRecord,
     @Param('id') taskId: TaskT['id']
   ) {
-    const task = await this.taskService.toggleCompleted(taskId, user.uid)()
+    const task = await this.taskService.ToggleCompleted(taskId, user.uid)()
 
     if (E.isLeft(task)) {
       throw task.left
@@ -103,11 +103,11 @@ export class TasksController {
   }
 
   @Patch(':id/important/toggle')
-  async toggleImportant(
+  async ToggleImportant(
     @User() user: UserRecord,
     @Param('id') taskId: TaskT['id']
   ) {
-    const task = await this.taskService.toggleImportant(taskId, user.uid)()
+    const task = await this.taskService.ToggleImportant(taskId, user.uid)()
 
     if (E.isLeft(task)) {
       throw task.left
@@ -117,8 +117,8 @@ export class TasksController {
   }
 
   @Delete(':id')
-  async deleteOne(@User() user: UserRecord, @Param('id') taskId: TaskT['id']) {
-    const result = await this.taskService.deleteOne(taskId, user.uid)()
+  async DeleteOne(@User() user: UserRecord, @Param('id') taskId: TaskT['id']) {
+    const result = await this.taskService.DeleteOne(taskId, user.uid)()
 
     if (E.isLeft(result)) {
       throw result.left
@@ -132,12 +132,12 @@ export class TasksController {
   }
 
   @Post(':taskId/tags/:tagId')
-  async createTaskTag(
+  async CreateTaskTag(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskId,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.taskService.createTag(uid, taskId, tagId)()
+    const result = await this.taskService.CreateTag(uid, taskId, tagId)()
 
     if (E.isLeft(result)) {
       throw result.left
@@ -147,12 +147,12 @@ export class TasksController {
   }
 
   @Delete(':taskId/tags/:tagId')
-  async deleteTaskTag(
+  async DeleteTaskTag(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskId,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.taskService.deleteTag(uid, taskId, tagId)()
+    const result = await this.taskService.DeleteTag(uid, taskId, tagId)()
 
     if (E.isLeft(result)) {
       throw result.left

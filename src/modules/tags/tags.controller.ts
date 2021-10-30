@@ -22,17 +22,17 @@ export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
   @Get()
-  findAll(@User('uid') uid: UID) {
-    return this.tagsService.findAll(uid)
+  FindAll(@User('uid') uid: UID) {
+    return this.tagsService.FindAll(uid)
   }
 
   @Post()
   @HttpCode(201)
-  async createTag(
+  async CreateTag(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTagSchema)) dto: CreateTagDto
   ) {
-    const result = await this.tagsService.createTag(uid, dto)()
+    const result = await this.tagsService.CreateTag(uid, dto)()
 
     if (E.isLeft(result)) {
       throw result.left
@@ -42,11 +42,11 @@ export class TagsController {
   }
 
   @Delete(':tagId')
-  async deleteTag(
+  async DeleteTag(
     @User('uid') uid: UID,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.tagsService.deleteTag(uid, tagId)()
+    const result = await this.tagsService.DeleteTag(uid, tagId)()
 
     if (E.isLeft(result)) {
       throw result.left

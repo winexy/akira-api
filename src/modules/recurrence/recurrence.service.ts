@@ -16,15 +16,15 @@ export class RecurrenceService {
     private readonly recurrenceRepo: RecurrenceRepo
   ) {}
 
-  create(
+  Create(
     uid: UID,
     taskId: TaskId,
     dto: RuleSchema
   ): TE.TaskEither<UserError, Recurrence> {
     return pipe(
-      this.taskService.ensureAuthority(taskId, uid),
+      this.taskService.EnsureAuthority(taskId, uid),
       TE.map(mapToInsertableRule(dto)),
-      TE.chain(rule => this.recurrenceRepo.createRecurrence(uid, taskId, rule))
+      TE.chain(rule => this.recurrenceRepo.CreateRecurrence(uid, taskId, rule))
     )
   }
 

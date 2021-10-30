@@ -16,7 +16,7 @@ export class ListsRepo {
     private readonly listModel: typeof ListModel
   ) {}
 
-  create(uid: UID) {
+  Create(uid: UID) {
     return (title: string): TE.TaskEither<UserError, TaskList> => {
       return TE.tryCatch(() => {
         return this.listModel
@@ -30,7 +30,7 @@ export class ListsRepo {
     }
   }
 
-  findExactTitle(
+  FindExactTitle(
     uid: UID,
     title: string
   ): TE.TaskEither<UserError, O.Option<string>> {
@@ -50,7 +50,7 @@ export class ListsRepo {
     )
   }
 
-  findDuplicates(
+  FindDuplicates(
     uid: UID,
     title: string
   ): TE.TaskEither<UserError, TaskList[]> {
@@ -74,7 +74,7 @@ export class ListsRepo {
     }, transformRejectReason)
   }
 
-  findAll(uid: UID) {
+  FindAll(uid: UID) {
     const countQuery = this.listModel
       .relatedQuery('tasks')
       .count()
@@ -86,7 +86,7 @@ export class ListsRepo {
       .where('author_uid', uid)
   }
 
-  remove(uid: UID, listId: TaskList['id']) {
+  Remove(uid: UID, listId: TaskList['id']) {
     return this.listModel
       .query()
       .where({author_uid: uid})
@@ -94,7 +94,7 @@ export class ListsRepo {
       .throwIfNotFound()
   }
 
-  queryWithTasks(uid: UID, listId: TaskList['id']) {
+  QueryWithTasks(uid: UID, listId: TaskList['id']) {
     return this.listModel
       .query()
       .where({author_uid: uid})

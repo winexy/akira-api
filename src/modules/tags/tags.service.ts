@@ -6,15 +6,15 @@ import {CreateTagDto, Tag} from './tag.model'
 export class TagsService {
   constructor(private readonly tagsRepo: TagsRepo) {}
 
-  findAll(uid: UID) {
-    return this.tagsRepo.findAllByUID(uid)
+  FindAll(uid: UID) {
+    return this.tagsRepo.FindAllByUID(uid)
   }
 
-  createTag(uid: UID, dto: CreateTagDto) {
-    return this.tagsRepo.createTag(uid, dto)
+  CreateTag(uid: UID, dto: CreateTagDto) {
+    return this.tagsRepo.CreateTag(uid, dto)
   }
 
-  deleteTag(uid: UID, tagId: Tag['id']) {
-    return this.tagsRepo.deleteTag(uid, tagId)
+  DeleteTag(uid: UID, tagId: Tag['id']) {
+    return this.tagsRepo.DeleteTag(uid, tagId)
   }
 }

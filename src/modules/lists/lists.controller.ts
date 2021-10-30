@@ -23,11 +23,11 @@ export class ListsController {
 
   @Post()
   @HttpCode(201)
-  async create(
+  async Create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskListSchema)) dto: CreateTaskListDto
   ) {
-    const result = await this.listsService.create(uid, dto.title)()
+    const result = await this.listsService.Create(uid, dto.title)()
 
     if (E.isLeft(result)) {
       throw result.left
@@ -37,23 +37,23 @@ export class ListsController {
   }
 
   @Get()
-  findAll(@User('uid') uid: UID) {
-    return this.listsService.findAll(uid)
+  FindAll(@User('uid') uid: UID) {
+    return this.listsService.FindAll(uid)
   }
 
   @Delete(':listId')
-  remove(
+  Remove(
     @User('uid') uid: UID,
     @Param('listId', ParseIntPipe) listId: TaskList['id']
   ) {
-    return this.listsService.remove(uid, listId)
+    return this.listsService.Remove(uid, listId)
   }
 
   @Get(':listId/tasks')
-  findAllTasks(
+  FindAllTasks(
     @User('uid') uid: UID,
     @Param('listId', ParseIntPipe) listId: TaskList['id']
   ) {
-    return this.listsService.findAllTasks(uid, listId)
+    return this.listsService.FindAllTasks(uid, listId)
   }
 }

@@ -20,21 +20,21 @@ export class ChecklistService {
 
   removeTodo(uid: UID, taskId: TaskId, todoId: TodoIdT) {
     return pipe(
-      this.tasksService.ensureAuthority(taskId, uid),
+      this.tasksService.EnsureAuthority(taskId, uid),
       TE.chain(() => this.checklistRepo.removeTodo(taskId, todoId))
     )
   }
 
   findAllByTaskId(user: UserRecord, taskId: TaskId) {
     return pipe(
-      this.tasksService.ensureAuthority(taskId, user.uid),
+      this.tasksService.EnsureAuthority(taskId, user.uid),
       TE.chain(() => this.checklistRepo.findAllByTaskId(taskId))
     )
   }
 
   patchTodo(uid: UID, taskId: TaskId, todoId: TodoIdT, patch: TodoPatchT) {
     return pipe(
-      this.tasksService.ensureAuthority(taskId, uid),
+      this.tasksService.EnsureAuthority(taskId, uid),
       TE.chain(() => this.checklistRepo.patchTodo(todoId, patch))
     )
   }

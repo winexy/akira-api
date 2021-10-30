@@ -26,54 +26,54 @@ export class TasksService {
     private readonly taskSchedulerService: TaskSchedulerService
   ) {}
 
-  create(uid: UID, taskDto: CreateTaskDto) {
+  Create(uid: UID, taskDto: CreateTaskDto) {
     return pipe(
-      this.tasksRepo.create(uid, taskDto),
-      TE.chain(this.tasksRepo.findOne(uid))
+      this.tasksRepo.Create(uid, taskDto),
+      TE.chain(this.tasksRepo.FindOne(uid))
     )
   }
 
-  findAllByUID(uid: UID, query: TasksQueryFiltersT) {
-    return this.tasksRepo.findAllByUID(uid, query)
+  FindAllByUID(uid: UID, query: TasksQueryFiltersT) {
+    return this.tasksRepo.FindAllByUID(uid, query)
   }
 
-  findOne(taskId: TaskId, uid: UID) {
-    return this.tasksRepo.findOne(uid)(taskId)
+  FindOne(taskId: TaskId, uid: UID) {
+    return this.tasksRepo.FindOne(uid)(taskId)
   }
 
-  search(uid: UID, query: string) {
-    return this.tasksRepo.search(uid, query)
+  Search(uid: UID, query: string) {
+    return this.tasksRepo.Search(uid, query)
   }
 
-  toggleCompleted(taskId: TaskId, uid: UID) {
+  ToggleCompleted(taskId: TaskId, uid: UID) {
     return pipe(
-      this.findOne(taskId, uid),
+      this.FindOne(taskId, uid),
       TE.chain(task => {
-        return this.tasksRepo.update(taskId, uid, {
+        return this.tasksRepo.Update(taskId, uid, {
           is_completed: !task.is_completed
         })
       })
     )
   }
 
-  toggleImportant(taskId: TaskId, uid: UID) {
+  ToggleImportant(taskId: TaskId, uid: UID) {
     return pipe(
-      this.findOne(taskId, uid),
+      this.FindOne(taskId, uid),
       TE.chain(task => {
-        return this.tasksRepo.update(taskId, uid, {
+        return this.tasksRepo.Update(taskId, uid, {
           is_important: !task.is_important
         })
       })
     )
   }
 
-  deleteOne(taskId: TaskId, uid: UID): TE.TaskEither<UserError, boolean> {
-    return this.tasksRepo.deleteOne(taskId, uid)
+  DeleteOne(taskId: TaskId, uid: UID): TE.TaskEither<UserError, boolean> {
+    return this.tasksRepo.DeleteOne(taskId, uid)
   }
 
-  ensureAuthority(taskId: TaskId, uid: UID): TE.TaskEither<UserError, true> {
+  EnsureAuthority(taskId: TaskId, uid: UID): TE.TaskEither<UserError, true> {
     return pipe(
-      this.findOne(taskId, uid),
+      this.FindOne(taskId, uid),
       TE.mapLeft(error => {
         if (error instanceof NotFoundError) {
           return UserError.of({
@@ -97,38 +97,38 @@ export class TasksService {
     )
   }
 
-  patchTask(
+  PatchTask(
     uid: UID,
     taskId: TaskId,
     patch: TaskPatchT
   ): TE.TaskEither<UserError, TaskT> {
-    return this.tasksRepo.update(taskId, uid, patch)
+    return this.tasksRepo.Update(taskId, uid, patch)
   }
 
-  createTag(
+  CreateTag(
     uid: UID,
     taskId: TaskId,
     tagId: Tag['id']
   ): TE.TaskEither<UserError, TaskTag> {
     return pipe(
-      this.ensureAuthority(taskId, uid),
-      TE.chain(() => this.taskTagsRepo.createTaskTag(taskId, tagId))
+      this.EnsureAuthority(taskId, uid),
+      TE.chain(() => this.taskTagsRepo.CreateTaskTag(taskId, tagId))
     )
   }
 
-  deleteTag(
+  DeleteTag(
     uid: UID,
     taskId: TaskId,
     tagId: Tag['id']
   ): TE.TaskEither<UserError, number> {
     return pipe(
-      this.ensureAuthority(taskId, uid),
-      TE.chain(() => this.taskTagsRepo.deleteTaskTag(taskId, tagId))
+      this.EnsureAuthority(taskId, uid),
+      TE.chain(() => this.taskTagsRepo.DeleteTaskTag(taskId, tagId))
     )
   }
 
-  async findByUpdatedAtDate(uid: UID, date: string) {
-    return this.tasksRepo.findByUpdatedDate(uid, date)
+  async FindByUpdatedAtDate(uid: UID, date: string) {
+    return this.tasksRepo.FindByUpdatedDate(uid, date)
   }
 
   InternalCloneTask(trx?: Transaction) {

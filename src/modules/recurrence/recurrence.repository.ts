@@ -16,7 +16,7 @@ export class RecurrenceRepo {
     private readonly tasksRepo: TasksRepo
   ) {}
 
-  createRecurrence(
+  CreateRecurrence(
     uid: UID,
     taskId: TaskId,
     insertableRule: InsertableRule
@@ -24,14 +24,14 @@ export class RecurrenceRepo {
     return TE.tryCatch(
       () => {
         return this.recurrenceModel.transaction(async trx => {
-          const recurrence = await this.insertRecurrence(
+          const recurrence = await this.InsertRecurrence(
             uid,
             taskId,
             insertableRule,
             trx
           )
 
-          const updateTask = this.tasksRepo.update(
+          const updateTask = this.tasksRepo.Update(
             taskId,
             uid,
             {
@@ -56,7 +56,7 @@ export class RecurrenceRepo {
     )
   }
 
-  private insertRecurrence(
+  private InsertRecurrence(
     uid: UID,
     taskId: TaskId,
     insertableRule: InsertableRule,

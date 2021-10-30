@@ -10,11 +10,11 @@ import {pipe} from 'fp-ts/lib/function'
 export class TagsRepo {
   constructor(@Inject(TagModel) private readonly tagModel: typeof TagModel) {}
 
-  findAllByUID(uid: UID) {
+  FindAllByUID(uid: UID) {
     return this.tagModel.query().where({uid})
   }
 
-  createTag(uid: UID, dto: CreateTagDto): TE.TaskEither<UserError, Tag> {
+  CreateTag(uid: UID, dto: CreateTagDto): TE.TaskEither<UserError, Tag> {
     return pipe(
       TE.tryCatch(() => {
         return this.tagModel.query().insert({...dto, uid})
@@ -35,7 +35,7 @@ export class TagsRepo {
     )
   }
 
-  deleteTag(uid: UID, tagId: Tag['id']): TE.TaskEither<UserError, number> {
+  DeleteTag(uid: UID, tagId: Tag['id']): TE.TaskEither<UserError, number> {
     return TE.tryCatch(() => {
       return this.tagModel
         .query()

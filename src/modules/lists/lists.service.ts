@@ -17,11 +17,11 @@ export class ListsService {
 
   public static DUPLICATE_MARK_REGEX = / \((\d+)\)$/
 
-  create(uid: UID, title: string) {
+  Create(uid: UID, title: string) {
     return pipe(
       () => this.logger.log(`creating list "${title}"`),
       TE.fromIO,
-      TE.chain(() => this.listRepo.findDuplicates(uid, title)),
+      TE.chain(() => this.listRepo.FindDuplicates(uid, title)),
       TE.chainFirstIOK(
         tap(duplicates => () => {
           if (A.isEmpty(duplicates)) {
@@ -35,8 +35,8 @@ export class ListsService {
       ),
       TE.chain(duplicates => {
         return A.isEmpty(duplicates)
-          ? this.listRepo.findExactTitle(uid, title)
-          : TE.of(this.getLastDuplicateTitle(duplicates))
+          ? this.listRepo.FindExactTitle(uid, title)
+          : TE.of(this.GetLastDuplicateTitle(duplicates))
       }),
       TE.chainFirstIOK(
         tap(duplicateTitle => () => {
@@ -48,7 +48,7 @@ export class ListsService {
         })
       ),
       TE.map(
-        flow(O.map(this.getNextDuplicateTitle), O.getOrElse(constant(title)))
+        flow(O.map(this.GetNextDuplicateTitle), O.getOrElse(constant(title)))
       ),
       TE.chainFirstIOK(
         tap(title => () => {
@@ -57,19 +57,19 @@ export class ListsService {
           })
         })
       ),
-      TE.chain(this.listRepo.create(uid))
+      TE.chain(this.listRepo.Create(uid))
     )
   }
 
-  findAll(uid: UID) {
-    return this.listRepo.findAll(uid)
+  FindAll(uid: UID) {
+    return this.listRepo.FindAll(uid)
   }
 
-  remove(uid: UID, listId: TaskList['id']) {
-    return this.listRepo.remove(uid, listId)
+  Remove(uid: UID, listId: TaskList['id']) {
+    return this.listRepo.Remove(uid, listId)
   }
 
-  private getLastDuplicateTitle(duplicates: TaskList[]): O.Option<string> {
+  private GetLastDuplicateTitle(duplicates: TaskList[]): O.Option<string> {
     const regex = ListsService.DUPLICATE_MARK_REGEX
 
     type DuplicateMeta = {
@@ -104,7 +104,7 @@ export class ListsService {
     )
   }
 
-  private getNextDuplicateTitle(title: string): string {
+  private GetNextDuplicateTitle(title: string): string {
     const regex = ListsService.DUPLICATE_MARK_REGEX
 
     return pipe(
@@ -117,7 +117,7 @@ export class ListsService {
     )
   }
 
-  findAllTasks(uid: UID, listId: TaskList['id']) {
-    return this.listRepo.queryWithTasks(uid, listId)
+  FindAllTasks(uid: UID, listId: TaskList['id']) {
+    return this.listRepo.QueryWithTasks(uid, listId)
   }
 }

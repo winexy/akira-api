@@ -9,7 +9,7 @@ import {UserError} from 'src/filters/user-error.exception.filter'
 export class ReportsService {
   constructor(private readonly taskSchedulerService: TaskSchedulerService) {}
 
-  findFor(
+  FindFor(
     uid: UID,
     date: string
   ): TE.TaskEither<

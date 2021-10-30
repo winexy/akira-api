@@ -14,7 +14,7 @@ export class TasksTagsRepo {
     private readonly tasksTagsModel: typeof TasksTagsModel
   ) {}
 
-  createTaskTag(
+  CreateTaskTag(
     taskId: TaskT['id'],
     tagId: Tag['id']
   ): TE.TaskEither<UserError, TaskTag> {
@@ -29,7 +29,7 @@ export class TasksTagsRepo {
     }, transformRejectReason)
   }
 
-  deleteTaskTag(
+  DeleteTaskTag(
     taskId: TaskT['id'],
     tagId: Tag['id']
   ): TE.TaskEither<UserError, number> {
@@ -45,7 +45,7 @@ export class TasksTagsRepo {
     }, transformRejectReason)
   }
 
-  addTags(taskId: TaskT['id'], tags: Array<Tag['id']>, trx?: Transaction) {
+  AddTags(taskId: TaskT['id'], tags: Array<Tag['id']>, trx?: Transaction) {
     return this.tasksTagsModel.query(trx).insertGraph(
       tags.map(id => ({
         task_id: taskId,

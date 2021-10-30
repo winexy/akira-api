@@ -40,7 +40,7 @@ describe('ListsService', () => {
       }
     )
 
-    const result = await service.create(TEST_UID, TEST_TITLE)()
+    const result = await service.Create(TEST_UID, TEST_TITLE)()
 
     expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
@@ -67,7 +67,7 @@ describe('ListsService', () => {
       }
     )
 
-    const result = await service.create(TEST_UID, TEST_TITLE)()
+    const result = await service.Create(TEST_UID, TEST_TITLE)()
 
     expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
@@ -95,7 +95,7 @@ describe('ListsService', () => {
       }
     )
 
-    const result = await service.create(TEST_UID, TEST_TITLE)()
+    const result = await service.Create(TEST_UID, TEST_TITLE)()
 
     expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
@@ -122,7 +122,7 @@ describe('ListsService', () => {
       }
     )
 
-    const result = await service.create(TEST_UID, 'test')()
+    const result = await service.Create(TEST_UID, 'test')()
 
     expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,
@@ -149,7 +149,7 @@ describe('ListsService', () => {
       }
     )
 
-    const result = await service.create(TEST_UID, TEST_TITLE)()
+    const result = await service.Create(TEST_UID, TEST_TITLE)()
 
     expect(E.toUnion(result)).toEqual({
       author_uid: TEST_UID,

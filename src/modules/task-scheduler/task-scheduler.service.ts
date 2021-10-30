@@ -21,14 +21,14 @@ export class TaskSchedulerService {
 
   create(uid: UID, dto: ScheduleTaskDto) {
     return pipe(
-      this.taskService.ensureAuthority(dto.task_id, uid),
+      this.taskService.EnsureAuthority(dto.task_id, uid),
       TE.chain(() => this.scheduledTaskRepo.create(dto))
     )
   }
 
   delete(uid: UID, dto: ScheduleTaskDto) {
     return pipe(
-      this.taskService.ensureAuthority(dto.task_id, uid),
+      this.taskService.EnsureAuthority(dto.task_id, uid),
       TE.chain(() => this.scheduledTaskRepo.delete(dto))
     )
   }

@@ -27,7 +27,7 @@ export class RecurrenceController {
     @Param('taskId') taskId: TaskId,
     @Body(FujiPipe.of(ruleSchema)) dto: RuleSchema
   ) {
-    const result = await this.recurrenceService.create(uid, taskId, dto)()
+    const result = await this.recurrenceService.Create(uid, taskId, dto)()
 
     if (E.isLeft(result)) {
       throw result.left
