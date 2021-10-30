@@ -18,7 +18,6 @@ import {Model, ModelOptions, QueryContext} from 'objection'
 import {ChecklistModel} from '../checklist/checklist.model'
 import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
-import {ScheduledTaskModel} from '../task-scheduler/scheduled-task.model'
 import {RecurrenceModel} from '../recurrence/recurrence.model'
 
 export type TaskT = {
@@ -93,14 +92,6 @@ export class TaskModel extends Model implements TaskT {
           to: 'tags.id'
         }
       },
-      schedule: {
-        relation: Model.HasOneRelation,
-        modelClass: ScheduledTaskModel,
-        join: {
-          from: 'tasks.id',
-          to: 'scheduled_tasks.task_id'
-        }
-      },
       recurrence: {
         relation: Model.HasOneRelation,
         modelClass: RecurrenceModel,
@@ -142,6 +133,7 @@ export const taskPatchSchema = f.shape({
   is_completed: f(bool()),
   is_important: f(bool()),
   list_id: f(number()),
+  date: f(nullable(), datePattern),
   due_date: f(nullable(), datePattern)
 })
 
@@ -166,6 +158,7 @@ export type InsertNewTaskDto = {
   description?: string
   author_uid: string
   list_id?: number
+  date?: string | null
 }
 
 export type InsertClonedTaskDto = Pick<

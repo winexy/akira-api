@@ -10,20 +10,20 @@ import {
 import {Tag} from '../tags/tag.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
-import {TaskSchedulerService} from '../task-scheduler/task-scheduler.service'
 import {constant, pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {UserError} from 'src/filters/user-error.exception.filter'
 import {NotFoundError, Transaction} from 'objection'
 import {getCloneTaskPayload} from './utils/get-clone-task-payload'
 import {Recurrence} from '../recurrence/recurrence.model'
+import {getWeekRange} from './utils/get-week-range'
+import {format} from 'date-fns'
 
 @Injectable()
 export class TasksService {
   constructor(
     private readonly tasksRepo: TasksRepo,
-    private readonly taskTagsRepo: TasksTagsRepo,
-    private readonly taskSchedulerService: TaskSchedulerService
+    private readonly taskTagsRepo: TasksTagsRepo
   ) {}
 
   Create(uid: UID, taskDto: CreateTaskDto) {
@@ -138,6 +138,29 @@ export class TasksService {
         TE.map(getCloneTaskPayload),
         TE.chain(this.tasksRepo.InsertClonedTask(trx))
       )
+    }
+  }
+
+  FindTodayTasks(trx?: Transaction) {
+    return (uid: UID): TE.TaskEither<UserError, Array<TaskT>> => {
+      const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
+      const today = format(new Date(), DEFAULT_DATE_FORMAT)
+
+      return this.tasksRepo.FindUserTasksByDate(trx)(uid, today)
+    }
+  }
+
+  FindWeekTasks(trx?: Transaction) {
+    return (uid: UID): TE.TaskEither<UserError, Array<TaskT>> => {
+      const [start, end] = getWeekRange(new Date())
+
+      return this.tasksRepo.FindWeekTasks(trx)(uid, start, end)
+    }
+  }
+
+  FindByDate(trx?: Transaction) {
+    return (uid: UID, date: string) => {
+      return this.tasksRepo.FindByDate(trx)(uid, date)
     }
   }
 }

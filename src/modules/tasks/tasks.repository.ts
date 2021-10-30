@@ -18,7 +18,6 @@ import {TaskList} from '../lists/list.model'
 import {TodoT} from '../checklist/checklist.model'
 import {TaskTag} from './tasks-tags.model'
 import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
-import {ScheduledTaskRepo} from '../task-scheduler/scheduled-task.repo'
 import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {UserError} from '../../filters/user-error.exception.filter'
 import {Recurrence} from '../recurrence/recurrence.model'
@@ -37,15 +36,13 @@ export class TasksRepo {
 
   constructor(
     @Inject(TaskModel) private readonly taskModel: typeof TaskModel,
-    private readonly tasksTagsRepo: TasksTagsRepo,
-    private readonly scheduledTaskRepo: ScheduledTaskRepo
+    private readonly tasksTagsRepo: TasksTagsRepo
   ) {}
 
   static DEFAULT_FETCH_GRAPH = {
     checklist: true,
     tags: true,
     list: true,
-    schedule: true,
     recurrence: true
   }
 
@@ -59,7 +56,8 @@ export class TasksRepo {
           title: taskInfo.title,
           description: taskInfo?.description,
           list_id: meta.list_id,
-          author_uid: uid
+          author_uid: uid,
+          date: meta.date
         })
 
         this.logger.log('task created', `TaskId(${task.id})`)
@@ -70,16 +68,6 @@ export class TasksRepo {
           this.logger.log('add tags to task')
           promises.push(this.tasksTagsRepo.AddTags(task.id, tagsIds, trx))
         }
-
-        promises.push(
-          this.scheduledTaskRepo.create(
-            {
-              date: meta.date,
-              task_id: task.id
-            },
-            trx
-          )()
-        )
 
         await Promise.all(promises)
 
@@ -227,7 +215,44 @@ export class TasksRepo {
     }
   }
 
-  FindWeekTasks() {
-    
+  FindUserTasksByDate(trx?: Transaction) {
+    return (uid: UID, date: string): TE.TaskEither<UserError, Array<TaskT>> => {
+      return taskEitherQuery(() => {
+        return this.taskModel
+          .query(trx)
+          .where('date', date)
+          .andWhere('author_uid', uid)
+          .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+      })
+    }
+  }
+
+  FindWeekTasks(trx?: Transaction) {
+    return (
+      uid: UID,
+      weekStart: string,
+      weekEnd: string
+    ): TE.TaskEither<UserError, Array<TaskT>> => {
+      return taskEitherQuery(() => {
+        return this.taskModel
+          .query(trx)
+          .where('author_uid', uid)
+          .andWhere('date', '>=', weekStart)
+          .andWhere('date', '<=', weekEnd)
+          .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+      })
+    }
+  }
+
+  FindByDate(trx?: Transaction) {
+    return (uid: UID, date: string) => {
+      return taskEitherQuery(() => {
+        return this.taskModel
+          .query(trx)
+          .where('author_uid', uid)
+          .andWhere('date', date)
+          .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+      })
+    }
   }
 }
