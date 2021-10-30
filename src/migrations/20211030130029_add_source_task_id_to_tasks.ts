@@ -3,7 +3,7 @@ import * as Knex from 'knex'
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.alterTable('tasks', t => {
     t.uuid('source_task_id').defaultTo(null)
-    t.foreign('source_task_id').references('tasks.id')
+    t.foreign('source_task_id').references('tasks.id').onDelete('SET NULL')
   })
 }
 

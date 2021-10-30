@@ -9,7 +9,7 @@ export async function up(knex: Knex): Promise<void> {
     t.date('next_date').notNullable()
     t.uuid('source_task_id').notNullable()
 
-    t.foreign('source_task_id').references('tasks.id')
+    t.foreign('source_task_id').references('tasks.id').onDelete('CASCADE')
   })
 }
 
