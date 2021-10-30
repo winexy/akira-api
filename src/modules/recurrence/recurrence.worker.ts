@@ -20,13 +20,11 @@ export class RecurrenceWorker {
     private readonly tasksService: TasksService
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS, {
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
     name: 'recurrence',
     timeZone: 'Europe/Moscow'
   })
   async worker() {
-    this.logger.log('recurrence worker')()
-
     const trx = await Model.startTransaction()
 
     const runTask = pipe(
