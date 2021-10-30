@@ -23,7 +23,7 @@ export class RecurrenceService {
   ): TE.TaskEither<UserError, Recurrence> {
     return pipe(
       this.taskService.ensureAuthority(taskId, uid),
-      TE.chainEitherK(() => mapToInsertableRule(dto)),
+      TE.map(mapToInsertableRule(dto)),
       TE.chain(rule => this.recurrenceRepo.createRecurrence(uid, taskId, rule))
     )
   }

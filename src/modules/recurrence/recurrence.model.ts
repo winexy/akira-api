@@ -45,7 +45,6 @@ export class RecurrenceModel extends Model implements Recurrence {
 }
 
 export const ruleSchema = f.shape({
-  startDate: f(string(), required()),
   frequency: f(number(), required(), min(0), max(3)),
   interval: f(number(), positive(), defaultTo(1)),
   weekDays: f.array(
