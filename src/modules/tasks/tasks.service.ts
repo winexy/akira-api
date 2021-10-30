@@ -49,7 +49,7 @@ export class TasksService {
     return pipe(
       this.FindOne(taskId, uid),
       TE.chain(task => {
-        return this.tasksRepo.Update(taskId, uid, {
+        return this.tasksRepo.Update()(taskId, uid, {
           is_completed: !task.is_completed
         })
       })
@@ -60,7 +60,7 @@ export class TasksService {
     return pipe(
       this.FindOne(taskId, uid),
       TE.chain(task => {
-        return this.tasksRepo.Update(taskId, uid, {
+        return this.tasksRepo.Update()(taskId, uid, {
           is_important: !task.is_important
         })
       })
@@ -102,7 +102,7 @@ export class TasksService {
     taskId: TaskId,
     patch: TaskPatchT
   ): TE.TaskEither<UserError, TaskT> {
-    return this.tasksRepo.Update(taskId, uid, patch)
+    return this.tasksRepo.Update()(taskId, uid, patch)
   }
 
   CreateTag(

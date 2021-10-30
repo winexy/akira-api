@@ -142,20 +142,21 @@ export class TasksRepo {
     return this.taskModel.query(trx).whereIn('id', taskIds)
   }
 
-  Update(
-    id: TaskT['id'],
-    uid: UserRecord['uid'],
-    patch: Partial<TaskT>,
-    trx?: Transaction
-  ): TE.TaskEither<UserError, TaskT> {
-    return taskEitherQuery(() => {
-      return this.taskModel
-        .query(trx)
-        .where({author_uid: uid})
-        .patchAndFetchById(id, patch)
-        .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
-        .throwIfNotFound()
-    })
+  Update(trx?: Transaction) {
+    return (
+      id: TaskT['id'],
+      uid: UserRecord['uid'],
+      patch: Partial<TaskT>
+    ): TE.TaskEither<UserError, TaskT> => {
+      return taskEitherQuery(() => {
+        return this.taskModel
+          .query(trx)
+          .where({author_uid: uid})
+          .patchAndFetchById(id, patch)
+          .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+          .throwIfNotFound()
+      })
+    }
   }
 
   private Patch(

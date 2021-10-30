@@ -24,23 +24,15 @@ export class RecurrenceRepo {
     return TE.tryCatch(
       () => {
         return this.recurrenceModel.transaction(async trx => {
-          const recurrence = await this.InsertRecurrence(
+          const recurrence = await this.InsertRecurrence(trx)(
             uid,
             taskId,
-            insertableRule,
-            trx
+            insertableRule
           )
 
-          const updateTask = this.tasksRepo.Update(
-            taskId,
-            uid,
-            {
-              recurrence_id: recurrence.id
-            },
-            trx
-          )
-
-          await updateTask()
+          await this.tasksRepo.Update(trx)(taskId, uid, {
+            recurrence_id: recurrence.id
+          })
 
           return recurrence
         })
@@ -56,18 +48,15 @@ export class RecurrenceRepo {
     )
   }
 
-  private InsertRecurrence(
-    uid: UID,
-    taskId: TaskId,
-    insertableRule: InsertableRule,
-    trx: Transaction
-  ) {
-    return this.recurrenceModel.query(trx).insert({
-      next_date: insertableRule.next,
-      rule: insertableRule.rule,
-      source_task_id: taskId,
-      author_uid: uid
-    })
+  private InsertRecurrence(trx?: Transaction) {
+    return (uid: UID, taskId: TaskId, insertableRule: InsertableRule) => {
+      return this.recurrenceModel.query(trx).insert({
+        next_date: insertableRule.next,
+        rule: insertableRule.rule,
+        source_task_id: taskId,
+        author_uid: uid
+      })
+    }
   }
 
   FindByNextDate(trx?: Transaction) {
