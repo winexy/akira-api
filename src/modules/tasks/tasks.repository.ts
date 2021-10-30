@@ -7,7 +7,8 @@ import {
   TaskT,
   CreateTaskDto,
   TasksQueryFiltersT,
-  TaskId
+  TaskId,
+  InsertNewTaskDto
 } from './task.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskList} from '../lists/list.model'
@@ -52,15 +53,12 @@ export class TasksRepo {
       const tagsIds = meta?.tags || []
 
       return this.taskModel.transaction(async trx => {
-        const task = await this.taskModel
-          .query(trx)
-          .insert({
-            title: taskInfo.title,
-            description: taskInfo?.description,
-            list_id: meta.list_id,
-            author_uid: uid
-          })
-          .returning('id')
+        const task = await this.InsertNewTask(trx)({
+          title: taskInfo.title,
+          description: taskInfo?.description,
+          list_id: meta.list_id,
+          author_uid: uid
+        })
 
         this.logger.log('task created', `TaskId(${task.id})`)
 
@@ -88,6 +86,12 @@ export class TasksRepo {
         return task.id
       })
     }, transformRejectReason)
+  }
+
+  private InsertNewTask(trx?: Transaction) {
+    return (dto: InsertNewTaskDto) => {
+      return this.taskModel.query(trx).insert(dto).returning('id')
+    }
   }
 
   findAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
@@ -202,5 +206,11 @@ export class TasksRepo {
       .query()
       .where('author_uid', uid)
       .andWhereRaw('CAST(updated_at AS DATE) = CAST(:date AS DATE)', {date})
+  }
+
+  InternalFindOne(id: TaskId): TE.TaskEither<UserError, TaskT> {
+    return TE.tryCatch(() => {
+      return this.taskModel.query().findById(id).throwIfNotFound()
+    }, transformRejectReason)
   }
 }

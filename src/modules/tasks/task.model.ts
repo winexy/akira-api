@@ -158,3 +158,10 @@ export const tasksQueryFiltersSchema = f.shape({
 })
 
 export type TasksQueryFiltersT = Infer<typeof tasksQueryFiltersSchema>
+
+export type InsertNewTaskDto = {
+  title: string
+  description?: string
+  author_uid: string
+  list_id?: number
+}
