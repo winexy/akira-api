@@ -26,6 +26,7 @@ export type TaskT = {
   author_uid: string
   title: string
   description: string
+  date: string | null
   is_completed: boolean
   is_important: boolean
   created_at: string
@@ -42,6 +43,7 @@ export class TaskModel extends Model implements TaskT {
   author_uid: string
   title: string
   description: string
+  date: string | null
   is_completed: boolean
   is_important: boolean
   created_at: string

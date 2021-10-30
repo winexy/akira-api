@@ -12,11 +12,15 @@ import {pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {UserError} from 'src/filters/user-error.exception.filter'
+import {taskEitherQuery} from 'src/shared/task-either-query'
 
 type QueriedTask = ScheduledTask & {
   task: DefaultFetchedTaskGraph
 }
 
+/**
+ * @deprecated
+ */
 @Injectable()
 export class ScheduledTaskRepo {
   constructor(
@@ -24,6 +28,9 @@ export class ScheduledTaskRepo {
     private readonly scheduledTaskModel: typeof ScheduledTaskModel
   ) {}
 
+  /**
+   * @deprecated
+   */
   create(dto: ScheduleTaskDto, trx?: Transaction) {
     return pipe(
       this.findScheduledTask(dto.task_id, trx),
@@ -35,12 +42,18 @@ export class ScheduledTaskRepo {
     )
   }
 
+  /**
+   * @deprecated
+   */
   findScheduledTask(taskId: TaskId, trx?: Transaction) {
     return TE.tryCatch(() => {
       return this.scheduledTaskModel.query(trx).findOne('task_id', taskId)
     }, transformRejectReason)
   }
 
+  /**
+   * @deprecated
+   */
   insertNewScheduledTask(dto: ScheduleTaskDto, trx?: Transaction) {
     return TE.tryCatch(() => {
       return this.scheduledTaskModel.query(trx).insert({
@@ -50,6 +63,9 @@ export class ScheduledTaskRepo {
     }, transformRejectReason)
   }
 
+  /**
+   * @deprecated
+   */
   patchAlreadyScheduledTask(
     entity: ScheduledTask,
     dto: ScheduleTaskDto,
@@ -62,6 +78,9 @@ export class ScheduledTaskRepo {
     }, transformRejectReason)
   }
 
+  /**
+   * @deprecated
+   */
   delete(dto: ScheduleTaskDto) {
     return TE.tryCatch(() => {
       return this.scheduledTaskModel
@@ -72,12 +91,18 @@ export class ScheduledTaskRepo {
     }, transformRejectReason)
   }
 
+  /**
+   * @deprecated
+   */
   findByDate(date: string, trx: Transaction) {
     return this.scheduledTaskModel.query(trx).where({
       date
     })
   }
 
+  /**
+   * @deprecated
+   */
   findUserTasksByDate(
     uid: UID,
     date: string
@@ -102,6 +127,9 @@ export class ScheduledTaskRepo {
     }, transformRejectReason)
   }
 
+  /**
+   * @deprecated
+   */
   removeBatch(taskIds: Array<TaskId>, trx: Transaction) {
     return this.scheduledTaskModel
       .query(trx)
@@ -109,12 +137,15 @@ export class ScheduledTaskRepo {
       .whereIn('task_id', taskIds)
   }
 
+  /**
+   * @deprecated
+   */
   findWeekTasks(
     uid: UID,
     weekStart: string,
     weekEnd: string
   ): TE.TaskEither<UserError, Array<QueriedTask>> {
-    return TE.tryCatch(() => {
+    return taskEitherQuery(() => {
       return (this.scheduledTaskModel
         .query()
         .where('date', '>=', weekStart)
@@ -130,6 +161,6 @@ export class ScheduledTaskRepo {
             builder.where(TaskModel.ref('author_uid'), uid)
           }
         }) as unknown) as Promise<Array<QueriedTask>>
-    }, transformRejectReason)
+    })
   }
 }

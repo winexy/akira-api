@@ -11,6 +11,9 @@ import {UserError} from 'src/filters/user-error.exception.filter'
 
 const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
 
+/**
+ * @deprecated
+ */
 @Injectable()
 export class TaskSchedulerService {
   constructor(
@@ -19,6 +22,9 @@ export class TaskSchedulerService {
     private readonly scheduledTaskRepo: ScheduledTaskRepo
   ) {}
 
+  /**
+   * @deprecated
+   */
   create(uid: UID, dto: ScheduleTaskDto) {
     return pipe(
       this.taskService.EnsureAuthority(dto.task_id, uid),
@@ -26,6 +32,9 @@ export class TaskSchedulerService {
     )
   }
 
+  /**
+   * @deprecated
+   */
   delete(uid: UID, dto: ScheduleTaskDto) {
     return pipe(
       this.taskService.EnsureAuthority(dto.task_id, uid),
@@ -33,6 +42,9 @@ export class TaskSchedulerService {
     )
   }
 
+  /**
+   * @deprecated
+   */
   findByDate(uid: UID, date: string) {
     return pipe(
       this.scheduledTaskRepo.findUserTasksByDate(uid, date),
@@ -40,6 +52,9 @@ export class TaskSchedulerService {
     )
   }
 
+  /**
+   * @deprecated
+   */
   private temporary_extractTasks(
     scheduledTasks: Array<{task: DefaultFetchedTaskGraph | null}>
   ): Array<DefaultFetchedTaskGraph> {
@@ -56,6 +71,9 @@ export class TaskSchedulerService {
     )
   }
 
+  /**
+   * @deprecated
+   */
   findTodayTasks(
     uid: UID
   ): TE.TaskEither<UserError, Array<DefaultFetchedTaskGraph>> {
@@ -66,6 +84,9 @@ export class TaskSchedulerService {
     )
   }
 
+  /**
+   * @deprecated
+   */
   private getWeekRange(date: Date) {
     const weekConfig = {weekStartsOn: 1} as const
 
@@ -75,6 +96,9 @@ export class TaskSchedulerService {
     ]
   }
 
+  /**
+   * @deprecated
+   */
   findWeekTasks(
     uid: UID
   ): TE.TaskEither<UserError, Array<DefaultFetchedTaskGraph>> {
@@ -84,21 +108,5 @@ export class TaskSchedulerService {
       this.scheduledTaskRepo.findWeekTasks(uid, start, end),
       TE.map(this.temporary_extractTasks)
     )
-  }
-
-  findAll() {
-    return `This action returns all taskScheduler`
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} taskScheduler`
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} taskScheduler`
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} taskScheduler`
   }
 }

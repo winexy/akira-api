@@ -3,9 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Delete,
-  NotImplementedException,
   UseGuards,
   Param
 } from '@nestjs/common'
@@ -96,25 +94,5 @@ export class TaskSchedulerController {
     }
 
     return result.right
-  }
-
-  @Get()
-  findAll() {
-    throw new NotImplementedException()
-  }
-
-  @Get(':id')
-  findOne() {
-    throw new NotImplementedException()
-  }
-
-  @Patch(':id')
-  update() {
-    throw new NotImplementedException()
-  }
-
-  @Delete(':id')
-  remove() {
-    throw new NotImplementedException()
   }
 }
