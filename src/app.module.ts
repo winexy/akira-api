@@ -1,3 +1,5 @@
+import {readFileSync} from 'fs'
+import path from 'path'
 import {Module} from '@nestjs/common'
 import {ScheduleModule} from '@nestjs/schedule'
 import {ConfigModule, ConfigService} from '@nestjs/config'
@@ -13,6 +15,15 @@ import {TaskSchedulerModule} from './modules/task-scheduler/task-scheduler.modul
 import {ReportsModule} from './modules/reports/reports.module'
 import {RecurrenceModule} from './modules/recurrence/recurrence.module'
 
+function loadCertificate() {
+  try {
+    return readFileSync(path.join(__dirname, '..', 'ca-certificate.crt'))
+  } catch (error) {
+    console.error('[AppModule] Failed to load ssl certificate')
+    throw error
+  }
+}
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,6 +33,11 @@ import {RecurrenceModule} from './modules/recurrence/recurrence.module'
       imports: [ConfigModule.forRoot({validate: validateEnv})],
       inject: [ConfigService],
       useFactory(config: AppConfigService) {
+        const ssl =
+          config.get('NODE_ENV') === 'production'
+            ? {ca: loadCertificate()}
+            : (config.get('POSTGRES_SSL') as boolean)
+
         return {
           config: {
             client: 'pg',
@@ -32,7 +48,7 @@ import {RecurrenceModule} from './modules/recurrence/recurrence.module'
               user: config.get('POSTGRES_USER'),
               password: config.get('POSTGRES_PASSWORD'),
               port: config.get('POSTGRES_PORT'),
-              ssl: config.get('POSTGRES_SSL') as boolean
+              ssl
             },
             migrations: {
               tableName: 'migrations'
