@@ -16,6 +16,8 @@ COPY --chown=node:node . ./
 
 RUN yarn build
 
+# ca-certificate used for connection to external database
+# file is generated during CI pipeline
 COPY --chown=node:node ./ca-certificate.crt ./dist/
 
 EXPOSE 3000
