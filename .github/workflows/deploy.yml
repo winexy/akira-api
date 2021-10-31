@@ -15,6 +15,11 @@ jobs:
           cat <<EOF > firebase-service-account.json
           ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           EOF
+      - name: Generate ca-certificate.crt
+        run: |
+          cat <<EOF > ca-certificate.crt
+          ${{ secrets.CA_CERTIFICATE }}
+          EOF
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
