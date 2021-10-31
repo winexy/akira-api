@@ -1,5 +1,5 @@
 import {readFileSync} from 'fs'
-import path from 'path'
+import {join} from 'path'
 import {Module} from '@nestjs/common'
 import {ScheduleModule} from '@nestjs/schedule'
 import {ConfigModule, ConfigService} from '@nestjs/config'
@@ -15,9 +15,9 @@ import {TaskSchedulerModule} from './modules/task-scheduler/task-scheduler.modul
 import {ReportsModule} from './modules/reports/reports.module'
 import {RecurrenceModule} from './modules/recurrence/recurrence.module'
 
-function loadCertificate() {
+function readCert() {
   try {
-    return readFileSync(path.join(__dirname, '..', 'ca-certificate.crt'))
+    return readFileSync(join(__dirname, '..', 'ca-certificate.crt'))
   } catch (error) {
     console.error('[AppModule] Failed to load ssl certificate')
     throw error
@@ -35,7 +35,7 @@ function loadCertificate() {
       useFactory(config: AppConfigService) {
         const ssl =
           config.get('NODE_ENV') === 'production'
-            ? {ca: loadCertificate()}
+            ? {ca: readCert()}
             : (config.get('POSTGRES_SSL') as boolean)
 
         return {
