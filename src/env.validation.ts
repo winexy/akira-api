@@ -20,7 +20,17 @@ const schema = f.shape({
   POSTGRES_HOST: f(string(), required()),
   POSTGRES_PASSWORD: f(string(), required()),
   POSTGRES_USER: f(string(), required()),
-  POSTGRES_DB: f(string(), required())
+  POSTGRES_DB: f(string(), required()),
+  POSTGRES_PORT: f(
+    string(),
+    required(),
+    fmap(s => parseInt(s))
+  ),
+  POSTGRES_SSL: f(
+    string(),
+    oneOf(['true', 'false']),
+    fmap(value => value === 'true')
+  )
 })
 
 export type AppConfig = Infer<typeof schema>
