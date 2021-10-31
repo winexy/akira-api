@@ -17,7 +17,7 @@ import {RecurrenceModule} from './modules/recurrence/recurrence.module'
 
 function readCert() {
   try {
-    return require('../ca-certificate.crt')
+    return readFileSync(join(__dirname, '..', 'ca-certificate.crt'))
   } catch (error) {
     console.error('[AppModule] Failed to load ssl certificate')
     throw error
