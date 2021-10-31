@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "npx nest build",
+    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -30,6 +30,7 @@
     "docker-compose:prod": "docker-compose -f docker-compose.prod.yml"
   },
   "dependencies": {
+    "@nestjs/cli": "^8.1.1",
     "@nestjs/common": "^8.0.5",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.5",
@@ -52,7 +53,6 @@
     "rxjs": "^7.3.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^8.1.1",
     "@nestjs/schematics": "^8.0.2",
     "@nestjs/testing": "^8.0.6",
     "@types/cron": "^1.7.2",
