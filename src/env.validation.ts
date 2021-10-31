@@ -35,7 +35,7 @@ const schema = f.shape({
 
 export type AppConfig = Infer<typeof schema>
 
-export function validateEnv(config: Record<string, string>) {
+export function validateEnv(config: Record<string, string | undefined>) {
   const result = run(schema, config, {
     valueName: 'env schema',
     allowUnknown: true
@@ -45,5 +45,5 @@ export function validateEnv(config: Record<string, string>) {
     throw new Error(map(result.errors, 'message').join('\n'))
   }
 
-  return config
+  return result.value
 }
