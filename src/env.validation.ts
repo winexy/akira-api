@@ -5,6 +5,10 @@ import {map} from 'lodash'
 
 const envTypes = ['development', 'production'] as const
 
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P]
+}
+
 type EnvTypes = Mutable<typeof envTypes>[number]
 
 const schema = f.shape({
