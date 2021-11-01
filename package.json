@@ -25,12 +25,7 @@
     "migrate:down": "knex migrate:down",
     "migrate:latest": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
-    "docker:up": "docker-compose -f docker-compose.dev.yml up",
-    "docker:up:prod": "docker-compose -f docker-compose.prod.yml up",
-    "docker:down": "docker-compose down",
-    "docker:sh": "docker-compose -f docker-compose.dev.yml exec akira-api sh",
-    "docker-compose:prod": "docker-compose -f docker-compose.prod.yml",
-    "ci:write-firebase-config": "ts-node ./scripts/write-firebase-config.ts"
+    "docker:sh": "docker-compose exec akira-api sh"
   },
   "dependencies": {
     "@nestjs/cli": "^8.1.1",
