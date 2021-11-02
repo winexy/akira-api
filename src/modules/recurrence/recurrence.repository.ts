@@ -7,6 +7,8 @@ import {InsertableRule} from './utils/map-to-insertable-rule'
 import {TasksRepo} from '../tasks/tasks.repository'
 import {UserError} from 'src/filters/user-error.exception.filter'
 import {taskEitherQuery} from 'src/shared/task-either-query'
+import {pipe} from 'fp-ts/lib/function'
+import * as E from 'fp-ts/lib/Either'
 
 @Injectable()
 export class RecurrenceRepo {
@@ -21,40 +23,35 @@ export class RecurrenceRepo {
     taskId: TaskId,
     insertableRule: InsertableRule
   ): TE.TaskEither<UserError, Recurrence> {
-    return TE.tryCatch(
-      () => {
-        return this.recurrenceModel.transaction(async trx => {
-          const recurrence = await this.InsertRecurrence(trx)(
-            uid,
-            taskId,
-            insertableRule
+    return taskEitherQuery(() => {
+      return this.recurrenceModel.transaction(async trx => {
+        const result = await pipe(
+          this.InsertRecurrence(trx)(uid, taskId, insertableRule),
+          TE.chainFirst(recurrence =>
+            this.tasksRepo.Update(trx)(taskId, uid, {
+              recurrence_id: recurrence.id
+            })
           )
+        )()
 
-          await this.tasksRepo.Update(trx)(taskId, uid, {
-            recurrence_id: recurrence.id
-          })
+        if (E.isLeft(result)) {
+          throw result.left
+        }
 
-          return recurrence
-        })
-      },
-      reason =>
-        UserError.of({
-          type: 'unknown',
-          message: 'Failed to create recurrence',
-          meta: {
-            reason
-          }
-        })
-    )
+        return result.right
+      })
+    })
   }
 
   private InsertRecurrence(trx?: Transaction) {
     return (uid: UID, taskId: TaskId, insertableRule: InsertableRule) => {
-      return this.recurrenceModel.query(trx).insert({
-        next_date: insertableRule.next,
-        rule: insertableRule.rule,
-        source_task_id: taskId,
-        author_uid: uid
+      return taskEitherQuery(() => {
+        return this.recurrenceModel.query(trx).insert({
+          next_date: insertableRule.next,
+          rule: insertableRule.rule,
+          source_task_id: taskId,
+          author_uid: uid
+        })
       })
     }
   }
