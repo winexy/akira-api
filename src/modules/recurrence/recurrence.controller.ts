@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Body
-} from '@nestjs/common'
+import {Controller, Post, Param, UseGuards, Body} from '@nestjs/common'
 import {RecurrenceService} from './recurrence.service'
 import {AuthGuard} from '../../auth.guard'
 import {FujiPipe} from '../../pipes/fuji.pipe'
@@ -34,25 +25,5 @@ export class RecurrenceController {
     }
 
     return result.right
-  }
-
-  @Get()
-  findAll() {
-    return this.recurrenceService.findAll()
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.recurrenceService.findOne(+id)
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.recurrenceService.update(+id)
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.recurrenceService.remove(+id)
   }
 }
