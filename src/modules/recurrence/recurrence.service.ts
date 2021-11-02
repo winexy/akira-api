@@ -1,13 +1,16 @@
 import {Injectable} from '@nestjs/common'
 import {pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
+import {Transaction} from 'objection'
 import {TaskId} from '../tasks/task.model'
-import {RuleSchema, Recurrence} from './recurrence.model'
+import {RuleSchema} from './recurrence.model'
 import {TasksService} from '../tasks/tasks.service'
 import {RecurrenceRepo} from './recurrence.repository'
 import {mapToInsertableRule} from './utils/map-to-insertable-rule'
-import {UserError} from 'src/filters/user-error.exception.filter'
-import {Transaction} from 'objection'
+import {
+  isUniqueViolation,
+  UserError
+} from 'src/filters/user-error.exception.filter'
 
 @Injectable()
 export class RecurrenceService {
@@ -20,11 +23,24 @@ export class RecurrenceService {
     uid: UID,
     taskId: TaskId,
     dto: RuleSchema
-  ): TE.TaskEither<UserError, Recurrence> {
+  ): TE.TaskEither<UserError, void> {
+    const patchExistingRecurrence = (
+      error: UserError
+    ): TE.TaskEither<UserError, void> => {
+      return isUniqueViolation(error)
+        ? pipe(
+            mapToInsertableRule(dto),
+            TE.fromIO,
+            TE.chain(this.recurrenceRepo.PatchByTaskId(taskId))
+          )
+        : TE.throwError(error)
+    }
+
     return pipe(
       this.taskService.EnsureAuthority(taskId, uid),
       TE.map(mapToInsertableRule(dto)),
-      TE.chain(rule => this.recurrenceRepo.CreateRecurrence(uid, taskId, rule))
+      TE.chain(this.recurrenceRepo.CreateRecurrence(uid)(taskId)),
+      TE.orElseW(patchExistingRecurrence)
     )
   }
 
