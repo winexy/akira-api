@@ -8,11 +8,9 @@ import {
   positive,
   required,
   string,
-  oneOf,
-  fmap
+  oneOf
 } from '@winexy/fuji'
 import {Model} from 'objection'
-import RRule from 'rrule'
 import {TaskModel, TaskT} from '../tasks/task.model'
 
 export type Recurrence = {
@@ -50,11 +48,7 @@ export const ruleSchema = f.shape({
   frequency: f(number(), required(), min(0), max(3)),
   interval: f(number(), positive(), defaultTo(1)),
   weekDays: f.array(
-    f(
-      string(),
-      oneOf(['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']),
-      fmap(day => RRule[day as 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'])
-    )
+    f(string(), oneOf(['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']))
   ),
   months: f.array(f(number(), min(1), max(12)))
 })

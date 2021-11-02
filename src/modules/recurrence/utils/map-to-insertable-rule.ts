@@ -14,11 +14,13 @@ export function mapToInsertableRule(dto: RuleSchema): IO.IO<InsertableRule> {
   return pipe(
     D.create,
     IO.map(startDate => {
+      const weekDays = dto.weekDays as Array<WeekdayStr> | undefined
+
       return new RRule({
         dtstart: startDate,
         freq: dto.frequency,
         interval: dto.interval,
-        byweekday: dto.weekDays as Array<WeekdayStr> | undefined,
+        byweekday: weekDays?.map(day => RRule[day]),
         bymonth: dto.months
       })
     }),
