@@ -12,7 +12,7 @@ import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskTag} from './tasks-tags.model'
 import {constant, pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {UserError} from 'src/filters/user-error.exception.filter'
+import {UserError, UserErrorEnum} from 'src/filters/user-error.exception.filter'
 import {NotFoundError, Transaction} from 'objection'
 import {getCloneTaskPayload} from './utils/get-clone-task-payload'
 import {Recurrence} from '../recurrence/recurrence.model'
@@ -77,7 +77,7 @@ export class TasksService {
       TE.mapLeft(error => {
         if (error instanceof NotFoundError) {
           return UserError.of({
-            type: UserError.NoAccess,
+            type: UserErrorEnum.NoAccess,
             message: `User(${uid}) has no access to Task(${taskId})`,
             meta: {
               error
@@ -86,7 +86,7 @@ export class TasksService {
         }
 
         return UserError.of({
-          type: UserError.Internal,
+          type: UserErrorEnum.Internal,
           message: '...',
           meta: {
             error

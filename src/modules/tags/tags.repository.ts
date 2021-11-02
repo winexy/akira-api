@@ -1,8 +1,8 @@
 import {Inject, Injectable} from '@nestjs/common'
 import {UniqueViolationError} from 'db-errors'
 import {TagModel, CreateTagDto, Tag} from './tag.model'
-import {UserError} from '../../filters/user-error.exception.filter'
-import {transformRejectReason} from '../../shared/transform-reject-reason'
+import {UserError, UserErrorEnum} from 'src/filters/user-error.exception.filter'
+import {transformRejectReason} from 'src/shared/transform-reject-reason'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {pipe} from 'fp-ts/lib/function'
 
@@ -22,7 +22,7 @@ export class TagsRepo {
       TE.mapLeft(error => {
         if (error instanceof UniqueViolationError) {
           return UserError.of({
-            type: UserError.Duplicate,
+            type: UserErrorEnum.Duplicate,
             message: `tag "${dto.name}" is already exist`,
             meta: {
               name: dto.name

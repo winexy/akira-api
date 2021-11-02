@@ -1,50 +1,77 @@
 import {ArgumentsHost, Catch, ExceptionFilter, HttpStatus} from '@nestjs/common'
+import {DBError} from 'db-errors'
 import {Response} from 'express'
 
-type Params = {
-  type: string
+type Params<Type = string, Meta = Record<string, unknown>> = {
+  type: Type
   message: string
-  meta?: Record<any, unknown>
+  meta?: Meta
 }
 
-export class UserError {
-  private readonly message: string
-  private readonly type: string
-  private readonly meta: Record<any, unknown> | null
+export enum UserErrorEnum {
+  Duplicate = 'duplicate',
+  BadRequest = 'bad-request',
+  Internal = 'internal',
+  NoAccess = 'no-access',
+  NotFound = 'not-found',
+  DbQuery = 'db-query',
+  UnknownDbQuery = 'unknown-db-query'
+}
 
-  static Duplicate = 'duplicate'
-  static BadRequest = 'bad-request'
-  static Internal = 'internal'
-  static NoAccess = 'no-access'
-  static NotFound = 'not-found'
-  static DbQuery = 'db-query'
-  static UnknownDbQuery = 'unknown-db-query'
+export type DBQueryError = UserError<UserErrorEnum.DbQuery, {reason: DBError}>
 
-  static of(params: Params) {
+export const isDbQueryError = (err: UserError): err is DBQueryError =>
+  err.type === UserErrorEnum.DbQuery
+
+export const isUniqueViolation = (error: UserError) => {
+  return (
+    isDbQueryError(error) && error.meta?.reason.name === 'UniqueViolationError'
+  )
+}
+export class UserError<
+  Type extends UserErrorEnum = UserErrorEnum,
+  Meta extends Record<string, unknown> = Record<string, unknown>
+> {
+  private readonly $message: string
+  private readonly $type: Type
+  private readonly $meta: Meta | null
+
+  static of<
+    Type extends UserErrorEnum,
+    Meta extends Record<string, unknown> = Record<string, unknown>
+  >(params: Params<Type, Meta>) {
     return new UserError(params)
   }
 
-  constructor(params: Params) {
-    this.type = params.type
-    this.message = params.message
-    this.meta = params.meta ?? null
+  constructor(params: Params<Type, Meta>) {
+    this.$type = params.type
+    this.$message = params.message
+    this.$meta = params.meta ?? null
+  }
+
+  get meta() {
+    return this.$meta
+  }
+
+  get type() {
+    return this.$type
   }
 
   toJSON() {
     return {
-      type: this.type,
-      message: this.message,
-      meta: this.meta
+      type: this.$type,
+      message: this.$message,
+      meta: this.$meta
     }
   }
 
   getHttpCode() {
-    switch (this.type) {
-      case UserError.Duplicate:
+    switch (this.$type) {
+      case UserErrorEnum.Duplicate:
         return HttpStatus.CONFLICT
-      case UserError.Internal:
+      case UserErrorEnum.Internal:
         return HttpStatus.INTERNAL_SERVER_ERROR
-      case UserError.NoAccess:
+      case UserErrorEnum.NoAccess:
         return HttpStatus.FORBIDDEN
       default:
         return HttpStatus.BAD_REQUEST
