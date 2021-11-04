@@ -8,7 +8,8 @@ const CLONEABLE_PROPERTIES = [
   'is_important',
   'list_id',
   'recurrence_id',
-  'title'
+  'title',
+  'date'
 ] as const
 
 const extractPoperties = pick<TaskT>()(CLONEABLE_PROPERTIES)
