@@ -32,9 +32,7 @@ export class RecurrenceWorker {
     const trx = await Model.startTransaction()
 
     const runTask = pipe(
-      this.logger.log(
-        `Starting Recurrence Worker. Date=${new Date().toUTCString()}`
-      ),
+      this.logger.log(`Starting Recurrence Worker. Date=${String(new Date())}`),
       TE.fromIO,
       TE.chain(() => this.recurrenceService.FindRecurrentForToday(trx)),
       TE.chainFirstIOK(

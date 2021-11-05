@@ -11,6 +11,7 @@ import {
   isUniqueViolation,
   UserError
 } from 'src/filters/user-error.exception.filter'
+import {formatISO} from 'date-fns'
 
 @Injectable()
 export class RecurrenceService {
@@ -45,10 +46,7 @@ export class RecurrenceService {
   }
 
   FindRecurrentForToday(trx?: Transaction) {
-    return pipe(
-      new Date().toISOString(),
-      this.recurrenceRepo.FindByNextDate(trx)
-    )
+    return pipe(formatISO(new Date()), this.recurrenceRepo.FindByNextDate(trx))
   }
 
   UpdateNextDate(trx?: Transaction) {
