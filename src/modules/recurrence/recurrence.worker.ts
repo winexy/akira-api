@@ -25,6 +25,10 @@ export class RecurrenceWorker {
     timeZone: 'Europe/Moscow'
   })
   async worker() {
+    await this.syncRecurrentTasks()
+  }
+
+  async syncRecurrentTasks() {
     const trx = await Model.startTransaction()
 
     const runTask = pipe(
