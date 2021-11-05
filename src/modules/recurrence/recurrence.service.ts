@@ -31,15 +31,14 @@ export class RecurrenceService {
       return isUniqueViolation(error)
         ? pipe(
             mapToInsertableRule(dto),
-            TE.fromIO,
-            TE.chain(this.recurrenceRepo.PatchByTaskId(taskId))
+            this.recurrenceRepo.PatchByTaskId(taskId)
           )
         : TE.throwError(error)
     }
 
     return pipe(
       this.taskService.EnsureAuthority(taskId, uid),
-      TE.map(mapToInsertableRule(dto)),
+      TE.map(() => mapToInsertableRule(dto)),
       TE.chain(this.recurrenceRepo.CreateRecurrence(uid)(taskId)),
       TE.orElseW(patchExistingRecurrence)
     )
