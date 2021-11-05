@@ -2,10 +2,12 @@ import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common'
 import {Request} from 'express'
 import * as O from 'fp-ts/lib/Option'
 import {constant, pipe} from 'fp-ts/lib/function'
+import {ConfigService} from '@nestjs/config'
+import {AppConfig} from './env.validation'
 
 @Injectable()
 export class SuperUserGuard implements CanActivate {
-  constructor(private readonly configService: AppConfigService) {}
+  constructor(private readonly configService: ConfigService<AppConfig>) {}
 
   async canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest()

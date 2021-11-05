@@ -27,10 +27,10 @@ function readCert() {
 @Module({
   imports: [
     ConfigModule.forRoot({
-      validate: validateEnv
+      validate: validateEnv,
+      isGlobal: true
     }),
     ObjectionModule.registerAsync({
-      imports: [ConfigModule.forRoot({validate: validateEnv})],
       inject: [ConfigService],
       useFactory(config: AppConfigService) {
         const ssl =
