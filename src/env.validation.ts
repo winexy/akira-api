@@ -35,7 +35,8 @@ const schema = f.shape({
     oneOf(['true', 'false']),
     fmap(value => value === 'true')
   ),
-  SUPERUSER_UID: f(string(), required())
+  SUPERUSER_UID: f(string(), required()),
+  TZ: f(string(), required())
 })
 
 export type AppConfig = Infer<typeof schema>
