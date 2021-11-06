@@ -43,7 +43,7 @@ export class DueDateWorker {
           date: nextDate
         }))
       ),
-      TE.map(
+      TE.chain(
         TE.traverseArray(task => {
           return this.tasksService.InternalPatchTask(trx)(task.taskId, {
             date: task.date
