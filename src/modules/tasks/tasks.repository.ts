@@ -21,6 +21,7 @@ import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
 import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {UserError} from '../../filters/user-error.exception.filter'
 import {Recurrence} from '../recurrence/recurrence.model'
+import {formatISO} from 'date-fns'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
@@ -159,6 +160,14 @@ export class TasksRepo {
       .patch(patch)
   }
 
+  InternalPatchTask(trx?: Transaction) {
+    return (id: TaskT['id'], patch: Partial<TaskT>) => {
+      return taskEitherQuery(() => {
+        return this.taskModel.query(trx).where('id', id).update(patch)
+      })
+    }
+  }
+
   DeleteOne(
     taskId: TaskT['id'],
     uid: UserRecord['uid']
@@ -254,5 +263,17 @@ export class TasksRepo {
           .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
       })
     }
+  }
+
+  FindRescheduableTasksWithDueDate(
+    trx?: Transaction
+  ): TE.TaskEither<UserError, TaskT[]> {
+    return taskEitherQuery(() => {
+      return this.taskModel
+        .query(trx)
+        .where('is_completed', false)
+        .andWhereNot('due_date', null)
+        .andWhere('date', '<=', formatISO(new Date()))
+    })
   }
 }

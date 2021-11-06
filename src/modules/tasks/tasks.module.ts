@@ -7,13 +7,14 @@ import {TasksService} from './tasks.service'
 import {TasksTagsModel} from './tasks-tags.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskSchedulerModule} from '../task-scheduler/task-scheduler.module'
+import {DueDateWorker} from './due-date.worker'
 
 @Module({
   imports: [
     ObjectionModule.forFeature([TaskModel, TasksTagsModel]),
     TaskSchedulerModule
   ],
-  providers: [TasksRepo, TasksService, TasksTagsRepo],
+  providers: [TasksRepo, TasksService, TasksTagsRepo, DueDateWorker],
   controllers: [TasksController],
   exports: [TasksService, TasksRepo]
 })

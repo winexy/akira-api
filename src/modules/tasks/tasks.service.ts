@@ -163,4 +163,12 @@ export class TasksService {
       return this.tasksRepo.FindByDate(trx)(uid, date)
     }
   }
+
+  FindRescheduableTasksWithDueDate(trx?: Transaction) {
+    return this.tasksRepo.FindRescheduableTasksWithDueDate(trx)
+  }
+
+  InternalPatchTask(trx?: Transaction) {
+    return this.tasksRepo.InternalPatchTask(trx)
+  }
 }

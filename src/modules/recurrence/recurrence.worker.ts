@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common'
 import {Cron, CronExpression} from '@nestjs/schedule'
-import {Model} from 'objection'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as RA from 'fp-ts/lib/ReadonlyArray'
 import {flow, pipe} from 'fp-ts/lib/function'
@@ -10,6 +9,7 @@ import RRule from 'rrule'
 import {RecurrenceService} from './recurrence.service'
 import {TasksService} from '../tasks/tasks.service'
 import {IOLogger} from 'src/shared/io-logger'
+import {startTransaction} from 'src/shared/transaction'
 
 @Injectable()
 export class RecurrenceWorker {
@@ -29,7 +29,7 @@ export class RecurrenceWorker {
   }
 
   async syncRecurrentTasks() {
-    const trx = await Model.startTransaction()
+    const {trx, foldTransaction} = await startTransaction()
 
     const runTask = pipe(
       this.logger.log(`Starting Recurrence Worker. Date=${String(new Date())}`),
@@ -64,21 +64,15 @@ export class RecurrenceWorker {
           this.logger.log(`Updated ${RA.size(recurrences)} recurrences`)
         )
       ),
-      TE.match(
+      foldTransaction(
         error => {
-          return trx
-            .rollback()
-            .then(
-              this.logger.error(
-                'Recurrence worker finished with error',
-                error.toJSON()
-              )
-            )
+          return this.logger.error(
+            'Recurrence worker finished with error',
+            error.toJSON()
+          )
         },
         () => {
-          return trx
-            .commit()
-            .then(this.logger.log('Recurrence worker finished with success'))
+          return this.logger.log('Recurrence worker finished with success')
         }
       )
     )
