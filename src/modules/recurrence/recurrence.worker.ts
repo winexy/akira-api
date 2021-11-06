@@ -4,7 +4,7 @@ import * as TE from 'fp-ts/lib/TaskEither'
 import * as RA from 'fp-ts/lib/ReadonlyArray'
 import {flow, pipe} from 'fp-ts/lib/function'
 import {tap} from 'fp-ts-std/IO'
-import {endOfToday} from 'date-fns'
+import {endOfToday, formatISO} from 'date-fns'
 import RRule from 'rrule'
 import {RecurrenceService} from './recurrence.service'
 import {TasksService} from '../tasks/tasks.service'
@@ -51,9 +51,9 @@ export class RecurrenceWorker {
       TE.map(
         RA.map(recurrence => ({
           id: recurrence.id,
-          nextDate: RRule.fromString(recurrence.rule)
-            .after(endOfToday())
-            .toISOString()
+          nextDate: formatISO(
+            RRule.fromString(recurrence.rule).after(endOfToday())
+          )
         }))
       ),
       TE.chainFirst(
