@@ -4,7 +4,7 @@ import {TasksService} from './tasks.service'
 import {pipe} from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as RA from 'fp-ts/lib/ReadonlyArray'
-import {formatISO} from 'date-fns'
+import {format} from 'date-fns'
 import {tap} from 'fp-ts-std/IO'
 import {IOLogger} from 'src/shared/io-logger'
 import {startTransaction} from 'src/shared/transaction'
@@ -26,8 +26,12 @@ export class DueDateWorker {
   async RunTask() {
     const {trx, foldTransaction} = await startTransaction()
 
+    const nextDate = format(new Date(), 'yyyy-MM-dd')
+
     const runTask = pipe(
-      this.tasksService.FindRescheduableTasksWithDueDate(trx),
+      this.logger.log(`Starting Worker: Next date is ${nextDate}`),
+      TE.fromIO,
+      TE.chain(() => this.tasksService.FindRescheduableTasksWithDueDate(trx)),
       TE.chainFirstIOK(
         tap(tasks =>
           this.logger.log(`Found ${RA.size(tasks)} rescheduable tasks`)
@@ -36,7 +40,7 @@ export class DueDateWorker {
       TE.map(
         RA.map(task => ({
           taskId: task.id,
-          date: formatISO(new Date())
+          date: nextDate
         }))
       ),
       TE.map(

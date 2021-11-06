@@ -19,6 +19,7 @@ import {FujiPipe} from '../../pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
 import {TasksQueryFiltersT, tasksQueryFiltersSchema} from './task.model'
 import {Tag} from '../tags/tag.model'
+import {DueDateWorker} from './due-date.worker'
 import {
   TaskPatchT,
   TaskT,
@@ -31,7 +32,15 @@ import {
 @Controller('tasks')
 @UseGuards(AuthGuard)
 export class TasksController {
-  constructor(private readonly taskService: TasksService) {}
+  constructor(
+    private readonly taskService: TasksService,
+    private readonly dueDateWorker: DueDateWorker
+  ) {}
+
+  @Post('hook/due-date')
+  DueDateHook() {
+    return this.dueDateWorker.RunTask()
+  }
 
   @Post()
   @HttpCode(201)
