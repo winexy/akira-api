@@ -20,6 +20,7 @@ import {User} from 'src/decorators/user.decorator'
 import {TasksQueryFiltersT, tasksQueryFiltersSchema} from './task.model'
 import {Tag} from '../tags/tag.model'
 import {DueDateWorker} from './due-date.worker'
+import {SuperUserGuard} from '../../superuser.guard'
 import {
   TaskPatchT,
   TaskT,
@@ -38,6 +39,7 @@ export class TasksController {
   ) {}
 
   @Post('hook/due-date')
+  @UseGuards(SuperUserGuard)
   DueDateHook() {
     return this.dueDateWorker.RunTask()
   }
