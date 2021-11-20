@@ -122,7 +122,7 @@ export class RecurrenceRepo {
         .query()
         .where('author_uid', uid)
         .withGraphFetched({
-          task: TasksRepo.DEFAULT_FETCH_GRAPH
+          task: true
         })
     })
   }
