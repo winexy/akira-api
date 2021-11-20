@@ -115,4 +115,15 @@ export class RecurrenceRepo {
       })
     }
   }
+
+  GetUserTasks(uid: UID) {
+    return taskEitherQuery(() => {
+      return this.recurrenceModel
+        .query()
+        .where('author_uid', uid)
+        .withGraphFetched({
+          task: TasksRepo.DEFAULT_FETCH_GRAPH
+        })
+    })
+  }
 }

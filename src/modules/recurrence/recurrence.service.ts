@@ -51,4 +51,8 @@ export class RecurrenceService {
   UpdateNextDate(trx?: Transaction) {
     return this.recurrenceRepo.UpdateNextDate(trx)
   }
+
+  GetUserTasks(uid: UID) {
+    return this.recurrenceRepo.GetUserTasks(uid)
+  }
 }
