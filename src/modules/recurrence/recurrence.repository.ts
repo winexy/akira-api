@@ -126,4 +126,13 @@ export class RecurrenceRepo {
         })
     })
   }
+
+  RemoveRecurrence(recurrenceId: number, uid: UID) {
+    return taskEitherQuery(() => {
+      return this.recurrenceModel
+        .query()
+        .where('author_uid', uid)
+        .deleteById(recurrenceId)
+    })
+  }
 }

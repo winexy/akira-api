@@ -1,4 +1,13 @@
-import {Controller, Post, Param, UseGuards, Body, Get} from '@nestjs/common'
+import {
+  Controller,
+  Post,
+  Param,
+  UseGuards,
+  Body,
+  Get,
+  Delete,
+  ParseIntPipe
+} from '@nestjs/common'
 import {RecurrenceService} from './recurrence.service'
 import {AuthGuard} from '../../auth.guard'
 import {FujiPipe} from '../../pipes/fuji.pipe'
@@ -30,6 +39,23 @@ export class RecurrenceController {
     @Body(FujiPipe.of(ruleSchema)) dto: RuleSchema
   ) {
     const result = await this.recurrenceService.Create(uid, taskId, dto)()
+
+    if (E.isLeft(result)) {
+      throw result.left
+    }
+
+    return result.right
+  }
+
+  @Delete(':id')
+  async RemoveRecurrence(
+    @User('uid') uid: UID,
+    @Param('id', ParseIntPipe) recurrenceId: number
+  ) {
+    const result = await this.recurrenceService.RemoveRecurrence(
+      recurrenceId,
+      uid
+    )()
 
     if (E.isLeft(result)) {
       throw result.left

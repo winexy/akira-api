@@ -55,4 +55,8 @@ export class RecurrenceService {
   GetUserTasks(uid: UID) {
     return this.recurrenceRepo.GetUserTasks(uid)
   }
+
+  RemoveRecurrence(recurrenceId: number, uid: UID) {
+    return this.recurrenceRepo.RemoveRecurrence(recurrenceId, uid)
+  }
 }
