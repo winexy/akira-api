@@ -1,5 +1,5 @@
 import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common'
-import firebase from 'firebase-admin'
+import {auth, firebase} from 'src/firebase'
 import {Request} from 'express'
 import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
@@ -12,7 +12,6 @@ import {tap} from 'fp-ts-std/IO'
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request: Request = context.switchToHttp().getRequest()
-    const auth = firebase.auth()
 
     const runTask = pipe(
       this.extractToken(request),
