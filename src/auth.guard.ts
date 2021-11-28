@@ -18,9 +18,8 @@ export class AuthGuard implements CanActivate {
       this.extractToken(request),
       TO.fromOption,
       TO.chain(this.verifyToken(auth)),
-      TO.map(idToken => idToken.email),
-      TO.filter(S.isString),
-      TO.chain(this.getUserByEmail(auth)),
+      TO.map(idToken => idToken.uid),
+      TO.chain(this.getUser(auth)),
       TO.chainFirstIOK(
         tap(user => () => {
           request.user = user
@@ -49,9 +48,9 @@ export class AuthGuard implements CanActivate {
     }
   }
 
-  private getUserByEmail(auth: firebase.auth.Auth) {
-    return (email: string) => {
-      return TO.tryCatch(() => auth.getUserByEmail(email))
+  private getUser(auth: firebase.auth.Auth) {
+    return (uid: string) => {
+      return TO.tryCatch(() => auth.getUser(uid))
     }
   }
 }
