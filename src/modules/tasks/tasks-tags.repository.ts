@@ -4,8 +4,8 @@ import {TasksTagsModel, TaskTag} from './tasks-tags.model'
 import {Tag} from '../tags/tag.model'
 import {TaskT} from './task.model'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {UserError} from '../../filters/user-error.exception.filter'
+import {taskEitherQuery} from 'src/shared/task-either-query'
 
 @Injectable()
 export class TasksTagsRepo {
@@ -18,7 +18,7 @@ export class TasksTagsRepo {
     taskId: TaskT['id'],
     tagId: Tag['id']
   ): TE.TaskEither<UserError, TaskTag> {
-    return TE.tryCatch(() => {
+    return taskEitherQuery(() => {
       return this.tasksTagsModel
         .query()
         .insert({
@@ -26,14 +26,14 @@ export class TasksTagsRepo {
           tag_id: tagId
         })
         .returning('*')
-    }, transformRejectReason)
+    })
   }
 
   DeleteTaskTag(
     taskId: TaskT['id'],
     tagId: Tag['id']
   ): TE.TaskEither<UserError, number> {
-    return TE.tryCatch(() => {
+    return taskEitherQuery(() => {
       return this.tasksTagsModel
         .query()
         .delete()
@@ -42,7 +42,7 @@ export class TasksTagsRepo {
           tag_id: tagId
         })
         .throwIfNotFound()
-    }, transformRejectReason)
+    })
   }
 
   AddTags(taskId: TaskT['id'], tags: Array<Tag['id']>, trx?: Transaction) {

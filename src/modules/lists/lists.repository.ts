@@ -2,10 +2,10 @@ import {Inject, Injectable, Logger} from '@nestjs/common'
 import {ListModel, TaskList} from './list.model'
 import {TasksRepo} from '../tasks/tasks.repository'
 import * as TE from 'fp-ts/lib/TaskEither'
-import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {flow, pipe} from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import {UserError} from 'src/filters/user-error.exception.filter'
+import {taskEitherQuery} from 'src/shared/task-either-query'
 
 @Injectable()
 export class ListsRepo {
@@ -18,7 +18,7 @@ export class ListsRepo {
 
   Create(uid: UID) {
     return (title: string): TE.TaskEither<UserError, TaskList> => {
-      return TE.tryCatch(() => {
+      return taskEitherQuery(() => {
         return this.listModel
           .query()
           .insert({
@@ -26,7 +26,7 @@ export class ListsRepo {
             title
           })
           .returning('*')
-      }, transformRejectReason)
+      })
     }
   }
 
@@ -35,12 +35,12 @@ export class ListsRepo {
     title: string
   ): TE.TaskEither<UserError, O.Option<string>> {
     return pipe(
-      TE.tryCatch(() => {
+      taskEitherQuery(() => {
         return this.listModel
           .query()
           .where('title', title)
           .findOne('author_uid', uid)
-      }, transformRejectReason),
+      }),
       TE.map(
         flow(
           O.fromNullable,
@@ -66,12 +66,12 @@ export class ListsRepo {
      */
     const rawExpression = this.listModel.raw(`:title || ' (%)'`, {title})
 
-    return TE.tryCatch(() => {
+    return taskEitherQuery(() => {
       return this.listModel
         .query()
         .where('author_uid', uid)
         .andWhere('title', 'LIKE', rawExpression)
-    }, transformRejectReason)
+    })
   }
 
   FindAll(uid: UID) {

@@ -1,5 +1,5 @@
 import {Inject, Injectable, Logger} from '@nestjs/common'
-import {Transaction} from 'objection'
+import {Model, QueryBuilder, Transaction} from 'objection'
 import {isEmpty} from 'lodash/fp'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {pipe} from 'fp-ts/lib/function'
@@ -47,6 +47,17 @@ export class TasksRepo {
     recurrence: true
   }
 
+  static GetFetchGraph(
+    graph: Partial<{
+      checklist: true
+      tags: true
+      list: true
+      recurrence: true
+    }> = {}
+  ) {
+    return graph
+  }
+
   Create(uid: UID, taskDto: CreateTaskDto) {
     return TE.tryCatch(() => {
       const {task: taskInfo, meta} = taskDto
@@ -63,7 +74,7 @@ export class TasksRepo {
 
         this.logger.log('task created', `TaskId(${task.id})`)
 
-        const promises: Array<Promise<unknown>> = []
+        const promises: Array<QueryBuilder<Model, unknown>> = []
 
         if (!isEmpty(tagsIds)) {
           this.logger.log('add tags to task')
@@ -108,7 +119,7 @@ export class TasksRepo {
   FindOne(uid: UserRecord['uid']) {
     return (taskId: TaskT['id']) => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        const x = this.taskModel
           .query()
           .findOne('id', taskId)
           .where({
@@ -116,6 +127,8 @@ export class TasksRepo {
           })
           .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
           .throwIfNotFound()
+
+        return x
       })
     }
   }

@@ -2,9 +2,9 @@ import {Inject, Injectable} from '@nestjs/common'
 import {UniqueViolationError} from 'db-errors'
 import {TagModel, CreateTagDto, Tag} from './tag.model'
 import {UserError, UserErrorEnum} from 'src/filters/user-error.exception.filter'
-import {transformRejectReason} from 'src/shared/transform-reject-reason'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {pipe} from 'fp-ts/lib/function'
+import {taskEitherQuery} from 'src/shared/task-either-query'
 
 @Injectable()
 export class TagsRepo {
@@ -16,9 +16,7 @@ export class TagsRepo {
 
   CreateTag(uid: UID, dto: CreateTagDto): TE.TaskEither<UserError, Tag> {
     return pipe(
-      TE.tryCatch(() => {
-        return this.tagModel.query().insert({...dto, uid})
-      }, transformRejectReason),
+      taskEitherQuery(() => this.tagModel.query().insert({...dto, uid})),
       TE.mapLeft(error => {
         if (error instanceof UniqueViolationError) {
           return UserError.of({
@@ -36,7 +34,7 @@ export class TagsRepo {
   }
 
   DeleteTag(uid: UID, tagId: Tag['id']): TE.TaskEither<UserError, number> {
-    return TE.tryCatch(() => {
+    return taskEitherQuery(() => {
       return this.tagModel
         .query()
         .deleteById(tagId)
@@ -44,6 +42,6 @@ export class TagsRepo {
           uid
         })
         .throwIfNotFound()
-    }, transformRejectReason)
+    })
   }
 }
