@@ -7,7 +7,7 @@ function readCert() {
   try {
     return readFileSync(join(__dirname, 'ca-certificate.crt'))
   } catch (error) {
-    console.error('[AppModule] Failed to load ssl certificate')
+    console.error('[knexfile] Failed to load ssl certificate')
     throw error
   }
 }
