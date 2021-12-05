@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import {Knex} from 'knex'
 
 const table = 'task_lists'
 export async function up(knex: Knex): Promise<void> {

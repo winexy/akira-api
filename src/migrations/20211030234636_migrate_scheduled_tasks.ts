@@ -1,4 +1,4 @@
-import * as Knex from 'knex'
+import {Knex} from 'knex'
 
 export async function up(knex: Knex): Promise<void> {
   const data = await knex('scheduled_tasks').select('*')
@@ -12,4 +12,6 @@ export async function up(knex: Knex): Promise<void> {
   }
 }
 
-export async function down(knex: Knex): Promise<void> {}
+export async function down(): Promise<void> {
+  //
+}
