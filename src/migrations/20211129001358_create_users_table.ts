@@ -6,6 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string('email').notNullable()
     t.string('display_name')
     t.string('fcm_token')
+    t.timestamps(true, true)
     t.unique(['uid'])
   })
 }

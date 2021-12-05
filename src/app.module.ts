@@ -14,6 +14,7 @@ import {TagsModule} from './modules/tags/tags.module'
 import {TaskSchedulerModule} from './modules/task-scheduler/task-scheduler.module'
 import {ReportsModule} from './modules/reports/reports.module'
 import {RecurrenceModule} from './modules/recurrence/recurrence.module'
+import {UsersModule} from './modules/users/users.module'
 
 function readCert() {
   try {
@@ -64,7 +65,8 @@ function readCert() {
     TagsModule,
     TaskSchedulerModule,
     ReportsModule,
-    RecurrenceModule
+    RecurrenceModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService]
