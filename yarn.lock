@@ -1385,10 +1385,10 @@
     "@webassemblyjs/ast" "1.11.1"
     "@xtuc/long" "4.2.2"
 
-"@willsoto/nestjs-objection@^5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@willsoto/nestjs-objection/-/nestjs-objection-5.1.0.tgz#21ed551371db0fa400260f43853099fdd68f3aa2"
-  integrity sha512-X0n8Fqv6Jv/voR5T4RTQJGCKdZVPM8sNdhKrFN66a9V765KnacdtaSQT9QDO1bReZNGz9vID8Xto1UGaiSwmQQ==
+"@willsoto/nestjs-objection@^6.3.0":
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/@willsoto/nestjs-objection/-/nestjs-objection-6.3.0.tgz#67304e5d5f262e5f1693e6c9ff3ac708a3437872"
+  integrity sha512-Nv6SbX50ItHI+5v/fLahn75tZEhEM7IT+PeShq+TtdtDjmnQYs+epmSawiTH7U8UbPDSiJddjakMT6u3EGBLGg==
 
 "@winexy/fuji@0.1.0-beta.21":
   version "0.1.0-beta.21"
