@@ -1,7 +1,7 @@
 import {readFileSync} from 'fs'
 import {join} from 'path'
 import * as dotenv from 'dotenv'
-import {validateEnv} from './src/env.validation'
+import {validatePGEnv} from './src/env.validation'
 
 function readCert() {
   try {
@@ -14,12 +14,12 @@ function readCert() {
 
 function readENV() {
   try {
-    return validateEnv(process.env)
+    return validatePGEnv(process.env)
   } catch (error) {
     dotenv.config({path: '.env'})
     dotenv.config({path: '.env.postgres'})
 
-    return validateEnv(process.env)
+    return validatePGEnv(process.env)
   }
 }
 

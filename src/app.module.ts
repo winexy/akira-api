@@ -8,7 +8,7 @@ import {AppController} from './app.controller'
 import {AppService} from './app.service'
 import {TasksModule} from './modules/tasks/tasks.module'
 import {ChecklistModule} from './modules/checklist/checklist.module'
-import {validateEnv} from './env.validation'
+import {validateAppEnv} from './env.validation'
 import {ListsModule} from './modules/lists/lists.module'
 import {TagsModule} from './modules/tags/tags.module'
 import {TaskSchedulerModule} from './modules/task-scheduler/task-scheduler.module'
@@ -28,7 +28,7 @@ function readCert() {
 @Module({
   imports: [
     ConfigModule.forRoot({
-      validate: validateEnv,
+      validate: validateAppEnv,
       isGlobal: true
     }),
     ObjectionModule.registerAsync({

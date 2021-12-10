@@ -1,4 +1,4 @@
-import {f, fmap, Infer, oneOf, required, run, string} from '@winexy/fuji'
+import {f, fmap, Infer, oneOf, required, run, string, Fuji} from '@winexy/fuji'
 import {OneOfType} from '@winexy/fuji/dist/rules/one-of'
 import {RequiredType} from '@winexy/fuji/dist/rules/required'
 import {map} from 'lodash'
@@ -11,16 +11,7 @@ type Mutable<T> = {
 
 type EnvTypes = Mutable<typeof envTypes>[number]
 
-const schema = f.shape({
-  NODE_ENV: f<RequiredType | OneOfType, EnvTypes>(
-    required(),
-    oneOf(envTypes as Mutable<typeof envTypes>)
-  ),
-  PORT: f(
-    string(),
-    required(),
-    fmap(s => parseInt(s))
-  ),
+const pgschema = {
   POSTGRES_HOST: f(string(), required()),
   POSTGRES_PASSWORD: f(string(), required()),
   POSTGRES_USER: f(string(), required()),
@@ -34,22 +25,40 @@ const schema = f.shape({
     string(),
     oneOf(['true', 'false']),
     fmap(value => value === 'true')
+  )
+}
+
+const appschema = f.shape({
+  ...pgschema,
+  NODE_ENV: f<RequiredType | OneOfType, EnvTypes>(
+    required(),
+    oneOf(envTypes as Mutable<typeof envTypes>)
+  ),
+  PORT: f(
+    string(),
+    required(),
+    fmap(s => parseInt(s))
   ),
   SUPERUSER_UID: f(string(), required()),
   TZ: f(string(), required())
 })
 
-export type AppConfig = Infer<typeof schema>
+export type AppConfig = Infer<typeof appschema>
 
-export function validateEnv(config: Record<string, string | undefined>) {
-  const result = run(schema, config, {
-    valueName: 'env schema',
-    allowUnknown: true
-  })
+function validateEnv<Shape extends Fuji<any, any>>(schema: Shape) {
+  return (config: Record<string, string | undefined>): Infer<Shape> => {
+    const result = run(schema, config, {
+      valueName: 'env schema',
+      allowUnknown: true
+    })
 
-  if (result.invalid) {
-    throw new Error(map(result.errors, 'message').join('\n'))
+    if (result.invalid) {
+      throw new Error(map(result.errors, 'message').join('\n'))
+    }
+
+    return result.value
   }
-
-  return result.value
 }
+
+export const validateAppEnv = validateEnv(appschema)
+export const validatePGEnv = validateEnv(f.shape(pgschema))
