@@ -11,7 +11,15 @@ type Mutable<T> = {
 
 type EnvTypes = Mutable<typeof envTypes>[number]
 
+const nodeschema = {
+  NODE_ENV: f<RequiredType | OneOfType, EnvTypes>(
+    required(),
+    oneOf(envTypes as Mutable<typeof envTypes>)
+  )
+}
+
 const pgschema = {
+  ...nodeschema,
   POSTGRES_HOST: f(string(), required()),
   POSTGRES_PASSWORD: f(string(), required()),
   POSTGRES_USER: f(string(), required()),
@@ -30,10 +38,7 @@ const pgschema = {
 
 const appschema = f.shape({
   ...pgschema,
-  NODE_ENV: f<RequiredType | OneOfType, EnvTypes>(
-    required(),
-    oneOf(envTypes as Mutable<typeof envTypes>)
-  ),
+  ...nodeschema,
   PORT: f(
     string(),
     required(),
