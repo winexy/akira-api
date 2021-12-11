@@ -14,7 +14,6 @@ async function main() {
   })
 
   await $`cp -p ca-certificate.crt ./dist/ca-certificate.crt`
-  await $`knex migrate:latest`
 
   log.success('finish')
 }
