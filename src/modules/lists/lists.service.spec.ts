@@ -8,9 +8,9 @@ import {ListsRepo} from './lists.repository'
 describe('ListsService', () => {
   let service: ListsService
   const listsRepo = {
-    findDuplicates: jest.fn(),
-    findExactTitle: jest.fn(),
-    create: jest.fn()
+    FindDuplicates: jest.fn(),
+    FindExactTitle: jest.fn(),
+    Create: jest.fn()
   }
 
   beforeEach(async () => {
@@ -28,10 +28,10 @@ describe('ListsService', () => {
     const TEST_UID = 'test-uid'
     const TEST_TITLE = 'test'
 
-    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([]))
-    listsRepo.findExactTitle.mockReturnValueOnce(TE.of(O.none))
+    listsRepo.FindDuplicates.mockReturnValueOnce(TE.of([]))
+    listsRepo.FindExactTitle.mockReturnValueOnce(TE.of(O.none))
 
-    listsRepo.create.mockImplementationOnce(
+    listsRepo.Create.mockImplementationOnce(
       (uid: string) => (title: string) => {
         return TE.of({
           author_uid: uid,
@@ -53,12 +53,12 @@ describe('ListsService', () => {
     const TEST_TITLE = 'test'
     const MOCK_EXACT_TITLE = TEST_TITLE
 
-    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([]))
-    listsRepo.findExactTitle.mockReturnValueOnce(
+    listsRepo.FindDuplicates.mockReturnValueOnce(TE.of([]))
+    listsRepo.FindExactTitle.mockReturnValueOnce(
       TE.of(O.some(MOCK_EXACT_TITLE))
     )
 
-    listsRepo.create.mockImplementationOnce(
+    listsRepo.Create.mockImplementationOnce(
       (uid: string) => (title: string) => {
         return TE.of({
           author_uid: uid,
@@ -84,9 +84,9 @@ describe('ListsService', () => {
       title: `${TEST_TITLE} ${DUPLICATE_POSTFIX}`
     }
 
-    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([MOCK_SIMILAR_LIST]))
+    listsRepo.FindDuplicates.mockReturnValueOnce(TE.of([MOCK_SIMILAR_LIST]))
 
-    listsRepo.create.mockImplementationOnce(
+    listsRepo.Create.mockImplementationOnce(
       (uid: string) => (title: string) => {
         return TE.of({
           author_uid: uid,
@@ -106,14 +106,14 @@ describe('ListsService', () => {
   it('should return new duplicate title if has many duplicates', async () => {
     const TEST_UID = 'test-uid'
 
-    listsRepo.findDuplicates.mockReturnValueOnce(
+    listsRepo.FindDuplicates.mockReturnValueOnce(
       TE.of([
         {author_uid: TEST_UID, title: 'test (9)'},
         {author_uid: TEST_UID, title: 'test (10)'}
       ])
     )
 
-    listsRepo.create.mockImplementationOnce(
+    listsRepo.Create.mockImplementationOnce(
       (uid: string) => (title: string) => {
         return TE.of({
           author_uid: uid,
@@ -138,9 +138,9 @@ describe('ListsService', () => {
       title: TEST_TITLE
     }
 
-    listsRepo.findDuplicates.mockReturnValueOnce(TE.of([MOCK_SIMILAR_LIST]))
+    listsRepo.FindDuplicates.mockReturnValueOnce(TE.of([MOCK_SIMILAR_LIST]))
 
-    listsRepo.create.mockImplementationOnce(
+    listsRepo.Create.mockImplementationOnce(
       (uid: string) => (title: string) => {
         return TE.of({
           author_uid: uid,

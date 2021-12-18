@@ -93,7 +93,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "resetMocks": true
+    "resetMocks": true,
+    "moduleNameMapper": {
+      "^src(.*)$": "<rootDir>/$1"
+    }
   },
   "engines": {
     "node": "14"
