@@ -113,7 +113,8 @@ export const createTaskDtoSchema = f.shape({
     description: f(
       string(),
       fmap(s => s?.trim())
-    )
+    ),
+    due_date: f(nullable(), datePattern)
   }),
   meta: f.shapeRequired({
     date: f(required(), nullable(), datePattern),
@@ -159,6 +160,7 @@ export type InsertNewTaskDto = {
   author_uid: string
   list_id?: number
   date?: string | null
+  due_date?: string | null
 }
 
 export type InsertClonedTaskDto = Pick<

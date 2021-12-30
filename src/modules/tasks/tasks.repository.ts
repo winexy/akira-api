@@ -67,6 +67,7 @@ export class TasksRepo {
         const task = await this.InsertNewTask(trx)({
           title: taskInfo.title,
           description: taskInfo?.description,
+          due_date: taskInfo.due_date,
           list_id: meta.list_id,
           author_uid: uid,
           date: meta.date
