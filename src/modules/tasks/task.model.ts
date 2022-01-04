@@ -19,6 +19,7 @@ import {ChecklistModel} from '../checklist/checklist.model'
 import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
 import {RecurrenceModel} from '../recurrence/recurrence.model'
+import {UserModel} from '../users/users.model'
 
 export type TaskT = {
   id: string
@@ -64,6 +65,14 @@ export class TaskModel extends Model implements TaskT {
 
   static get relationMappings() {
     return {
+      author: {
+        relation: Model.HasOneRelation,
+        modelClass: UserModel,
+        join: {
+          from: 'tasks.author_uid',
+          to: 'users.uid'
+        }
+      },
       checklist: {
         relation: Model.HasManyRelation,
         modelClass: ChecklistModel,

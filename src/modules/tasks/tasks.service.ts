@@ -171,4 +171,8 @@ export class TasksService {
   InternalPatchTask(trx?: Transaction) {
     return this.tasksRepo.InternalPatchTask(trx)
   }
+
+  CountTodayTasksByUsers(trx?: Transaction) {
+    return this.tasksRepo.CountTodayTasksByUsers(trx)
+  }
 }

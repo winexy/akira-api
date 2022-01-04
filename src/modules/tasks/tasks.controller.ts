@@ -21,6 +21,7 @@ import {TasksQueryFiltersT, tasksQueryFiltersSchema} from './task.model'
 import {Tag} from '../tags/tag.model'
 import {DueDateWorker} from './due-date.worker'
 import {SuperUserGuard} from '../../superuser.guard'
+import {ScheduledTasksPushWorker} from './scheduled-tasks-push.worker'
 import {
   TaskPatchT,
   TaskT,
@@ -35,8 +36,15 @@ import {
 export class TasksController {
   constructor(
     private readonly taskService: TasksService,
-    private readonly dueDateWorker: DueDateWorker
+    private readonly dueDateWorker: DueDateWorker,
+    private readonly scheduledTasksPushWorker: ScheduledTasksPushWorker
   ) {}
+
+  @Post('hooks/scheduled-tasks-push')
+  @UseGuards(SuperUserGuard)
+  PushScheduledTasksHook() {
+    return this.scheduledTasksPushWorker.RunTask()
+  }
 
   @Post('hook/due-date')
   @UseGuards(SuperUserGuard)

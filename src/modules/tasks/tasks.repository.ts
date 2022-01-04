@@ -22,6 +22,7 @@ import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {UserError} from '../../filters/user-error.exception.filter'
 import {Recurrence} from '../recurrence/recurrence.model'
 import {formatISO} from 'date-fns'
+import {UserEntity} from '../users/users.model'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
@@ -288,6 +289,33 @@ export class TasksRepo {
         .where('is_completed', false)
         .andWhereNot('due_date', null)
         .andWhere('date', '<=', formatISO(new Date()))
+    })
+  }
+
+  CountTodayTasksByUsers(
+    trx?: Transaction
+  ): TE.TaskEither<
+    UserError,
+    Array<{
+      author_uid: string
+      tasks_count: string
+      author: UserEntity
+    }>
+  > {
+    return taskEitherQuery(() => {
+      return (this.taskModel
+        .query(trx)
+        .select('author_uid')
+        .count('author_uid', {as: 'tasks_count'})
+        .where('date', formatISO(new Date()))
+        .withGraphFetched('author')
+        .groupBy('author_uid') as unknown) as Promise<
+        Array<{
+          author_uid: string
+          tasks_count: string
+          author: UserEntity
+        }>
+      >
     })
   }
 }
