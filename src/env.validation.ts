@@ -45,7 +45,11 @@ const appschema = f.shape({
     fmap(s => parseInt(s))
   ),
   SUPERUSER_UID: f(string(), required()),
-  TZ: f(string(), required())
+  TZ: f(string(), required()),
+  USE_MOCK_AUTH: f(
+    string(),
+    fmap(s => s === 'true')
+  )
 })
 
 export type AppConfig = Infer<typeof appschema>

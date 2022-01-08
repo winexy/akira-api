@@ -11,7 +11,7 @@ async function bootstrap() {
   const config = app.get<AppConfigService>(ConfigService)
   const port = config.get<AppConfig['PORT']>('PORT', 3000)
 
-  initializeApp()
+  initializeApp(config)
 
   app.enableCors()
   app.useGlobalFilters(new DbExceptionFilter(config), new UserErrorFilter())
