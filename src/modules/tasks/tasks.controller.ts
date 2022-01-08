@@ -76,6 +76,17 @@ export class TasksController {
     return this.taskService.FindAllByUID(user.uid, query)
   }
 
+  @Post('clone/:taskId')
+  async CloneTask(@User('uid') uid: UID, @Param('taskId') taskId: TaskId) {
+    const task = await this.taskService.CloneTask(taskId, uid)()
+
+    if (E.isLeft(task)) {
+      throw task.left
+    }
+
+    return task.right
+  }
+
   @Get('search')
   Search(@User('uid') uid: UID, @Query('query') query: string) {
     return this.taskService.Search(uid, query)

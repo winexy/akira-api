@@ -121,7 +121,7 @@ export class TasksRepo {
   FindOne(uid: UserRecord['uid']) {
     return (taskId: TaskT['id']) => {
       return taskEitherQuery(() => {
-        const x = this.taskModel
+        return this.taskModel
           .query()
           .findOne('id', taskId)
           .where({
@@ -129,8 +129,6 @@ export class TasksRepo {
           })
           .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
           .throwIfNotFound()
-
-        return x
       })
     }
   }

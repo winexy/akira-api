@@ -175,4 +175,12 @@ export class TasksService {
   CountTodayTasksByUsers(trx?: Transaction) {
     return this.tasksRepo.CountTodayTasksByUsers(trx)
   }
+
+  CloneTask(taskId: TaskId, uid: UID) {
+    return pipe(
+      this.FindOne(taskId, uid),
+      TE.map(getCloneTaskPayload),
+      TE.chain(this.tasksRepo.InsertClonedTask())
+    )
+  }
 }
