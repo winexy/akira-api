@@ -1,3 +1,4 @@
+import {f, Infer, string} from '@winexy/fuji'
 import {Model} from 'objection'
 
 export type Note = {
@@ -16,3 +17,10 @@ export class NoteModel extends Model implements Note {
   static idColumn = 'uuid'
   static tableName = 'notes'
 }
+
+export const notePatchSchema = f.shape({
+  title: f(string()),
+  content: f(string())
+})
+
+export type NotePatch = Infer<typeof notePatchSchema>

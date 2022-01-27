@@ -1,5 +1,7 @@
 import {Injectable} from '@nestjs/common'
 import {NotesRepo} from './note.repository'
+import {NotePatch} from './note.model'
+import {taskEitherQuery} from '../../shared/task-either-query'
 
 @Injectable()
 export class NotesService {
@@ -15,5 +17,9 @@ export class NotesService {
 
   FindOne(noteId: string, uid: UID) {
     return this.notesRepo.FindOne(noteId, uid)
+  }
+
+  PatchNote(noteId: string, uid: UID, dto: NotePatch) {
+    return this.notesRepo.PatchNote(noteId, uid, dto)
   }
 }

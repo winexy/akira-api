@@ -2,7 +2,7 @@ import {Inject, Injectable, Logger} from '@nestjs/common'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {UserError} from 'src/filters/user-error.exception.filter'
 import {taskEitherQuery} from 'src/shared/task-either-query'
-import {Note, NoteModel} from './note.model'
+import {Note, NoteModel, NotePatch} from './note.model'
 
 type NotePreview = Pick<Note, 'uuid' | 'title'>
 
@@ -37,6 +37,19 @@ export class NotesRepo {
         .query()
         .findById(noteId)
         .where({
+          author_uid: uid
+        })
+        .throwIfNotFound()
+    })
+  }
+
+  PatchNote(noteId: string, uid: UID, dto: NotePatch) {
+    return taskEitherQuery(() => {
+      return this.noteModel
+        .query()
+        .patch(dto)
+        .where({
+          uuid: noteId,
           author_uid: uid
         })
         .throwIfNotFound()
