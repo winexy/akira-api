@@ -14,7 +14,8 @@ export function mapToInsertableRule(dto: RuleSchema): InsertableRule {
     freq: dto.frequency,
     interval: dto.interval,
     byweekday: weekDays?.map(day => RRule[day]),
-    bymonth: dto.months
+    bymonth: dto.months,
+    wkst: RRule.MO
   })
 
   return {
