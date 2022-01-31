@@ -128,6 +128,9 @@ export class TasksRepo {
             author_uid: uid
           })
           .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
+          .modifyGraph('checklist', builder => {
+            builder.orderBy('created_at')
+          })
           .throwIfNotFound()
       })
     }
