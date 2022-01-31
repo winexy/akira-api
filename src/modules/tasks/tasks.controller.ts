@@ -30,6 +30,7 @@ import {
   CreateTaskDto,
   createTaskDtoSchema
 } from './task.model'
+import {doTask} from 'src/shared/do-task'
 
 @Controller('tasks')
 @UseGuards(AuthGuard)
@@ -77,14 +78,8 @@ export class TasksController {
   }
 
   @Post('clone/:taskId')
-  async CloneTask(@User('uid') uid: UID, @Param('taskId') taskId: TaskId) {
-    const task = await this.taskService.CloneTask(taskId, uid)()
-
-    if (E.isLeft(task)) {
-      throw task.left
-    }
-
-    return task.right
+  CloneTask(@User('uid') uid: UID, @Param('taskId') taskId: TaskId) {
+    return doTask(this.taskService.CloneTask(taskId, uid))
   }
 
   @Get('search')
@@ -94,13 +89,7 @@ export class TasksController {
 
   @Get(':id')
   async FindOne(@User() user: UserRecord, @Param('id') id: TaskT['id']) {
-    const task = await this.taskService.FindOne(id, user.uid)()
-
-    if (E.isLeft(task)) {
-      throw task.left
-    }
-
-    return task.right
+    return doTask(this.taskService.FindOne(id, user.uid))
   }
 
   @Patch(':id')
