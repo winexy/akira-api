@@ -14,6 +14,8 @@ export type TodoT = {
   title: string
   task_id: string
   is_completed: boolean
+  createad_at: string
+  updated_at: string
 }
 
 export type TodoIdT = TodoT['id']
@@ -24,6 +26,8 @@ export class ChecklistModel extends Model implements TodoT {
   title: string
   task_id: string
   is_completed: boolean
+  createad_at: string
+  updated_at: string
 }
 
 const titleSchema = f(string(), maxLength(255), required())
