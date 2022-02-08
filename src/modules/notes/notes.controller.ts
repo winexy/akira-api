@@ -7,11 +7,11 @@ import {
   Post,
   UseGuards
 } from '@nestjs/common'
-import * as E from 'fp-ts/lib/Either'
+import {doTask} from 'src/shared/do-task'
 import {User} from 'src/decorators/user.decorator'
 import {AuthGuard} from 'src/auth.guard'
 import {NotesService} from './notes.service'
-import {FujiPipe} from '../../pipes/fuji.pipe'
+import {FujiPipe} from 'src/pipes/fuji.pipe'
 import {notePatchSchema, NotePatch} from './note.model'
 
 @Controller('notes')
@@ -20,50 +20,26 @@ export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
   @Get('preview')
-  async FindNotesPreview(@User('uid') uid: UID) {
-    const result = await this.notesService.FindNotesPreview(uid)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+  FindNotesPreview(@User('uid') uid: UID) {
+    return doTask(this.notesService.FindNotesPreview(uid))
   }
 
   @Post()
-  async CreateEmptyNote(@User('uid') uid: UID) {
-    const result = await this.notesService.CreateEmptyNote(uid)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+  CreateEmptyNote(@User('uid') uid: UID) {
+    return doTask(this.notesService.CreateEmptyNote(uid))
   }
 
   @Get(':noteId')
-  async FindOne(@Param('noteId') noteId: string, @User('uid') uid: UID) {
-    const result = await this.notesService.FindOne(noteId, uid)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+  FindOne(@Param('noteId') noteId: string, @User('uid') uid: UID) {
+    return doTask(this.notesService.FindOne(noteId, uid))
   }
 
   @Patch(':noteId')
-  async PatchNote(
+  PatchNote(
     @Param('noteId') noteId: string,
     @User('uid') uid: UID,
     @Body(FujiPipe.of(notePatchSchema)) dto: NotePatch
   ) {
-    const result = await this.notesService.PatchNote(noteId, uid, dto)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.notesService.PatchNote(noteId, uid, dto))
   }
 }

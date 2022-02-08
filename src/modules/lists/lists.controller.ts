@@ -9,12 +9,12 @@ import {
   Post,
   UseGuards
 } from '@nestjs/common'
+import {doTask} from 'src/shared/do-task'
 import {User} from 'src/decorators/user.decorator'
+import {AuthGuard} from 'src/auth.guard'
+import {FujiPipe} from 'src/pipes/fuji.pipe'
 import {ListsService} from './lists.service'
-import {AuthGuard} from '../../auth.guard'
-import {FujiPipe} from '../../pipes/fuji.pipe'
 import {CreateTaskListDto, createTaskListSchema, TaskList} from './list.model'
-import * as E from 'fp-ts/lib/Either'
 
 @Controller('lists')
 @UseGuards(AuthGuard)
@@ -23,17 +23,11 @@ export class ListsController {
 
   @Post()
   @HttpCode(201)
-  async Create(
+  Create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskListSchema)) dto: CreateTaskListDto
   ) {
-    const result = await this.listsService.Create(uid, dto.title)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.listsService.Create(uid, dto.title))
   }
 
   @Get()

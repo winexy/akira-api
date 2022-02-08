@@ -55,18 +55,12 @@ export class TasksController {
 
   @Post()
   @HttpCode(201)
-  async Create(
+  Create(
     @User('uid') uid: UID,
     @Body(FujiPipe.of(createTaskDtoSchema))
     taskDto: CreateTaskDto
   ): Promise<TaskT> {
-    const result = await this.taskService.Create(uid, taskDto)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.taskService.Create(uid, taskDto))
   }
 
   @Get()
@@ -93,18 +87,12 @@ export class TasksController {
   }
 
   @Patch(':id')
-  async PatchTask(
+  PatchTask(
     @User('uid') uid: UID,
     @Param('id') id: TaskId,
     @Body(FujiPipe.of(taskPatchSchema)) patch: TaskPatchT
   ) {
-    const result = await this.taskService.PatchTask(uid, id, patch)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.taskService.PatchTask(uid, id, patch))
   }
 
   @Patch(':id/complete/toggle')
@@ -112,27 +100,12 @@ export class TasksController {
     @User() user: UserRecord,
     @Param('id') taskId: TaskT['id']
   ) {
-    const task = await this.taskService.ToggleCompleted(taskId, user.uid)()
-
-    if (E.isLeft(task)) {
-      throw task.left
-    }
-
-    return task.right
+    return doTask(this.taskService.ToggleCompleted(taskId, user.uid))
   }
 
   @Patch(':id/important/toggle')
-  async ToggleImportant(
-    @User() user: UserRecord,
-    @Param('id') taskId: TaskT['id']
-  ) {
-    const task = await this.taskService.ToggleImportant(taskId, user.uid)()
-
-    if (E.isLeft(task)) {
-      throw task.left
-    }
-
-    return task.right
+  ToggleImportant(@User() user: UserRecord, @Param('id') taskId: TaskT['id']) {
+    return doTask(this.taskService.ToggleImportant(taskId, user.uid))
   }
 
   @Delete(':id')
@@ -151,32 +124,20 @@ export class TasksController {
   }
 
   @Post(':taskId/tags/:tagId')
-  async CreateTaskTag(
+  CreateTaskTag(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskId,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.taskService.CreateTag(uid, taskId, tagId)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.taskService.CreateTag(uid, taskId, tagId))
   }
 
   @Delete(':taskId/tags/:tagId')
-  async DeleteTaskTag(
+  DeleteTaskTag(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskId,
     @Param('tagId', ParseIntPipe) tagId: Tag['id']
   ) {
-    const result = await this.taskService.DeleteTag(uid, taskId, tagId)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.taskService.DeleteTag(uid, taskId, tagId))
   }
 }

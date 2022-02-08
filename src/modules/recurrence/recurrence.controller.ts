@@ -17,6 +17,7 @@ import {User} from 'src/decorators/user.decorator'
 import * as E from 'fp-ts/lib/Either'
 import {SuperUserGuard} from 'src/superuser.guard'
 import {RecurrenceWorker} from './recurrence.worker'
+import {doTask} from 'src/shared/do-task'
 
 @UseGuards(AuthGuard)
 @Controller('recurrence')
@@ -33,45 +34,24 @@ export class RecurrenceController {
   }
 
   @Post(':taskId')
-  async Create(
+  Create(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskId,
     @Body(FujiPipe.of(ruleSchema)) dto: RuleSchema
   ) {
-    const result = await this.recurrenceService.Create(uid, taskId, dto)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.recurrenceService.Create(uid, taskId, dto))
   }
 
   @Delete(':id')
-  async RemoveRecurrence(
+  RemoveRecurrence(
     @User('uid') uid: UID,
     @Param('id', ParseIntPipe) recurrenceId: number
   ) {
-    const result = await this.recurrenceService.RemoveRecurrence(
-      recurrenceId,
-      uid
-    )()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.recurrenceService.RemoveRecurrence(recurrenceId, uid))
   }
 
   @Get('tasks')
-  async GetUserTasks(@User('uid') uid: UID) {
-    const result = await this.recurrenceService.GetUserTasks(uid)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+  GetUserTasks(@User('uid') uid: UID) {
+    return doTask(this.recurrenceService.GetUserTasks(uid))
   }
 }

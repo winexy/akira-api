@@ -10,11 +10,11 @@ import {
   UseGuards
 } from '@nestjs/common'
 import {ChecklistService} from './checklist.service'
-import {FujiPipe} from '../../pipes/fuji.pipe'
+import {FujiPipe} from 'src/pipes/fuji.pipe'
 import {User} from 'src/decorators/user.decorator'
 import {TaskId} from '../tasks/task.model'
-import {AuthGuard} from '../../auth.guard'
-import * as E from 'fp-ts/lib/Either'
+import {doTask} from 'src/shared/do-task'
+import {AuthGuard} from 'src/auth.guard'
 import {
   CreateTodoDto,
   createTodoDtoSchema,
@@ -29,67 +29,31 @@ export class ChecklistController {
   constructor(private readonly checklistService: ChecklistService) {}
 
   @Post()
-  async addTodo(@Body(FujiPipe.of(createTodoDtoSchema)) body: CreateTodoDto) {
-    const result = await this.checklistService.addTodo(body)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+  AddTodo(@Body(FujiPipe.of(createTodoDtoSchema)) body: CreateTodoDto) {
+    return doTask(this.checklistService.addTodo(body))
   }
 
   @Get('/:taskId')
-  async findAllByTaskId(
-    @User() user: UserRecord,
-    @Param('taskId') taskId: TaskId
-  ) {
-    const result = await this.checklistService.findAllByTaskId(user, taskId)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+  FindAllByTaskId(@User() user: UserRecord, @Param('taskId') taskId: TaskId) {
+    return doTask(this.checklistService.findAllByTaskId(user, taskId))
   }
 
   @Delete('/:taskId/:todoId')
-  async removeTodo(
+  removeTodo(
     @User() user: UserRecord,
     @Param('taskId') taskId: TaskId,
     @Param('todoId', ParseIntPipe) todoId: TodoIdT
   ) {
-    const result = await this.checklistService.removeTodo(
-      user.uid,
-      taskId,
-      todoId
-    )()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.checklistService.removeTodo(user.uid, taskId, todoId))
   }
 
   @Patch(':taskId/:todoId')
-  async patchTodo(
+  patchTodo(
     @User('uid') uid: UID,
     @Param('taskId') taskId: TaskId,
     @Param('todoId', ParseIntPipe) todoId: TodoIdT,
     @Body(FujiPipe.of(todoPatchSchema)) patch: TodoPatchT
   ) {
-    const result = await this.checklistService.patchTodo(
-      uid,
-      taskId,
-      todoId,
-      patch
-    )()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.checklistService.patchTodo(uid, taskId, todoId, patch))
   }
 }

@@ -1,10 +1,10 @@
 import {Controller, Get, Query, UseGuards} from '@nestjs/common'
-import * as E from 'fp-ts/lib/Either'
 import {f, string, pattern} from '@winexy/fuji'
+import {doTask} from 'src/shared/do-task'
 import {ReportsService} from './reports.service'
-import {FujiPipe} from '../../pipes/fuji.pipe'
-import {AuthGuard} from '../../auth.guard'
-import {User} from '../../decorators/user.decorator'
+import {FujiPipe} from 'src/pipes/fuji.pipe'
+import {AuthGuard} from 'src/auth.guard'
+import {User} from 'src/decorators/user.decorator'
 
 const dateSchema = f(string(), pattern(/\d{4}-\d{1,2}-\d{1,2}/))
 
@@ -14,16 +14,10 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('')
-  async FindOne(
+  FindOne(
     @User('uid') uid: UID,
     @Query('date', FujiPipe.of(dateSchema)) date: string
   ) {
-    const result = await this.reportsService.FindFor(uid, date)()
-
-    if (E.isLeft(result)) {
-      throw result.left
-    }
-
-    return result.right
+    return doTask(this.reportsService.FindFor(uid, date))
   }
 }
