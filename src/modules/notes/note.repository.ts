@@ -1,5 +1,6 @@
 import {Inject, Injectable, Logger} from '@nestjs/common'
 import * as TE from 'fp-ts/lib/TaskEither'
+import {first} from 'lodash'
 import {UserError} from 'src/filters/user-error.exception.filter'
 import {taskEitherQuery} from 'src/shared/task-either-query'
 import {Note, NoteModel, NotePatch} from './note.model'
@@ -55,7 +56,10 @@ export class NotesRepo {
           uuid: noteId,
           author_uid: uid
         })
+        .returning(['uuid', 'updated_at'])
+        .limit(1)
         .throwIfNotFound()
+        .then(first)
     })
   }
 }
