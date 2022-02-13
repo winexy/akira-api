@@ -1,5 +1,5 @@
 import {f, Infer, string} from '@winexy/fuji'
-import formatISO from 'date-fns/formatISO'
+import {formatISO} from 'date-fns'
 import {Model, ModelOptions, QueryContext} from 'objection'
 
 export type Note = {
