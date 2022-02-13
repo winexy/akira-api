@@ -4,7 +4,7 @@ import {UserError} from 'src/filters/user-error.exception.filter'
 import {taskEitherQuery} from 'src/shared/task-either-query'
 import {Note, NoteModel, NotePatch} from './note.model'
 
-type NotePreview = Pick<Note, 'uuid' | 'title'>
+type NotePreview = Pick<Note, 'uuid' | 'title' | 'updated_at' | 'created_at'>
 
 @Injectable()
 export class NotesRepo {
@@ -17,9 +17,12 @@ export class NotesRepo {
 
   FindNotesPreview(uid: UID): TE.TaskEither<UserError, NotePreview> {
     return taskEitherQuery(() => {
-      return (this.noteModel.query().select(['uuid', 'title']).where({
-        author_uid: uid
-      }) as unknown) as Promise<NotePreview>
+      return (this.noteModel
+        .query()
+        .select(['uuid', 'title', 'updated_at', 'created_at'])
+        .where({
+          author_uid: uid
+        }) as unknown) as Promise<NotePreview>
     })
   }
 
