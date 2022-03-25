@@ -7,7 +7,7 @@ import {
   required,
   string
 } from '@winexy/fuji'
-import {Model} from 'objection'
+import {Model, QueryBuilder} from 'objection'
 
 export type TodoT = {
   id: number
@@ -28,6 +28,14 @@ export class ChecklistModel extends Model implements TodoT {
   is_completed: boolean
   createad_at: string
   updated_at: string
+
+  static get modifiers() {
+    return {
+      ordered(builder: QueryBuilder<ChecklistModel>) {
+        builder.orderBy('created_at')
+      }
+    }
+  }
 }
 
 const titleSchema = f(string(), maxLength(255), required())

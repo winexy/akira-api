@@ -42,7 +42,9 @@ export class TasksRepo {
   ) {}
 
   static DEFAULT_FETCH_GRAPH = {
-    checklist: true,
+    checklist: {
+      $modify: ['ordered']
+    },
     tags: true,
     list: true,
     recurrence: true
@@ -128,9 +130,6 @@ export class TasksRepo {
             author_uid: uid
           })
           .withGraphFetched(TasksRepo.DEFAULT_FETCH_GRAPH)
-          .modifyGraph('checklist', builder => {
-            builder.orderBy('created_at')
-          })
           .throwIfNotFound()
       })
     }
