@@ -34,7 +34,7 @@ $ yarn test:cov
 ## Migrations
 
 ```bash
-docker-compose exec akira-api sh
+npm run docker:sh
 
 - yarn run migrate:up
 - yarn run migrate:down
