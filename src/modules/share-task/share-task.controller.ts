@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -12,6 +13,13 @@ import {AuthGuard} from 'src/auth.guard'
 import {User} from 'src/decorators/user.decorator'
 import {ShareTaskService} from '../share-task/share-task.service'
 import {doTask} from 'src/shared/do-task'
+import {FujiPipe} from 'src/pipes/fuji.pipe'
+import {
+  SharedTaskPatchDto,
+  patchSharedTaskSchema,
+  createSharedTaskSchema,
+  CreateSharedTaskDto
+} from './shared-task.model'
 
 @UseGuards(AuthGuard)
 @Controller('/share-task')
@@ -19,16 +27,20 @@ export class ShareTaskController {
   constructor(private readonly shareTaskService: ShareTaskService) {}
 
   @Post()
-  ShareTask(@User('uid') uid: UID, @Param('id', ParseIntPipe) id: number) {
-    // TODO
+  ShareTask(
+    @User('uid') uid: UID,
+    @Body(FujiPipe.of(createSharedTaskSchema)) dto: CreateSharedTaskDto
+  ) {
+    return doTask(this.shareTaskService.Create(uid, dto))
   }
 
   @Patch(':id')
-  PatchAccessEntry(
+  Update(
     @User('uid') uid: UID,
-    @Param('id', ParseIntPipe) id: number
+    @Param('id', ParseIntPipe) id: number,
+    @Body(FujiPipe.of(patchSharedTaskSchema)) patch: SharedTaskPatchDto
   ) {
-    // TODO
+    return doTask(this.shareTaskService.Update(uid, id, patch))
   }
 
   @Delete(':id')
@@ -44,6 +56,7 @@ export class ShareTaskController {
     @User('uid') uid: UID,
     @Param('id', ParseIntPipe) id: number
   ) {
+    return doTask(this.shareTaskService.FindOneById(uid, id))
     // TODO
   }
 }
