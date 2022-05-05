@@ -5,9 +5,12 @@ import {firebase, messaging} from 'src/firebase'
 import {TasksService} from './tasks.service'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as A from 'fp-ts/lib/Array'
+import {WorkerSpec} from 'src/shared/app-worker'
+import {UserError} from 'src/filters/user-error.exception.filter'
 
 @Injectable()
-export class ScheduledTasksPushWorker {
+export class ScheduledTasksPushWorker
+  implements WorkerSpec<UserError | Error | firebase.messaging.BatchResponse> {
   constructor(private readonly tasksService: TasksService) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_8AM, {

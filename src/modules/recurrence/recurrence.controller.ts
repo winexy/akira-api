@@ -14,7 +14,6 @@ import {FujiPipe} from '../../pipes/fuji.pipe'
 import {ruleSchema, RuleSchema} from './recurrence.model'
 import {TaskId} from '../tasks/task.model'
 import {User} from 'src/decorators/user.decorator'
-import * as E from 'fp-ts/lib/Either'
 import {SuperUserGuard} from 'src/superuser.guard'
 import {RecurrenceWorker} from './recurrence.worker'
 import {doTask} from 'src/shared/do-task'
@@ -30,7 +29,7 @@ export class RecurrenceController {
   @Post('hook')
   @UseGuards(SuperUserGuard)
   Hook() {
-    return this.recurrenceWorker.syncRecurrentTasks()
+    return this.recurrenceWorker.RunTask()
   }
 
   @Post(':taskId')

@@ -8,9 +8,10 @@ import {format} from 'date-fns'
 import {tap} from 'fp-ts-std/IO'
 import {IOLogger} from 'src/shared/io-logger'
 import {startTransaction} from 'src/shared/transaction'
+import {WorkerSpec} from 'src/shared/app-worker'
 
 @Injectable()
-export class DueDateWorker {
+export class DueDateWorker implements WorkerSpec {
   private readonly logger = IOLogger.of(DueDateWorker.name)
 
   constructor(private readonly tasksService: TasksService) {}

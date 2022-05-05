@@ -10,9 +10,10 @@ import {RecurrenceService} from './recurrence.service'
 import {TasksService} from '../tasks/tasks.service'
 import {IOLogger} from 'src/shared/io-logger'
 import {startTransaction} from 'src/shared/transaction'
+import {WorkerSpec} from 'src/shared/app-worker'
 
 @Injectable()
-export class RecurrenceWorker {
+export class RecurrenceWorker implements WorkerSpec {
   private readonly logger = IOLogger.of(RecurrenceWorker.name)
 
   constructor(
@@ -24,11 +25,11 @@ export class RecurrenceWorker {
     name: 'recurrence',
     timeZone: 'Europe/Moscow'
   })
-  async worker() {
-    await this.syncRecurrentTasks()
+  async Worker() {
+    await this.RunTask()
   }
 
-  async syncRecurrentTasks() {
+  async RunTask() {
     const {trx, foldTransaction} = await startTransaction()
 
     const runTask = pipe(
