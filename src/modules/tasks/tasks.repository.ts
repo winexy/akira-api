@@ -15,7 +15,7 @@ import {
 } from './task.model'
 import {TasksTagsRepo} from './tasks-tags.repository'
 import {TaskList} from '../lists/list.model'
-import {TodoT} from '../checklist/checklist.model'
+import {TodoT, ChecklistModel} from '../checklist/checklist.model'
 import {TaskTag} from './tasks-tags.model'
 import {ScheduledTask} from '../task-scheduler/scheduled-task.model'
 import {transformRejectReason} from '../../shared/transform-reject-reason'
@@ -43,7 +43,7 @@ export class TasksRepo {
 
   static DEFAULT_FETCH_GRAPH = {
     checklist: {
-      $modify: ['ordered']
+      $modify: [ChecklistModel.modifiers.ordered.name]
     },
     tags: true,
     list: true,
