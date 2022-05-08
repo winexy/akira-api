@@ -22,7 +22,7 @@ import {
 } from './shared-task.model'
 
 @UseGuards(AuthGuard)
-@Controller('/share-task')
+@Controller('share-task')
 export class ShareTaskController {
   constructor(private readonly shareTaskService: ShareTaskService) {}
 
@@ -57,6 +57,5 @@ export class ShareTaskController {
     @Param('id', ParseIntPipe) id: number
   ) {
     return doTask(this.shareTaskService.FindOneById(uid, id))
-    // TODO
   }
 }
