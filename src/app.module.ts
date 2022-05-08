@@ -16,7 +16,7 @@ import {ReportsModule} from './modules/reports/reports.module'
 import {RecurrenceModule} from './modules/recurrence/recurrence.module'
 import {UsersModule} from './modules/users/users.module'
 import {NotesModule} from './modules/notes/notes.module'
-import {ShareTaskModule} from './modules/share-task/task-sharing.module'
+import {ShareTaskModule} from './modules/share-task/share-task.module'
 
 function readCert() {
   try {
