@@ -318,4 +318,19 @@ export class TasksRepo {
       >
     })
   }
+
+  FindSharedTasksByDate(trx?: Transaction) {
+    return (uid: UID, date: string): TE.TaskEither<UserError, Array<TaskT>> => {
+      return taskEitherQuery(() => {
+        return this.taskModel
+          .query(trx)
+          .withGraphJoined({
+            ...TasksRepo.DEFAULT_FETCH_GRAPH,
+            shared: true
+          })
+          .where('date', date)
+          .where('shared.user_id', uid)
+      })
+    }
+  }
 }

@@ -20,6 +20,7 @@ import {ListModel} from '../lists/list.model'
 import {TagModel} from '../tags/tag.model'
 import {RecurrenceModel} from '../recurrence/recurrence.model'
 import {UserModel} from '../users/users.model'
+import {SharedTaskModel} from '../share-task/shared-task.model'
 
 export type TaskT = {
   id: string
@@ -107,6 +108,14 @@ export class TaskModel extends Model implements TaskT {
         join: {
           from: 'tasks.recurrence_id',
           to: 'recurrences.id'
+        }
+      },
+      shared: {
+        relation: Model.HasOneRelation,
+        modelClass: SharedTaskModel,
+        join: {
+          from: 'tasks.id',
+          to: 'shared_tasks.task_id'
         }
       }
     }

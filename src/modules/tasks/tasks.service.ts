@@ -18,6 +18,8 @@ import {getCloneTaskPayload} from './utils/get-clone-task-payload'
 import {Recurrence} from '../recurrence/recurrence.model'
 import {getWeekRange} from './utils/get-week-range'
 import {format} from 'date-fns'
+import {concat} from 'src/shared/array-utils'
+import {DEFAULT_DATE_FORMAT} from 'src/shared/constants'
 
 @Injectable()
 export class TasksService {
@@ -143,10 +145,13 @@ export class TasksService {
 
   FindTodayTasks(trx?: Transaction) {
     return (uid: UID): TE.TaskEither<UserError, Array<TaskT>> => {
-      const DEFAULT_DATE_FORMAT = 'yyyy-MM-dd'
       const today = format(new Date(), DEFAULT_DATE_FORMAT)
 
-      return this.tasksRepo.FindUserTasksByDate(trx)(uid, today)
+      return pipe(
+        TE.of(concat<TaskT>()),
+        TE.ap(this.tasksRepo.FindUserTasksByDate(trx)(uid, today)),
+        TE.ap(this.tasksRepo.FindSharedTasksByDate(trx)(uid, today))
+      )
     }
   }
 
