@@ -22,7 +22,7 @@ import {transformRejectReason} from '../../shared/transform-reject-reason'
 import {UserError} from '../../filters/user-error.exception.filter'
 import {Recurrence} from '../recurrence/recurrence.model'
 import {formatISO} from 'date-fns'
-import {UserEntity} from '../users/users.model'
+import {isUndefined} from 'lodash'
 
 export type DefaultFetchedTaskGraph = TaskT & {
   checklist: Array<TodoT>
@@ -30,6 +30,11 @@ export type DefaultFetchedTaskGraph = TaskT & {
   list: Array<TaskList>
   schedule: ScheduledTask | null
   recurrence: Recurrence | null
+}
+
+export type UserTaskCountMeta = {
+  user_id: string
+  tasks_count: string
 }
 
 @Injectable()
@@ -292,30 +297,48 @@ export class TasksRepo {
     })
   }
 
+  CountTodaySharedTasksByUsers(
+    trx?: Transaction
+  ): TE.TaskEither<UserError, Array<UserTaskCountMeta>> {
+    /*
+    Why "raw" knex query?
+    
+    For some reason Objection model 
+    can't remove shared_tasks.id and tasks.id columns 
+    from "select" clause while withGraphJoined method called
+
+    This behavior leads to issue that we need to add id columns 
+    to group by and that breaks main reason why this query exists
+    */
+    return taskEitherQuery(() => {
+      const knexQuery = this.taskModel.knexQuery()
+
+      if (!isUndefined(trx)) {
+        knexQuery.transacting(trx)
+      }
+
+      return knexQuery
+        .select('shared_tasks.user_id')
+        .count('shared_tasks.user_id', {as: 'tasks_count'})
+        .from('shared_tasks')
+        .where('date', formatISO(new Date()))
+        .leftJoin('tasks', join => {
+          join.on('tasks.id', 'shared_tasks.task_id')
+        })
+        .groupBy('shared_tasks.user_id')
+    })
+  }
+
   CountTodayTasksByUsers(
     trx?: Transaction
-  ): TE.TaskEither<
-    UserError,
-    Array<{
-      author_uid: string
-      tasks_count: string
-      author: UserEntity
-    }>
-  > {
-    return taskEitherQuery(() => {
+  ): TE.TaskEither<UserError, Array<UserTaskCountMeta>> {
+    return taskEitherQuery(async () => {
       return (this.taskModel
         .query(trx)
-        .select('author_uid')
+        .select(this.taskModel.ref('author_uid').as('user_id'))
         .count('author_uid', {as: 'tasks_count'})
         .where('date', formatISO(new Date()))
-        .withGraphFetched('author')
-        .groupBy('author_uid') as unknown) as Promise<
-        Array<{
-          author_uid: string
-          tasks_count: string
-          author: UserEntity
-        }>
-      >
+        .groupBy('author_uid') as unknown) as Promise<Array<UserTaskCountMeta>>
     })
   }
 

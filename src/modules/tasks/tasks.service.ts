@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common'
-import {TasksRepo} from './tasks.repository'
+import {TasksRepo, UserTaskCountMeta} from './tasks.repository'
 import {
   TaskId,
   TaskPatchT,
@@ -20,6 +20,10 @@ import {getWeekRange} from './utils/get-week-range'
 import {format} from 'date-fns'
 import {concat} from 'src/shared/array-utils'
 import {DEFAULT_DATE_FORMAT} from 'src/shared/constants'
+import {
+  combineUserTaskCount,
+  TaskCountByUserId
+} from './utils/combine-user-task-count'
 
 @Injectable()
 export class TasksService {
@@ -61,11 +65,12 @@ export class TasksService {
   ToggleImportant(taskId: TaskId, uid: UID) {
     return pipe(
       this.FindOne(taskId, uid),
-      TE.chain(task => {
-        return this.tasksRepo.Update()(taskId, uid, {
-          is_important: !task.is_important
+      TE.map(task => task.is_important),
+      TE.chain(isImportant =>
+        this.tasksRepo.Update()(taskId, uid, {
+          is_important: !isImportant
         })
-      })
+      )
     )
   }
 
@@ -177,8 +182,26 @@ export class TasksService {
     return this.tasksRepo.InternalPatchTask(trx)
   }
 
-  CountTodayTasksByUsers(trx?: Transaction) {
+  CountTodayTasksByUsers(
+    trx?: Transaction
+  ): TE.TaskEither<UserError, Array<UserTaskCountMeta>> {
     return this.tasksRepo.CountTodayTasksByUsers(trx)
+  }
+
+  CountTodaySharedTasksByUsers(
+    trx?: Transaction
+  ): TE.TaskEither<UserError, Array<UserTaskCountMeta>> {
+    return this.tasksRepo.CountTodaySharedTasksByUsers(trx)
+  }
+
+  CountCombinedTodayTasks(
+    trx?: Transaction
+  ): TE.TaskEither<UserError, TaskCountByUserId> {
+    return pipe(
+      TE.of(combineUserTaskCount),
+      TE.ap(this.CountTodayTasksByUsers(trx)),
+      TE.ap(this.CountTodaySharedTasksByUsers(trx))
+    )
   }
 
   CloneTask(taskId: TaskId, uid: UID) {

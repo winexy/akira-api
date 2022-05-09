@@ -8,6 +8,7 @@ import {UserModel} from './users.model'
 @Module({
   imports: [ObjectionModule.forFeature([UserModel])],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepo]
+  providers: [UsersService, UsersRepo],
+  exports: [UsersService]
 })
 export class UsersModule {}
