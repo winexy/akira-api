@@ -18,4 +18,8 @@ export class UsersService {
   FindUser(uid: UID) {
     return this.usersRepo.FindUser(uid)
   }
+
+  FindUsersByIds() {
+    return (uids: Array<UID>) => this.usersRepo.FindUsersByIds(uids)
+  }
 }

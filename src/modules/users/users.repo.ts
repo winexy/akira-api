@@ -2,7 +2,12 @@ import {Inject} from '@nestjs/common'
 import {Injectable} from '@nestjs/common'
 import {pipe} from 'fp-ts/lib/function'
 import {taskEitherQuery} from 'src/shared/task-either-query'
-import {UserModel, SyncUserMeta, InsertableUser} from './users.model'
+import {
+  UserModel,
+  SyncUserMeta,
+  InsertableUser,
+  UserEntity
+} from './users.model'
 import * as TE from 'fp-ts/lib/TaskEither'
 import {UserError} from 'src/filters/user-error.exception.filter'
 
@@ -70,6 +75,14 @@ export class UsersRepo {
   FindUser(uid: UID) {
     return taskEitherQuery(() => {
       return this.usersModel.query().findOne('uid', uid)
+    })
+  }
+
+  FindUsersByIds(
+    uids: Array<UID>
+  ): TE.TaskEither<UserError, Array<UserEntity>> {
+    return taskEitherQuery(() => {
+      return this.usersModel.query().whereIn('uid', uids).limit(uids.length)
     })
   }
 }
