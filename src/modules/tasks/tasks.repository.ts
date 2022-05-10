@@ -273,6 +273,26 @@ export class TasksRepo {
     }
   }
 
+  FindSharedWeekTasks(trx?: Transaction) {
+    return (
+      uid: UID,
+      weekStart: string,
+      weekEnd: string
+    ): TE.TaskEither<UserError, Array<TaskT>> => {
+      return taskEitherQuery(() => {
+        return this.taskModel
+          .query(trx)
+          .withGraphJoined({
+            ...TasksRepo.DEFAULT_FETCH_GRAPH,
+            shared: true
+          })
+          .where('shared.user_id', uid)
+          .andWhere('date', '>=', weekStart)
+          .andWhere('date', '<=', weekEnd)
+      })
+    }
+  }
+
   FindByDate(trx?: Transaction) {
     return (uid: UID, date: string) => {
       return taskEitherQuery(() => {

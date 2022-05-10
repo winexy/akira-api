@@ -164,7 +164,11 @@ export class TasksService {
     return (uid: UID): TE.TaskEither<UserError, Array<TaskT>> => {
       const [start, end] = getWeekRange(new Date())
 
-      return this.tasksRepo.FindWeekTasks(trx)(uid, start, end)
+      return pipe(
+        TE.of(concat<TaskT>()),
+        TE.ap(this.tasksRepo.FindWeekTasks(trx)(uid, start, end)),
+        TE.ap(this.tasksRepo.FindSharedWeekTasks(trx)(uid, start, end))
+      )
     }
   }
 
