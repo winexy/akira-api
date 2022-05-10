@@ -42,7 +42,7 @@ export class TasksRepo {
   private readonly logger = new Logger(TasksRepo.name)
 
   constructor(
-    @Inject(TaskModel) private readonly taskModel: typeof TaskModel,
+    @Inject(TaskModel) private readonly model: typeof TaskModel,
     private readonly tasksTagsRepo: TasksTagsRepo
   ) {}
 
@@ -71,7 +71,7 @@ export class TasksRepo {
       const {task: taskInfo, meta} = taskDto
       const tagsIds = meta?.tags || []
 
-      return this.taskModel.transaction(async trx => {
+      return this.model.transaction(async trx => {
         const task = await this.InsertNewTask(trx)({
           title: taskInfo.title,
           description: taskInfo?.description,
@@ -101,12 +101,12 @@ export class TasksRepo {
 
   private InsertNewTask(trx?: Transaction) {
     return (dto: InsertNewTaskDto) => {
-      return this.taskModel.query(trx).insert(dto).returning('id')
+      return this.model.query(trx).insert(dto).returning('id')
     }
   }
 
   FindAllByUID(uid: UID, {is_today, ...params}: TasksQueryFiltersT) {
-    const query = this.taskModel
+    const query = this.model
       .query()
       .where({
         author_uid: uid,
@@ -117,8 +117,8 @@ export class TasksRepo {
 
     if (is_today) {
       query.andWhereBetween('created_at', [
-        this.taskModel.raw('CURRENT_DATE'),
-        this.taskModel.raw('CURRENT_DATE + 1')
+        this.model.raw('CURRENT_DATE'),
+        this.model.raw('CURRENT_DATE + 1')
       ])
     }
 
@@ -128,7 +128,7 @@ export class TasksRepo {
   FindOne(uid: UserRecord['uid']) {
     return (taskId: TaskT['id']) => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query()
           .findOne('id', taskId)
           .where({
@@ -141,14 +141,14 @@ export class TasksRepo {
   }
 
   Search(uid: UID, query: string) {
-    return this.taskModel
+    return this.model
       .query()
       .where('author_uid', uid)
       .andWhereRaw('LOWER("title") LIKE ?', `%${query.toLowerCase()}%`)
   }
 
   FindAllByIds(taskIds: Array<TaskId>, trx: Transaction) {
-    return this.taskModel.query(trx).whereIn('id', taskIds)
+    return this.model.query(trx).whereIn('id', taskIds)
   }
 
   Update(trx?: Transaction) {
@@ -158,7 +158,7 @@ export class TasksRepo {
       patch: Partial<TaskT>
     ): TE.TaskEither<UserError, TaskT> => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query(trx)
           .where({author_uid: uid})
           .patchAndFetchById(id, patch)
@@ -173,17 +173,13 @@ export class TasksRepo {
     uid: UserRecord['uid'],
     patch: Partial<TaskT>
   ) {
-    return this.taskModel
-      .query()
-      .findById(id)
-      .where({author_uid: uid})
-      .patch(patch)
+    return this.model.query().findById(id).where({author_uid: uid}).patch(patch)
   }
 
   InternalPatchTask(trx?: Transaction) {
     return (id: TaskT['id'], patch: Partial<TaskT>) => {
       return taskEitherQuery(() => {
-        return this.taskModel.query(trx).where('id', id).update(patch)
+        return this.model.query(trx).where('id', id).update(patch)
       })
     }
   }
@@ -194,7 +190,7 @@ export class TasksRepo {
   ): TE.TaskEither<UserError, boolean> {
     return pipe(
       taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query()
           .deleteById(taskId)
           .where({
@@ -222,7 +218,7 @@ export class TasksRepo {
   }
 
   FindByUpdatedDate(uid: UID, date: string) {
-    return this.taskModel
+    return this.model
       .query()
       .where('author_uid', uid)
       .andWhereRaw('CAST(updated_at AS DATE) = CAST(:date AS DATE)', {date})
@@ -231,7 +227,7 @@ export class TasksRepo {
   InternalFindOne(trx?: Transaction) {
     return (id: TaskId): TE.TaskEither<UserError, TaskT> => {
       return taskEitherQuery(() => {
-        return this.taskModel.query(trx).findById(id).throwIfNotFound()
+        return this.model.query(trx).findById(id).throwIfNotFound()
       })
     }
   }
@@ -239,7 +235,7 @@ export class TasksRepo {
   InsertClonedTask(trx?: Transaction) {
     return (dto: InsertClonedTaskDto) => {
       return taskEitherQuery(() => {
-        return this.taskModel.query(trx).insert(dto).returning('*')
+        return this.model.query(trx).insert(dto).returning('*')
       })
     }
   }
@@ -247,7 +243,7 @@ export class TasksRepo {
   FindUserTasksByDate(trx?: Transaction) {
     return (uid: UID, date: string): TE.TaskEither<UserError, Array<TaskT>> => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query(trx)
           .where('date', date)
           .andWhere('author_uid', uid)
@@ -263,7 +259,7 @@ export class TasksRepo {
       weekEnd: string
     ): TE.TaskEither<UserError, Array<TaskT>> => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query(trx)
           .where('author_uid', uid)
           .andWhere('date', '>=', weekStart)
@@ -280,7 +276,7 @@ export class TasksRepo {
       weekEnd: string
     ): TE.TaskEither<UserError, Array<TaskT>> => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query(trx)
           .withGraphJoined({
             ...TasksRepo.DEFAULT_FETCH_GRAPH,
@@ -296,7 +292,7 @@ export class TasksRepo {
   FindByDate(trx?: Transaction) {
     return (uid: UID, date: string) => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query(trx)
           .where('author_uid', uid)
           .andWhere('date', date)
@@ -309,7 +305,7 @@ export class TasksRepo {
     trx?: Transaction
   ): TE.TaskEither<UserError, TaskT[]> {
     return taskEitherQuery(() => {
-      return this.taskModel
+      return this.model
         .query(trx)
         .where('is_completed', false)
         .andWhereNot('due_date', null)
@@ -331,7 +327,7 @@ export class TasksRepo {
     to group by and that breaks main reason why this query exists
     */
     return taskEitherQuery(() => {
-      const knexQuery = this.taskModel.knexQuery()
+      const knexQuery = this.model.knexQuery()
 
       if (!isUndefined(trx)) {
         knexQuery.transacting(trx)
@@ -353,9 +349,9 @@ export class TasksRepo {
     trx?: Transaction
   ): TE.TaskEither<UserError, Array<UserTaskCountMeta>> {
     return taskEitherQuery(async () => {
-      return (this.taskModel
+      return (this.model
         .query(trx)
-        .select(this.taskModel.ref('author_uid').as('user_id'))
+        .select(this.model.ref('author_uid').as('user_id'))
         .count('author_uid', {as: 'tasks_count'})
         .where('date', formatISO(new Date()))
         .groupBy('author_uid') as unknown) as Promise<Array<UserTaskCountMeta>>
@@ -365,7 +361,7 @@ export class TasksRepo {
   FindSharedTasksByDate(trx?: Transaction) {
     return (uid: UID, date: string): TE.TaskEither<UserError, Array<TaskT>> => {
       return taskEitherQuery(() => {
-        return this.taskModel
+        return this.model
           .query(trx)
           .withGraphJoined({
             ...TasksRepo.DEFAULT_FETCH_GRAPH,
