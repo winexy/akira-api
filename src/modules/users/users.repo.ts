@@ -85,4 +85,10 @@ export class UsersRepo {
       return this.usersModel.query().whereIn('uid', uids).limit(uids.length)
     })
   }
+
+  FindUserByEmail(email: string): TE.TaskEither<UserError, UserEntity> {
+    return taskEitherQuery(() => {
+      return this.usersModel.query().findOne({email}).throwIfNotFound()
+    })
+  }
 }

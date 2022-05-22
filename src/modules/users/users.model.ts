@@ -10,6 +10,11 @@ export type UserEntity = {
   updated_at: string
 }
 
+export type PublicUserEntity = {
+  uid: UID
+  email: string
+}
+
 export class UserModel extends Model implements UserEntity {
   uid: string
   email: string
@@ -30,3 +35,9 @@ export const syncUserMetaSchema = f.shape({
 export type SyncUserMeta = Infer<typeof syncUserMetaSchema>
 
 export type InsertableUser = Omit<UserEntity, 'created_at' | 'updated_at'>
+
+export const findUserSchema = f.shapeRequired({
+  email: f(string(), required())
+})
+
+export type FindUserParams = Infer<typeof findUserSchema>

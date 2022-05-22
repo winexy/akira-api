@@ -1,10 +1,16 @@
-import {Body, Controller, Get, Post, UseGuards} from '@nestjs/common'
+import {Body, Controller, Get, Post, UseGuards, Query} from '@nestjs/common'
 import {AuthGuard} from 'src/auth.guard'
 import {User} from 'src/decorators/user.decorator'
 import {UsersService} from './users.service'
-import {SyncUserMeta, syncUserMetaSchema} from './users.model'
+import {
+  SyncUserMeta,
+  syncUserMetaSchema,
+  findUserSchema,
+  FindUserParams
+} from './users.model'
 import {FujiPipe} from 'src/pipes/fuji.pipe'
 import {doTask} from 'src/shared/do-task'
+import {UserEntity} from './users.model'
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -22,5 +28,10 @@ export class UsersController {
   @Get('whoami')
   whoami(@User('uid') uid: UID) {
     return doTask(this.usersService.FindUser(uid))
+  }
+
+  @Get('find')
+  FindUserByEmail(@Query(FujiPipe.of(findUserSchema)) params: FindUserParams) {
+    return doTask(this.usersService.PublicFindUserByEmail(params.email))
   }
 }
